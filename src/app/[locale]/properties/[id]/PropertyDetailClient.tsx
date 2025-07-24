@@ -367,7 +367,7 @@ const YandexMap = ({
 	)
 }
 
-const API_BASE_URL = 'https://realty-app-admin.vercel.app'
+const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
 
 function CurrencyDisplay({
 	amount,

@@ -1,7 +1,7 @@
 // services/propertyService.ts - Updated with hidden/exclusive filtering
 import { PropertyFilter } from '../types/property'
 
-const API_BASE_URL = 'https://realty-app-admin.vercel.app'
+const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
 
 export function getCurrentLanguage(): 'hy' | 'en' | 'ru' {
 	if (typeof window !== 'undefined') {
