@@ -58,8 +58,8 @@ export const translations = {
 		day: '/օր',
 
 		// Home page
-		heroTitle: 'Գտեք ձեր երազանքի անշարժ գույքը',
-		heroSubtitle: 'Բացահայտեք կատարյալ տունը մեր լայն հավաքածուից',
+		heroTitle: 'Ձեր բնակարանը մեր առաջադրանքն է',
+		heroSubtitle: 'Մի կորցրեք ձեր շանսը',
 		searchPlaceholder: 'Մուտքագրեք գույքի ID (օր. PROP-001)',
 		advancedSearch: 'Ընդլայնված որոնում',
 		hideAdvancedSearch: 'Թաքցնել ընդլայնված որոնումը',

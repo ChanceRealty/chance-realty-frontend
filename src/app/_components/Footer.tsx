@@ -56,10 +56,10 @@ const Footer = () => {
 		icon: MapPin,
 		text:
 			language === 'hy'
-				? 'Մարգարյան 43, Երևան, Հայաստան'
+				? 'Շիրվանզադե 24/30, Երևան, Հայաստան'
 				: language === 'ru'
-				? 'Маргарян 43, Ереван, Армения'
-				: 'Margaryan 43, Yerevan, Armenia',
+				? 'Шираванзаде 24/30, Ереван, Армения'
+				: 'Shirvanzade 24/30, Yerevan, Armenia',
 
 		href: '#',
 	}
@@ -81,7 +81,7 @@ const Footer = () => {
 						<div className='flex items-center mb-6'>
 							<div className='p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300'>
 								<Image
-									src={'/3.png'}
+									src={'/cclogo2.png'}
 									alt='Chance Realty Logo'
 									width={140}
 									height={140}
@@ -118,13 +118,13 @@ Chance Realty has been operating in the market for over 10 years, providing high
 								{
 									name: 'Facebook',
 									icon: Facebook,
-									href: 'https://www.facebook.com/share/1BzdM7fmJ6/?mibextid=wwXIfr',
+									href: 'https://www.facebook.com/people/Chance-Realty/61581346280211/?rdid=ZVGl47bt0OCHj89r&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F17ULRmyRVr%2F',
 									color: 'hover:bg-blue-600',
 								},
 								{
 									name: 'Instagram',
 									icon: Instagram,
-									href: 'https://www.instagram.com/chance_realty_?igsh=cGR6NW10ZW1jb2x0&utm_source=qr',
+									href: 'https://www.instagram.com/chance.realty/?igsh=bmp5NTByYzEzb200&utm_source=ig_contact_invite#',
 									color: 'hover:bg-pink-600',
 								},
 								{

@@ -94,10 +94,10 @@ const ContactClient = () => {
 		icon: MapPin,
 		text:
 			language === 'hy'
-				? 'Մարգարյան 43, Երևան, Հայաստան'
+				? 'Շիրվանզադե 24/30, Երևան, Հայաստան'
 				: language === 'ru'
-				? 'Маргарян 43, Ереван, Армения'
-				: 'Margaryan 43, Yerevan, Armenia',
+				? 'Шираванзаде 24/30, Ереван, Армения'
+				: 'Shirvanzade 24/30, Yerevan, Armenia',
 
 		href: '#',
 	}
