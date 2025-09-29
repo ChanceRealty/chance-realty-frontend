@@ -1,10 +1,9 @@
-// src/app/[locale]/page.tsx - Updated with translations
 "use client"
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import PropertyCard from '../_components/PropertyCard'
-import { Property, PropertyType } from '@/types/property'
-import { getCitiesByState, getDistrictsByState, getRecentProperties, getStates, getTranslatedField } from '@/services/propertyService'
+import { Property } from '@/types/property'
+import { getRecentProperties } from '@/services/propertyService'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
 import {
@@ -21,7 +20,6 @@ export default function HomePage() {
 	const [recentProperties, setRecentProperties] = useState<Property[]>([])
 	const [loading, setLoading] = useState(true)
 
-	// Advanced search state
 
 	useEffect(() => {
 		const fetchProperties = async () => {
@@ -39,9 +37,6 @@ export default function HomePage() {
 		}
 		fetchProperties()
 	}, [])
-
-
-
 
 		return (
 			<div className='min-h-screen'>
