@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import PropertyCard from '../_components/PropertyCard'
-import { Property, PropertyType, State, City, District } from '@/types/property'
-import { getCitiesByState, getDistrictsByState, getRecentProperties, getStates, getTranslatedCityName, getTranslatedField, getTranslatedStateName } from '@/services/propertyService'
+import { Property, PropertyType } from '@/types/property'
+import { getCitiesByState, getDistrictsByState, getRecentProperties, getStates, getTranslatedField } from '@/services/propertyService'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
 import {
-	Search,
 	Home,
 	Building2,
 	Landmark,
@@ -21,14 +20,8 @@ export default function HomePage() {
 	const { language } = useLanguage()
 	const [recentProperties, setRecentProperties] = useState<Property[]>([])
 	const [loading, setLoading] = useState(true)
-	const [customId, setCustomId] = useState('')
-	const [states, setStates] = useState<State[]>([])
-	const [cities, setCities] = useState<City[]>([])
-	const [districts, setDistricts] = useState<District[]>([])
-	const [selectedState, setSelectedState] = useState<State | null>(null)
 
 	// Advanced search state
-	const [selectedPropertyType, setSelectedPropertyType] = useState<PropertyType | ''>('')
 
 	useEffect(() => {
 		const fetchProperties = async () => {
@@ -47,105 +40,6 @@ export default function HomePage() {
 		fetchProperties()
 	}, [])
 
-	useEffect(() => {
-		// Fetch states on component mount
-		const fetchStates = async () => {
-			try {
-				const statesData = await getStates()
-				setStates(statesData || [])
-			} catch (error) {
-				console.error('Error fetching states:', error)
-			}
-		}
-		fetchStates()
-	}, [])
-
-	const fetchCities = async (stateId: number) => {
-		try {
-			const data = await getCitiesByState(stateId)
-			setCities(data || [])
-		} catch (error) {
-			console.error('Error fetching cities:', error)
-			setCities([])
-		}
-	}
-
-	const fetchDistricts = async (stateId: number) => {
-		try {
-			const data = await getDistrictsByState(stateId)
-			setDistricts(data || [])
-		} catch (error) {
-			console.error('Error fetching districts:', error)
-			setDistricts([])
-		}
-	}
-
-
-
-	const propertyTypes = [
-		{
-			type: 'house' as PropertyType,
-			icon: Home,
-			label: t.house,
-			color: 'blue',
-			gradient: 'from-blue-500 to-blue-600',
-		},
-		{
-			type: 'apartment' as PropertyType,
-			icon: Building2,
-			label: t.apartment,
-			color: 'emerald',
-			gradient: 'from-emerald-500 to-emerald-600',
-		},
-		{
-			type: 'commercial' as PropertyType,
-			icon: Landmark,
-			label: t.commercial,
-			color: 'violet',
-			gradient: 'from-violet-500 to-violet-600',
-		},
-		{
-			type: 'land' as PropertyType,
-			icon: Trees,
-			label: t.land,
-			color: 'amber',
-			gradient: 'from-amber-500 to-amber-600',
-		},
-	]
-
-
-		const getTranslatedDistrictName = (
-			district: unknown | string | Record<string, undefined>,
-			language: string
-		): string => {
-			if (!district) return ''
-	
-			// If it's already a string, return it
-			if (typeof district === 'string') return district
-	
-			// If it has the expected structure, use getTranslatedField
-			if (district && typeof district === 'object' && 'name' in district) {
-				return getTranslatedField(
-					district as Record<string, undefined>,
-					'name',
-					language as 'hy' | 'en' | 'ru'
-				)
-			}
-	
-			// Fallback to name property or empty string
-			if (
-				typeof district === 'object' &&
-				district !== null &&
-				'name' in district &&
-				typeof (district as { name?: unknown }).name === 'string'
-			) {
-				return (district as { name: string }).name
-			} else {
-				return ''
-			}
-			  
-		}
-	
 
 
 

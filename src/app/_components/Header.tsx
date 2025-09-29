@@ -213,7 +213,7 @@ const Header = () => {
 						</div>
 
 						{/* Mobile Nav Items */}
-						{navItems.map((item, index) => (
+						{navItems.map((item) => (
 							<div key={item.label} className='space-y-2'>
 								<Link
 									href={item.href}
