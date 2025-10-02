@@ -20,21 +20,44 @@ interface SEOProps {
 }
 
 const DEFAULT_SEO = {
-	title: 'Chance Realty - Find Your Dream Property in Armenia',
-	description:
-		'Discover premium real estate in Armenia. Houses, apartments, commercial properties, and land for sale or rent. Professional real estate services in Yerevan and surrounding areas.',
-	keywords: [
-		'real estate Armenia',
-		'property Armenia',
-		'houses for sale Yerevan',
-		'apartments for rent Armenia',
-		'commercial property Armenia',
-		'land for sale Armenia',
-		'Chance Realty',
-		'Armenian real estate',
-		'Yerevan property market',
-	],
-	image: '/images/og-image.jpg',
+	title: {
+		hy: 'Chance Realty - Գտեք ձեր իդեալական գույքը Հայաստանում',
+		en: 'Chance Realty - Find Your Dream Property in Armenia',
+		ru: 'Chance Realty - Найдите свою недвижимость в Армении',
+	},
+	description: {
+		hy: 'Բացահայտեք պրեմիում անշարժ գույք Հայաստանում. Տներ, բնակարաններ, առևտրային տարածքներ և հողատարածքներ վաճառքի կամ վարձակալության համար։',
+		en: 'Discover premium real estate in Armenia. Houses, apartments, commercial properties, and land for sale or rent.',
+		ru: 'Откройте премиальную недвижимость в Армении. Дома, квартиры, коммерческая недвижимость и участки на продажу или аренду.',
+	},
+	keywords: {
+		hy: [
+			'անշարժ գույք Հայաստան',
+			'տուն վաճառք Երևան',
+			'բնակարան վարձակալություն',
+			'առևտրային տարածք Հայաստան',
+			'հող վաճառք',
+			'Chance Realty',
+		],
+		en: [
+			'real estate Armenia',
+			'property Armenia',
+			'houses for sale Yerevan',
+			'apartments for rent Armenia',
+			'commercial property Armenia',
+			'land for sale Armenia',
+			'Chance Realty',
+		],
+		ru: [
+			'недвижимость Армения',
+			'дома на продажу Ереван',
+			'квартиры в аренду',
+			'коммерческая недвижимость Армения',
+			'земля на продажу',
+			'Chance Realty',
+		],
+	},
+	image: '/images/og-image.png', // оптимизированное OG изображение
 	type: 'website' as const,
 	url: 'https://chancerealty.am',
 }
@@ -56,15 +79,19 @@ export default function SEOHead({
 }: SEOProps) {
 	const pathname = usePathname()
 
-	const seo = {
-		title: title ? `${title} | Chance Realty` : DEFAULT_SEO.title,
-		description: description || DEFAULT_SEO.description,
-		keywords: [...DEFAULT_SEO.keywords, ...keywords],
-		image: image || DEFAULT_SEO.image,
-		url: url || `${DEFAULT_SEO.url}${pathname}`,
-		type,
-		canonical: canonical || `${DEFAULT_SEO.url}${pathname}`,
-	}
+	// Определяем язык по пути
+	const lang = pathname.startsWith('/hy')
+		? 'hy'
+		: pathname.startsWith('/ru')
+		? 'ru'
+		: 'en'
+
+	const seoTitle = title || DEFAULT_SEO.title[lang]
+	const seoDescription = description || DEFAULT_SEO.description[lang]
+	const seoKeywords = [...DEFAULT_SEO.keywords[lang], ...keywords]
+	const seoImage = image || DEFAULT_SEO.image
+	const seoUrl = url || `${DEFAULT_SEO.url}${pathname}`
+	const seoCanonical = canonical || `${DEFAULT_SEO.url}${pathname}`
 
 	const robotsContent = [
 		noindex ? 'noindex' : 'index',
@@ -74,31 +101,35 @@ export default function SEOHead({
 	return (
 		<Head>
 			{/* Basic Meta Tags */}
-			<title>{seo.title}</title>
-			<meta name='description' content={seo.description} />
-			<meta name='keywords' content={seo.keywords.join(', ')} />
+			<title>{seoTitle}</title>
+			<meta name='description' content={seoDescription} />
+			<meta name='keywords' content={seoKeywords.join(', ')} />
 			<meta name='robots' content={robotsContent} />
 			<meta name='viewport' content='width=device-width, initial-scale=1' />
 			<meta name='theme-color' content='#2563eb' />
 
 			{/* Canonical URL */}
-			<link rel='canonical' href={seo.canonical} />
+			<link rel='canonical' href={seoCanonical} />
 
 			{/* Open Graph */}
-			<meta property='og:type' content={seo.type} />
-			<meta property='og:title' content={seo.title} />
-			<meta property='og:description' content={seo.description} />
-			<meta property='og:image' content={seo.image} />
-			<meta property='og:url' content={seo.url} />
+			<meta property='og:type' content={type} />
+			<meta property='og:title' content={seoTitle} />
+			<meta property='og:description' content={seoDescription} />
+			<meta property='og:image' content={seoImage} />
+			<meta property='og:image:width' content='1200' />
+			<meta property='og:image:height' content='630' />
+			<meta property='og:url' content={seoUrl} />
 			<meta property='og:site_name' content='Chance Realty' />
-			<meta property='og:locale' content='en_US' />
-			<meta property='og:locale:alternate' content='hy_AM' />
+			<meta
+				property='og:locale'
+				content={lang === 'hy' ? 'hy_AM' : lang === 'ru' ? 'ru_RU' : 'en_US'}
+			/>
 
 			{/* Twitter Card */}
 			<meta name='twitter:card' content='summary_large_image' />
-			<meta name='twitter:title' content={seo.title} />
-			<meta name='twitter:description' content={seo.description} />
-			<meta name='twitter:image' content={seo.image} />
+			<meta name='twitter:title' content={seoTitle} />
+			<meta name='twitter:description' content={seoDescription} />
+			<meta name='twitter:image' content={seoImage} />
 			<meta name='twitter:site' content='@ChanceRealty' />
 
 			{/* Additional Meta Tags */}
@@ -114,9 +145,7 @@ export default function SEOHead({
 			{structuredData && (
 				<script
 					type='application/ld+json'
-					dangerouslySetInnerHTML={{
-						__html: JSON.stringify(structuredData),
-					}}
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
 				/>
 			)}
 
@@ -153,12 +182,17 @@ export default function SEOHead({
 			<link
 				rel='alternate'
 				hrefLang='en'
-				href={`https://chancerealty.am${pathname}`}
+				href={`https://chancerealty.am/en${pathname}`}
 			/>
 			<link
 				rel='alternate'
 				hrefLang='hy'
-				href={`https://chancerealty.am/hy${pathname}`}
+				href={`https://chancerealty.am${pathname}`}
+			/>
+			<link
+				rel='alternate'
+				hrefLang='ru'
+				href={`https://chancerealty.am/ru${pathname}`}
 			/>
 			<link
 				rel='alternate'

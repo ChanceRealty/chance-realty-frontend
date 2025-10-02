@@ -79,12 +79,13 @@ const Footer = () => {
 					{/* Company Info */}
 					<div className='space-y-6'>
 						<div className='flex items-center mb-6'>
-							<div className='p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300'>
+							<div className='p-3 bg-white rounded-2xl shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300 w-52 h-52'>
 								<Image
 									src={'/cclogo2.png'}
 									alt='Chance Realty Logo'
-									width={140}
-									height={140}
+									className='w-full h-full object-contain'
+									width={200}
+									height={200}
 								/>
 							</div>
 						</div>
