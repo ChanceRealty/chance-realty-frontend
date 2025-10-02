@@ -1,83 +1,15 @@
 User-agent: *
 Allow: /
-
-# Disallow admin and API routes
 Disallow: /admin/
 Disallow: /api/
 Disallow: /private/
 Disallow: /temp/
-Disallow: /*?*utm_*
-Disallow: /*?*fbclid*
-Disallow: /*?*gclid*
-
-# Special rules for search engines
-User-agent: Googlebot
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /private/
-Disallow: /temp/
-
-User-agent: Bingbot
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /private/
-Disallow: /temp/
+Disallow: /*?utm_
+Disallow: /*?fbclid
+Disallow: /*?gclid
 
 # Sitemap location
 Sitemap: https://chancerealty.am/sitemap.xml
 
-# Host declaration
+# Host declaration (для Яндекса, Google игнорирует)
 Host: https://chancerealty.am
-
-# Crawl delay (optional)
-Crawl-delay: 1
-
-// public/site.webmanifest
-{
-  "name": "Chance Realty - Armenia Real Estate",
-  "short_name": "Chance Realty",
-  "description": "Find your dream property in Armenia. Houses, apartments, commercial properties, and land for sale or rent.",
-  "icons": [
-    {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    }
-  ],
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "en",
-  "categories": ["business", "finance", "shopping"],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop-home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Home page on desktop"
-    },
-    {
-      "src": "/screenshots/mobile-properties.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Properties page on mobile"
-    }
-  ]
-}
