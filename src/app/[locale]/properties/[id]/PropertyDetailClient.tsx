@@ -56,6 +56,7 @@ import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
 import React from 'react'
 import ymaps from 'yandex-maps'
+import ContactPopup from '@/app/_components/ContactPopup'
 
 interface PropertyDetailClientProps {
 	property: Property
@@ -522,6 +523,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 	const [showFullGallery, setShowFullGallery] = useState(false)
 	const [showMapPopup, setShowMapPopup] = useState(false)
 	const [showShareOptions, setShowShareOptions] = useState(false)
+	const [showContactPopup, setShowContactPopup] = useState(false)
 
 	const getImageUrl = useCallback((path: string) => {
 		if (path?.startsWith('http')) return path
@@ -564,7 +566,6 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 
 	const copyLinkToClipboard = useCallback(() => {
 		navigator.clipboard.writeText(window.location.href)
-		alert(getLinkCopiedText(language))
 		setShowShareOptions(false)
 	}, [language])
 
@@ -1236,7 +1237,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 							{t.backToListings}
 						</Link>
 						<div className='flex items-center space-x-3'>
-							<button
+							<span
 								onClick={() => setShowShareOptions(!showShareOptions)}
 								className='p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors relative'
 								aria-label='Share property'
@@ -1264,7 +1265,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 										</div>
 									</div>
 								)}
-							</button>
+							</span>
 						</div>
 					</div>
 				</div>
@@ -1670,7 +1671,10 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 
 									{/* Contact Button for Mobile */}
 									<div className='mt-6'>
-										<button className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center'>
+										<button
+											onClick={() => setShowContactPopup(true)}
+											className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center'
+										>
 											<Phone className='w-5 h-5 mr-2' />
 											{t.contactAgent}
 										</button>
@@ -1883,13 +1887,13 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 
 								{/* Contact Buttons */}
 								<div className='space-y-3 mb-6'>
-									<a
-										href='tel:+37441194646'
+									<button
+										onClick={() => setShowContactPopup(true)}
 										className='w-full block text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center'
 									>
 										<Phone className='w-5 h-5 mr-2' />
 										{t.contactAgent}
-									</a>
+									</button>
 								</div>
 
 								{/* Property Stats */}
@@ -2071,6 +2075,11 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 					</div>
 				</div>
 			)}
+			<ContactPopup
+				isOpen={showContactPopup}
+				onClose={() => setShowContactPopup(false)}
+				language={language}
+			/>
 		</div>
 	)
 }

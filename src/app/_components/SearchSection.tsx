@@ -728,7 +728,8 @@ export default function CompactSearchHeader() {
 	return (
 		<>
 			{/* Compact Header Search */}
-			<div className='flex items-center gap-2'>
+			<div className='flex items-center gap-2'
+			>
 				<form onSubmit={handleSimpleSearch} className='flex items-center gap-2'>
 					<div className='relative'>
 						<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -759,7 +760,9 @@ export default function CompactSearchHeader() {
 
 			{/* Advanced Search Modal */}
 			{showAdvancedModal && (
-				<div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200'>
+				<div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200'
+				onClick={() => setShowAdvancedModal(false)}
+				>
 					<div className='bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200'>
 						{/* Modal Header */}
 						<div className='flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50'>
