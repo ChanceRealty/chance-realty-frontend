@@ -1143,16 +1143,6 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 		}
 	}
 
-	const getLinkCopiedText = (language: string) => {
-		switch (language) {
-			case 'hy':
-				return 'Հղումը պատճենվել է!'
-			case 'ru':
-				return 'Ссылка скопирована!'
-			default:
-				return 'Link copied to clipboard!'
-		}
-	}
 
 	const getListingTypeColor = (listingType: string) => {
 		return listingTypeColors[listingType] || listingTypeColors.default
