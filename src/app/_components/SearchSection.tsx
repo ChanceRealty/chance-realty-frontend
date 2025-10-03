@@ -30,7 +30,6 @@ import {
 	Square,
 	ChevronDown,
 	X,
-	SlidersHorizontal,
 	Sparkles,
 } from 'lucide-react'
 
