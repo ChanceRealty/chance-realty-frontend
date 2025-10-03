@@ -1,7 +1,7 @@
-// PropertyCard.tsx - Fixed hooks order
+// PropertyCard.tsx - Fixed arrow navigation
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -22,7 +22,7 @@ import {
 	ChevronRight,
 	AlertCircle,
 	Pause,
-	Crown, // Add Crown icon for exclusive
+	Crown,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -59,7 +59,7 @@ export default function PropertyCard({
 	const t = useTranslations()
 	const { language } = useLanguage()
 
-	// ALL HOOKS MUST BE DECLARED FIRST - before any conditional logic
+	// ALL HOOKS MUST BE DECLARED FIRST
 	const [currentImageIndex, setCurrentImageIndex] = useState(0)
 	const [isHovering, setIsHovering] = useState(false)
 	const [isDragging, setIsDragging] = useState(false)
@@ -70,6 +70,62 @@ export default function PropertyCard({
 	const [thumbnailError, setThumbnailError] = useState(false)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const videoRef = useRef<HTMLVideoElement>(null)
+
+	// Manual navigation functions - wrapped in useCallback
+	const nextImage = useCallback(() => {
+		if (property.images && property.images.length > 1) {
+			setCurrentImageIndex(prev => (prev + 1) % property.images!.length)
+		}
+	}, [property.images])
+
+	const prevImage = useCallback(() => {
+		if (property.images && property.images.length > 1) {
+			setCurrentImageIndex(prev =>
+				prev === 0 ? property.images!.length - 1 : prev - 1
+			)
+		}
+	}, [property.images])
+
+	// Touch/Mouse handlers - wrapped in useCallback
+	const handleStart = useCallback(
+		(clientX: number) => {
+			if (!property.images || property.images.length <= 1) return
+			setIsDragging(true)
+			setStartX(clientX)
+			setCurrentX(clientX)
+		},
+		[property.images]
+	)
+
+	const handleMove = useCallback(
+		(clientX: number) => {
+			setCurrentX(clientX)
+			setTranslateX(prevTranslateX => {
+				if (!isDragging || !property.images || property.images.length <= 1)
+					return prevTranslateX
+				return clientX - startX
+			})
+		},
+		[isDragging, property.images, startX]
+	)
+
+	const handleEnd = useCallback(() => {
+		if (!isDragging || !property.images || property.images.length <= 1) return
+
+		setIsDragging(false)
+		const deltaX = currentX - startX
+		const threshold = 50
+
+		if (Math.abs(deltaX) > threshold) {
+			if (deltaX > 0) {
+				prevImage()
+			} else {
+				nextImage()
+			}
+		}
+
+		setTranslateX(0)
+	}, [isDragging, property.images, currentX, startX, prevImage, nextImage])
 
 	// Add global mouse events when dragging
 	useEffect(() => {
@@ -85,9 +141,9 @@ export default function PropertyCard({
 				document.removeEventListener('mouseup', handleGlobalMouseUp)
 			}
 		}
-	}, [isDragging, startX, currentX])
+	}, [isDragging, handleMove, handleEnd])
 
-	// NOW we can do conditional rendering - after all hooks are declared
+	// Check if property is hidden
 	if (property.is_hidden) {
 		return null
 	}
@@ -157,55 +213,6 @@ export default function PropertyCard({
 			},
 		}
 		return statuses[statusStr as keyof typeof statuses] || statuses.active
-	}
-
-	// Manual navigation functions
-	const nextImage = () => {
-		if (property.images && property.images.length > 1) {
-			setCurrentImageIndex(prev => (prev + 1) % property.images!.length)
-		}
-	}
-
-	const prevImage = () => {
-		if (property.images && property.images.length > 1) {
-			setCurrentImageIndex(prev =>
-				prev === 0 ? property.images!.length - 1 : prev - 1
-			)
-		}
-	}
-
-	// Touch/Mouse handlers for drag functionality
-	const handleStart = (clientX: number) => {
-		if (!property.images || property.images.length <= 1) return
-		setIsDragging(true)
-		setStartX(clientX)
-		setCurrentX(clientX)
-	}
-
-	const handleMove = (clientX: number) => {
-		if (!isDragging || !property.images || property.images.length <= 1) return
-
-		const deltaX = clientX - startX
-		setCurrentX(clientX)
-		setTranslateX(deltaX)
-	}
-
-	const handleEnd = () => {
-		if (!isDragging || !property.images || property.images.length <= 1) return
-
-		setIsDragging(false)
-		const deltaX = currentX - startX
-		const threshold = 50
-
-		if (Math.abs(deltaX) > threshold) {
-			if (deltaX > 0) {
-				prevImage()
-			} else {
-				nextImage()
-			}
-		}
-
-		setTranslateX(0)
 	}
 
 	// Mouse events
@@ -399,7 +406,7 @@ export default function PropertyCard({
 		}
 	}
 
-	// Get property attributes display - Fixed version
+	// Get property attributes display
 	const renderPropertyAttributes = () => {
 		const attributeClass = variant === 'compact' ? 'text-xs' : 'text-sm'
 
@@ -545,8 +552,65 @@ export default function PropertyCard({
 		return null
 	}
 
+	// Handle arrow button clicks - use onMouseDown to catch before Link
+	const handlePrevClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		e.nativeEvent.stopImmediatePropagation()
+		if (property.images && property.images.length > 1) {
+			setCurrentImageIndex(prev =>
+				prev === 0 ? property.images!.length - 1 : prev - 1
+			)
+		}
+		return false
+	}
+
+	const handleNextClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		e.nativeEvent.stopImmediatePropagation()
+		if (property.images && property.images.length > 1) {
+			setCurrentImageIndex(prev => (prev + 1) % property.images!.length)
+		}
+		return false
+	}
+
+	// Handle indicator clicks
+	const handleIndicatorClick = (e: React.MouseEvent, index: number) => {
+		e.preventDefault()
+		e.stopPropagation()
+		e.nativeEvent.stopImmediatePropagation()
+		setCurrentImageIndex(index)
+		return false
+	}
+
+	// Handle favorite click
+	const handleFavoriteClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		e.nativeEvent.stopImmediatePropagation()
+		if (onFavoriteClick) {
+			onFavoriteClick(property.id)
+		}
+		return false
+	}
+
+	// Handle link click - prevent navigation if clicking on buttons
+	const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+		const target = e.target as HTMLElement
+		if (target.closest('button') || isDragging) {
+			e.preventDefault()
+			e.stopPropagation()
+			return false
+		}
+	}
+
 	return (
-		<Link href={`/${language}/properties/${property.custom_id}`} target='_blank'>
+		<Link
+			href={`/${language}/properties/${property.custom_id}`}
+			target='_blank'
+			onClick={handleLinkClick}
+		>
 			<div className='group bg-white rounded-xl shadow-lg hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-500 transform hover:-translate-y-2'>
 				{/* Image Section with Touch/Drag Slider */}
 				<div
@@ -578,48 +642,42 @@ export default function PropertyCard({
 								)}
 							</div>
 
-							{/* Desktop Navigation Controls */}
+							{/* Desktop Navigation Controls - FIXED */}
 							{property.images.length > 1 && isHovering && !isDragging && (
 								<>
 									<button
-										onClick={e => {
-											e.preventDefault()
-											e.stopPropagation()
-											prevImage()
-										}}
-										className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10'
+										onMouseDown={handlePrevClick}
+										className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
+										aria-label='Previous image'
+										type='button'
 									>
-										<ChevronLeft className='w-4 h-4' />
+										<ChevronLeft className='w-5 h-5' />
 									</button>
 									<button
-										onClick={e => {
-											e.preventDefault()
-											e.stopPropagation()
-											nextImage()
-										}}
-										className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10'
+										onMouseDown={handleNextClick}
+										className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
+										aria-label='Next image'
+										type='button'
 									>
-										<ChevronRight className='w-4 h-4' />
+										<ChevronRight className='w-5 h-5' />
 									</button>
 								</>
 							)}
 
 							{/* Image Indicators */}
 							{property.images.length > 1 && (
-								<div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2'>
+								<div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[90]'>
 									{property.images.map((_, index) => (
 										<button
 											key={index}
-											onClick={e => {
-												e.preventDefault()
-												e.stopPropagation()
-												setCurrentImageIndex(index)
-											}}
+											onMouseDown={e => handleIndicatorClick(e, index)}
 											className={`w-2 h-2 rounded-full transition-all duration-300 ${
 												index === currentImageIndex
 													? 'bg-white scale-125'
 													: 'bg-white/50 hover:bg-white/80'
 											}`}
+											aria-label={`Go to image ${index + 1}`}
+											type='button'
 										/>
 									))}
 								</div>
@@ -627,14 +685,14 @@ export default function PropertyCard({
 
 							{/* Media Count Badge */}
 							{property.images.length > 1 && (
-								<div className='absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm'>
+								<div className='absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm z-10'>
 									{currentImageIndex + 1}/{property.images.length}
 								</div>
 							)}
 
 							{/* Drag Indicator for Mobile */}
 							{property.images.length > 1 && (
-								<div className='absolute bottom-1 left-1/2 transform -translate-x-1/2 md:hidden'>
+								<div className='absolute bottom-10 left-1/2 transform -translate-x-1/2 md:hidden z-10'>
 									<div className='bg-black/50 text-white px-2 py-1 rounded text-xs'>
 										← Swipe →
 									</div>
@@ -651,8 +709,8 @@ export default function PropertyCard({
 					)}
 
 					{/* Enhanced Badges */}
-					<div className='absolute top-3 left-3 flex flex-col gap-2'>
-						{/* Exclusive Badge - RED COLOR */}
+					<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
+						{/* Exclusive Badge */}
 						{property.is_exclusive && (
 							<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
 								<Crown className='w-3 h-3' />
@@ -673,7 +731,7 @@ export default function PropertyCard({
 							{getListingTypeLabel(property.listing_type)}
 						</span>
 
-						{/* Status Badge with Icon */}
+						{/* Status Badge */}
 						<span
 							className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1 ${statusInfo.color}`}
 						>
@@ -683,19 +741,17 @@ export default function PropertyCard({
 					</div>
 
 					{/* Action Buttons */}
-					<div className='absolute top-3 right-3'>
+					<div className='absolute top-3 right-3 z-10'>
 						{onFavoriteClick && (
 							<button
-								onClick={e => {
-									e.preventDefault()
-									e.stopPropagation()
-									onFavoriteClick(property.id)
-								}}
+								onClick={handleFavoriteClick}
 								className={`p-2 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 transform hover:scale-110 ${
 									isFavorited
 										? 'bg-red-500 text-white'
 										: 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
 								}`}
+								aria-label='Add to favorites'
+								type='button'
 							>
 								<Heart
 									className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`}

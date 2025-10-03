@@ -524,7 +524,9 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 	const [showMapPopup, setShowMapPopup] = useState(false)
 	const [showShareOptions, setShowShareOptions] = useState(false)
 	const [showContactPopup, setShowContactPopup] = useState(false)
-
+	const [galleryIndex, setGalleryIndex] = useState(0)
+	const [touchStart, setTouchStart] = useState(0)
+	const [touchEnd, setTouchEnd] = useState(0)
 	const getImageUrl = useCallback((path: string) => {
 		if (path?.startsWith('http')) return path
 		return `${API_BASE_URL}${path}`
@@ -747,6 +749,43 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 		}
 		return labels[key]?.[language] || key
 	}
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		setTouchStart(e.targetTouches[0].clientX)
+	}
+
+	const handleTouchMove = (e: React.TouchEvent) => {
+		setTouchEnd(e.targetTouches[0].clientX)
+	}
+
+	const handleTouchEnd = () => {
+		if (!touchStart || !touchEnd) return
+
+		const distance = touchStart - touchEnd
+		const isLeftSwipe = distance > 50
+		const isRightSwipe = distance < -50
+
+		if (isLeftSwipe && galleryIndex < property.images!.length - 1) {
+			setGalleryIndex(prev => prev + 1)
+		}
+		if (isRightSwipe && galleryIndex > 0) {
+			setGalleryIndex(prev => prev - 1)
+		}
+
+		setTouchStart(0)
+		setTouchEnd(0)
+	}
+
+	const nextGalleryImage = () => {
+		setGalleryIndex(prev =>
+			prev < property.images!.length - 1 ? prev + 1 : prev
+		)
+	}
+
+	const prevGalleryImage = () => {
+		setGalleryIndex(prev => (prev > 0 ? prev - 1 : 0))
+	}
+
 
 	// Click handler for images to open gallery
 	const handleImageClick = useCallback(() => {
@@ -1315,7 +1354,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 														)}
 														alt={property.title}
 														fill
-														className='object-cover transition-all duration-700 group-hover:scale-110'
+														className='object-cover transition-all duration-700'
 														priority
 													/>
 													{/* Tap to view indicator for mobile */}
@@ -1427,32 +1466,6 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												<span className='mx-1 opacity-70'>/</span>
 												<span>{property.images.length}</span>
 											</div>
-
-											{/* Enhanced View all button */}
-											{property.images.length > 1 && (
-												<button
-													onClick={e => {
-														e.stopPropagation()
-														setShowFullGallery(true)
-													}}
-													className='absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg hover:bg-white transition-all duration-200 flex items-center space-x-2'
-												>
-													<svg
-														className='w-4 h-4'
-														fill='none'
-														stroke='currentColor'
-														viewBox='0 0 24 24'
-													>
-														<path
-															strokeLinecap='round'
-															strokeLinejoin='round'
-															strokeWidth={2}
-															d='M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z'
-														/>
-													</svg>
-													<span>View all media</span>
-												</button>
-											)}
 
 											{/* Mobile swipe indicator */}
 											{property.images.length > 1 && (
@@ -1964,103 +1977,151 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 
 			{/* Enhanced Full Gallery Modal with better mobile support */}
 			{showFullGallery && property.images && (
-				<div className='fixed inset-0 bg-black z-50 overflow-y-auto'>
-					{/* Enhanced header */}
-					<div className='flex items-center justify-between p-4 bg-black/90 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-800'>
+				<div className='fixed inset-0 bg-black/95 z-50 flex flex-col'>
+					<div className='flex items-center justify-between p-4 backdrop-blur-sm border-b border-white/10'>
 						<div className='flex items-center space-x-3'>
-							<h3 className='text-xl font-medium text-white'>All Media</h3>
-							<span className='bg-white/20 text-white px-2 py-1 rounded-full text-sm'>
-								{property.images.length} items
+							<span className='bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium'>
+								{galleryIndex + 1} / {property.images.length}
 							</span>
 						</div>
+						<div className='absolute left-1/2 -translate-x-1/2 text-white text-lg md:block hidden'>
+							{property.title}
+						</div>
 						<button
-							onClick={() => setShowFullGallery(false)}
+							onClick={() => {
+								setShowFullGallery(false)
+								setGalleryIndex(0)
+							}}
 							className='text-white hover:text-gray-300 p-2 rounded-full hover:bg-white/10 transition-colors'
 							aria-label='Close gallery'
 						>
 							<X className='w-6 h-6' />
 						</button>
 					</div>
-
-					{/* Enhanced media grid */}
-					<div className='max-w-6xl mx-auto p-4 space-y-6'>
-						{property.images.map((media, index) => (
-							<div
-								key={media.id}
-								className='bg-gray-900 rounded-2xl overflow-hidden shadow-2xl'
-							>
-								{/* Media counter */}
-								<div className='bg-gray-800 px-4 py-2 flex items-center justify-between'>
-									<span className='text-white text-sm font-medium'>
-										{index + 1} of {property.images.length}
-									</span>
-									{media.type === 'video' && (
-										<span className='bg-red-500 text-white px-2 py-1 rounded text-xs font-bold'>
-											VIDEO
+					<div
+						className='flex-1 relative overflow-hidden'
+						onTouchStart={handleTouchStart}
+						onTouchMove={handleTouchMove}
+						onTouchEnd={handleTouchEnd}
+					>
+						{/* Current media display */}
+						<div className='absolute inset-0 flex items-center justify-center p-4'>
+							{property.images[galleryIndex].type === 'image' ? (
+								<div className='relative w-full h-full max-w-6xl'>
+									<Image
+										src={getImageUrl(property.images[galleryIndex].url)}
+										alt={`${property.title} - ${galleryIndex + 1}`}
+										fill
+										className='object-contain'
+										priority
+									/>
+								</div>
+							) : property.images[galleryIndex].type === 'video' ? (
+								<div className='w-full h-full max-w-6xl flex items-center justify-center'>
+									<video
+										src={getImageUrl(property.images[galleryIndex].url)}
+										controls
+										className='max-w-full max-h-full object-contain rounded-lg'
+										poster={
+											property.images[galleryIndex].thumbnail_url
+												? getImageUrl(
+														property.images[galleryIndex].thumbnail_url!
+												  )
+												: undefined
+										}
+										preload='metadata'
+									>
+										Your browser does not support the video tag.
+									</video>
+								</div>
+							) : (
+								<div className='flex items-center justify-center'>
+									<div className='text-center'>
+										<FileText className='w-16 h-16 text-gray-400 mx-auto mb-2' />
+										<span className='text-gray-400'>
+											Unsupported media type
 										</span>
-									)}
-								</div>
-
-								<div className='relative'>
-									{media.type === 'image' ? (
-										<div className='relative h-[60vh] md:h-[70vh]'>
-											<Image
-												src={getImageUrl(media.url)}
-												alt={`${property.title} - ${index + 1}`}
-												fill
-												className='object-contain'
-												priority={index === 0}
-											/>
-										</div>
-									) : media.type === 'video' ? (
-										<div className='relative h-[60vh] md:h-[70vh] flex items-center justify-center p-4'>
-											<video
-												src={getImageUrl(media.url)}
-												controls
-												className='max-w-full max-h-full object-contain rounded-lg'
-												poster={
-													media.thumbnail_url
-														? getImageUrl(media.thumbnail_url)
-														: undefined
-												}
-												preload='metadata'
-											>
-												Your browser does not support the video tag.
-											</video>
-										</div>
-									) : (
-										<div className='h-[60vh] bg-gray-300 flex items-center justify-center'>
-											<div className='text-center'>
-												<FileText className='w-16 h-16 text-gray-500 mx-auto mb-2' />
-												<span className='text-gray-500'>
-													Unsupported media type
-												</span>
-											</div>
-										</div>
-									)}
-								</div>
-
-								{/* Media caption */}
-								{media.caption && (
-									<div className='bg-gray-800 p-4 border-t border-gray-700'>
-										<p className='text-white text-sm leading-relaxed'>
-											{media.caption}
-										</p>
 									</div>
-								)}
-							</div>
-						))}
+								</div>
+							)}
+						</div>
+
+						{/* Navigation arrows */}
+						{galleryIndex > 0 && (
+							<button
+								onClick={prevGalleryImage}
+								className='absolute left-4 top-1/2 -translate-y-1/2 p-3 md:p-4 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-2xl transition-all z-20 backdrop-blur-sm'
+								aria-label='Previous image'
+							>
+								<ChevronLeft className='w-6 h-6 md:w-8 md:h-8' />
+							</button>
+						)}
+
+						{galleryIndex < property.images.length - 1 && (
+							<button
+								onClick={nextGalleryImage}
+								className='absolute right-4 top-1/2 -translate-y-1/2 p-3 md:p-4 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-2xl transition-all z-20 backdrop-blur-sm'
+								aria-label='Next image'
+							>
+								<ChevronRight className='w-6 h-6 md:w-8 md:h-8' />
+							</button>
+						)}
+
+						{/* Swipe indicator for mobile */}
+						<div className='absolute bottom-4 left-1/2 -translate-x-1/2 md:hidden bg-black/60 text-white px-4 py-2 rounded-full text-xs backdrop-blur-sm'>
+							← Swipe to navigate →
+						</div>
 					</div>
 
-					{/* Bottom navigation for mobile */}
-					<div className='md:hidden fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm p-4 border-t border-gray-800'>
-						<div className='flex items-center justify-center space-x-4'>
-							<button
-								onClick={() => setShowFullGallery(false)}
-								className='bg-white/20 text-white px-6 py-3 rounded-full font-medium hover:bg-white/30 transition-colors'
-							>
-								Close Gallery
-							</button>
+					{/* Caption */}
+					{property.images[galleryIndex].caption && (
+						<div className='bg-black/80 backdrop-blur-sm p-4 border-t border-white/10'>
+							<p className='text-white text-sm leading-relaxed max-w-4xl mx-auto'>
+								{property.images[galleryIndex].caption}
+							</p>
+						</div>
+					)}
+					{/* Thumbnail strip */}
+					<div className='backdrop-blur-sm border-t border-white/10 p-4'>
+						<div className='max-w-6xl mx-auto overflow-x-auto'>
+							<div className='flex gap-2 pb-2 justify-center'>
+								{property.images.map((media, index) => (
+									<button
+										key={media.id}
+										onClick={() => setGalleryIndex(index)}
+										className={`relative w-20 h-16 flex-shrink-0 rounded-lg overflow-hidden transition-all ${
+											galleryIndex === index
+												? 'ring-2 ring-blue-500 scale-105'
+												: 'opacity-60 hover:opacity-100'
+										}`}
+									>
+										{media.type === 'image' ? (
+											<Image
+												src={getImageUrl(media.url)}
+												alt={`Thumbnail ${index + 1}`}
+												fill
+												className='object-cover'
+											/>
+										) : media.type === 'video' ? (
+											<div className='w-full h-full bg-gray-800 flex items-center justify-center relative'>
+												<Play className='w-4 h-4 text-white absolute z-10' />
+												{media.thumbnail_url && (
+													<Image
+														src={getImageUrl(media.thumbnail_url)}
+														alt={`Video thumbnail ${index + 1}`}
+														fill
+														className='object-cover opacity-70'
+													/>
+												)}
+											</div>
+										) : (
+											<div className='w-full h-full bg-gray-700 flex items-center justify-center'>
+												<FileText className='w-4 h-4 text-white' />
+											</div>
+										)}
+									</button>
+								))}
+							</div>
 						</div>
 					</div>
 				</div>

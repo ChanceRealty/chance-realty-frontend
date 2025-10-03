@@ -60,7 +60,7 @@ export const translations = {
 		// Home page
 		heroTitle: 'Ձեր բնակարանը մեր առաջադրանքն է',
 		heroSubtitle: 'Մի կորցրեք ձեր շանսը',
-		searchPlaceholder: 'Մուտքագրեք գույքի ID (օր. PROP-001)',
+		searchPlaceholder: 'Մուտքագրեք գույքի ID',
 		advancedSearch: 'Ընդլայնված որոնում',
 		hideAdvancedSearch: 'Թաքցնել ընդլայնված որոնումը',
 		showAdvancedSearch: 'Ցույց տալ ընդլայնված որոնումը',
@@ -427,7 +427,7 @@ export const translations = {
 		// Home page
 		heroTitle: 'Find Your Dream Property',
 		heroSubtitle: 'Discover the perfect home from our extensive collection',
-		searchPlaceholder: 'Enter Property ID (e.g., PROP-001)',
+		searchPlaceholder: 'Enter Property ID',
 		advancedSearch: 'Advanced Search',
 		hideAdvancedSearch: 'Hide Advanced Search',
 		showAdvancedSearch: 'Show Advanced Search',
@@ -777,7 +777,7 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		// Home page
 		heroTitle: 'Найдите недвижимость вашей мечты',
 		heroSubtitle: 'Откройте для себя идеальный дом из нашей обширной коллекции',
-		searchPlaceholder: 'Введите ID недвижимости (например, PROP-001)',
+		searchPlaceholder: 'Введите ID недвижимости',
 		advancedSearch: 'Расширенный поиск',
 		hideAdvancedSearch: 'Скрыть расширенный поиск',
 		showAdvancedSearch: 'Показать расширенный поиск',

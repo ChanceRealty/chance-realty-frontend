@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
 	PropertyType,
 	ListingType,
@@ -31,6 +31,7 @@ import {
 	ChevronDown,
 	X,
 	SlidersHorizontal,
+	Sparkles,
 } from 'lucide-react'
 
 export default function CompactSearchHeader() {
@@ -42,6 +43,8 @@ export default function CompactSearchHeader() {
 	const [cities, setCities] = useState<City[]>([])
 	const [districts, setDistricts] = useState<District[]>([])
 	const [selectedState, setSelectedState] = useState<State | null>(null)
+
+	const modalRef = useRef<HTMLDivElement>(null)
 
 	const [selectedPropertyType, setSelectedPropertyType] = useState<
 		PropertyType | ''
@@ -100,13 +103,23 @@ export default function CompactSearchHeader() {
 	}, [advancedSearch.state_id, states])
 
 	useEffect(() => {
-		if (showAdvancedModal) {
-			document.body.style.overflow = 'hidden'
-		} else {
-			document.body.style.overflow = 'unset'
+		if (!showAdvancedModal) return
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				modalRef.current &&
+				!modalRef.current.contains(event.target as Node)
+			) {
+				setShowAdvancedModal(false)
+			}
 		}
+
+		document.body.style.overflow = 'hidden'
+		document.addEventListener('mousedown', handleClickOutside)
+
 		return () => {
 			document.body.style.overflow = 'unset'
+			document.removeEventListener('mousedown', handleClickOutside)
 		}
 	}, [showAdvancedModal])
 
@@ -281,55 +294,54 @@ export default function CompactSearchHeader() {
 			case 'house':
 				return (
 					<>
-						<div className='col-span-2 grid grid-cols-2 gap-4'>
-							<div className='relative group'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('bedrooms')}
-								</label>
-								<div className='relative'>
-									<Bed className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
-									<input
-										type='number'
-										placeholder={t.any}
-										value={advancedSearch.bedrooms}
-										onChange={e =>
-											setAdvancedSearch({
-												...advancedSearch,
-												bedrooms: e.target.value,
-											})
-										}
-										className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
-									/>
-								</div>
-							</div>
-
-							<div className='relative group'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('bathrooms')}
-								</label>
-								<div className='relative'>
-									<Bath className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
-									<input
-										type='number'
-										placeholder={t.any}
-										value={advancedSearch.bathrooms}
-										onChange={e =>
-											setAdvancedSearch({
-												...advancedSearch,
-												bathrooms: e.target.value,
-											})
-										}
-										className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
-									/>
-								</div>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('bedrooms')}
+							</label>
+							<div className='relative'>
+								<Bed className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.bedrooms}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											bedrooms: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								/>
 							</div>
 						</div>
 
-						<div className='col-span-2 grid grid-cols-2 gap-4'>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('bathrooms')}
+							</label>
 							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('floors')}
-								</label>
+								<Bath className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.bathrooms}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											bathrooms: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								/>
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('floors')}
+							</label>
+							<div className='relative'>
+								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -340,14 +352,18 @@ export default function CompactSearchHeader() {
 											floors: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='1'
 								/>
 							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('lot_size_sqft')}
+							</label>
 							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('lot_size_sqft')}
-								</label>
+								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -358,230 +374,18 @@ export default function CompactSearchHeader() {
 											lot_size_sqft: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='0'
 								/>
 							</div>
 						</div>
 
-						<div className='relative'>
-							<label className='block text-sm font-semibold text-gray-700 mb-3'>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 								{getAttributeLabel('ceiling_height')}
 							</label>
-							<input
-								type='number'
-								placeholder={t.any}
-								value={advancedSearch.ceiling_height}
-								onChange={e =>
-									setAdvancedSearch({
-										...advancedSearch,
-										ceiling_height: e.target.value,
-									})
-								}
-								className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-								min='2'
-								max='6'
-								step='0.1'
-							/>
-						</div>
-					</>
-				)
-
-			case 'apartment':
-				return (
-					<>
-						<div className='col-span-2 grid grid-cols-2 gap-4'>
-							<div className='relative group'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('bedrooms')}
-								</label>
-								<div className='relative'>
-									<Bed className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
-									<input
-										type='number'
-										placeholder={t.any}
-										value={advancedSearch.bedrooms}
-										onChange={e =>
-											setAdvancedSearch({
-												...advancedSearch,
-												bedrooms: e.target.value,
-											})
-										}
-										className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
-									/>
-								</div>
-							</div>
-
-							<div className='relative group'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('bathrooms')}
-								</label>
-								<div className='relative'>
-									<Bath className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
-									<input
-										type='number'
-										placeholder={t.any}
-										value={advancedSearch.bathrooms}
-										onChange={e =>
-											setAdvancedSearch({
-												...advancedSearch,
-												bathrooms: e.target.value,
-											})
-										}
-										className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
-									/>
-								</div>
-							</div>
-						</div>
-
-						<div className='col-span-2 grid grid-cols-2 gap-4'>
 							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('floor')}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={advancedSearch.floor}
-									onChange={e =>
-										setAdvancedSearch({
-											...advancedSearch,
-											floor: e.target.value,
-										})
-									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-									min='1'
-								/>
-							</div>
-							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('total_floors')}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={advancedSearch.total_floors}
-									onChange={e =>
-										setAdvancedSearch({
-											...advancedSearch,
-											total_floors: e.target.value,
-										})
-									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-									min='1'
-								/>
-							</div>
-						</div>
-
-						<div className='relative'>
-							<label className='block text-sm font-semibold text-gray-700 mb-3'>
-								{getAttributeLabel('ceiling_height')}
-							</label>
-							<input
-								type='number'
-								placeholder={t.any}
-								value={advancedSearch.ceiling_height}
-								onChange={e =>
-									setAdvancedSearch({
-										...advancedSearch,
-										ceiling_height: e.target.value,
-									})
-								}
-								className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-								min='2'
-								max='6'
-								step='0.1'
-							/>
-						</div>
-					</>
-				)
-
-			case 'commercial':
-				return (
-					<>
-						<div className='relative'>
-							<label className='block text-sm font-semibold text-gray-700 mb-3'>
-								{getAttributeLabel('business_type')}
-							</label>
-							<select
-								value={advancedSearch.business_type}
-								onChange={e =>
-									setAdvancedSearch({
-										...advancedSearch,
-										business_type: e.target.value,
-									})
-								}
-								className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white'
-							>
-								<option value=''>{t.any}</option>
-								<option value='office'>
-									{language === 'hy'
-										? 'Գրասենյակ'
-										: language === 'ru'
-										? 'Офис'
-										: 'Office'}
-								</option>
-								<option value='retail'>
-									{language === 'hy'
-										? 'Խանութ'
-										: language === 'ru'
-										? 'Магазин'
-										: 'Retail'}
-								</option>
-								<option value='restaurant'>
-									{language === 'hy'
-										? 'Ռեստորան'
-										: language === 'ru'
-										? 'Ресторан'
-										: 'Restaurant'}
-								</option>
-								<option value='warehouse'>
-									{language === 'hy'
-										? 'Պահեստ'
-										: language === 'ru'
-										? 'Склад'
-										: 'Warehouse'}
-								</option>
-								<option value='factory'>
-									{language === 'hy'
-										? 'Գործարան'
-										: language === 'ru'
-										? 'Завод'
-										: 'Factory'}
-								</option>
-								<option value='hotel'>
-									{language === 'hy'
-										? 'Հյուրանոց'
-										: language === 'ru'
-										? 'Отель'
-										: 'Hotel'}
-								</option>
-							</select>
-						</div>
-
-						<div className='col-span-2 grid grid-cols-2 gap-4'>
-							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('floors')}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={advancedSearch.floors}
-									onChange={e =>
-										setAdvancedSearch({
-											...advancedSearch,
-											floors: e.target.value,
-										})
-									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-									min='1'
-								/>
-							</div>
-							<div className='relative'>
-								<label className='block text-sm font-semibold text-gray-700 mb-3'>
-									{getAttributeLabel('ceiling_height')}
-								</label>
+								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -592,10 +396,191 @@ export default function CompactSearchHeader() {
 											ceiling_height: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-									min='2'
-									max='10'
-									step='0.1'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
+								/>
+							</div>
+						</div>
+					</>
+				)
+
+			case 'apartment':
+				return (
+					<>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('bedrooms')}
+							</label>
+							<div className='relative'>
+								<Bed className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.bedrooms}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											bedrooms: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								/>
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('bathrooms')}
+							</label>
+							<div className='relative'>
+								<Bath className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.bathrooms}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											bathrooms: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								/>
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('floor')}
+							</label>
+							<div className='relative'>
+								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.floor}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											floor: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='1'
+								/>
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('total_floors')}
+							</label>
+							<div className='relative'>
+								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.total_floors}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											total_floors: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='1'
+								/>
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('ceiling_height')}
+							</label>
+							<div className='relative'>
+								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.ceiling_height}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											ceiling_height: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
+								/>
+							</div>
+						</div>
+					</>
+				)
+
+			case 'commercial':
+				return (
+					<>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('business_type')}
+							</label>
+							<div className='relative'>
+								<Landmark className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+								<select
+									value={advancedSearch.business_type}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											business_type: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
+								>
+									<option value=''>{t.any}</option>
+									<option value='office'>
+										{language === 'hy'
+											? 'Գրասենյակ'
+											: language === 'ru'
+											? 'Офис'
+											: 'Office'}
+									</option>
+									<option value='retail'>
+										{language === 'hy'
+											? 'Խանութ'
+											: language === 'ru'
+											? 'Магазин'
+											: 'Retail'}
+									</option>
+									<option value='restaurant'>
+										{language === 'hy'
+											? 'Ռեստորան'
+											: language === 'ru'
+											? 'Ресторан'
+											: 'Restaurant'}
+									</option>
+								</select>
+								<ChevronDown className='absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' />
+							</div>
+						</div>
+
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('ceiling_height')}
+							</label>
+							<div className='relative'>
+								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.ceiling_height}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											ceiling_height: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
 								/>
 							</div>
 						</div>
@@ -604,11 +589,12 @@ export default function CompactSearchHeader() {
 
 			case 'land':
 				return (
-					<>
+					<div className='relative group'>
+						<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+							{getAttributeLabel('area_acres')}
+						</label>
 						<div className='relative'>
-							<label className='block text-sm font-semibold text-gray-700 mb-3'>
-								{getAttributeLabel('area_acres')}
-							</label>
+							<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
 							<input
 								type='number'
 								placeholder={t.any}
@@ -619,80 +605,11 @@ export default function CompactSearchHeader() {
 										area_acres: e.target.value,
 									})
 								}
-								className='w-full text-gray-600 px-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
+								className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 								min='0'
 							/>
 						</div>
-
-						<div className='col-span-2'>
-							<label className='block text-sm font-semibold text-gray-700 mb-3'>
-								{language === 'hy'
-									? 'Արագ ընտրություն'
-									: language === 'ru'
-									? 'Быстрый выбор'
-									: 'Quick Selection'}
-							</label>
-							<div className='grid grid-cols-2 gap-2'>
-								{[
-									{
-										label:
-											language === 'hy'
-												? 'Մինչև 1000 քմ'
-												: language === 'ru'
-												? 'До 1000 кв.м'
-												: 'Under 1000 sq m',
-										min: 0,
-										max: 1000,
-									},
-									{
-										label:
-											language === 'hy'
-												? '1000-5000 քմ'
-												: language === 'ru'
-												? '1000-5000 кв.м'
-												: '1000-5000 sq m',
-										min: 1000,
-										max: 5000,
-									},
-									{
-										label:
-											language === 'hy'
-												? '5000-10000 քմ'
-												: language === 'ru'
-												? '5000-10000 кв.м'
-												: '5000-10000 sq m',
-										min: 5000,
-										max: 10000,
-									},
-									{
-										label:
-											language === 'hy'
-												? 'Ավելի քան 10000 քմ'
-												: language === 'ru'
-												? 'Свыше 10000 кв.м'
-												: 'Over 10000 sq m',
-										min: 10000,
-										max: undefined,
-									},
-								].map((range, index) => (
-									<button
-										key={index}
-										type='button'
-										onClick={() => {
-											setAdvancedSearch(prev => ({
-												...prev,
-												min_area: range.min.toString(),
-												max_area: range.max?.toString() || '',
-											}))
-										}}
-										className='px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-green-100 hover:text-green-700 rounded-lg transition-colors'
-									>
-										{range.label}
-									</button>
-								))}
-							</div>
-						</div>
-					</>
+					</div>
 				)
 
 			default:
@@ -728,22 +645,20 @@ export default function CompactSearchHeader() {
 	return (
 		<>
 			{/* Compact Header Search */}
-			<div className='flex items-center gap-2'
-			>
+			<div className='flex items-center gap-2'>
 				<form onSubmit={handleSimpleSearch} className='flex items-center gap-2'>
 					<div className='relative'>
-						<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
 						<input
 							type='text'
 							placeholder={t.searchPlaceholder}
 							value={customId}
 							onChange={e => setCustomId(e.target.value)}
-							className='w-48 pl-9 pr-3 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200'
+							className='w-24 sm:w-42 pl-2 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200'
 						/>
 					</div>
 					<button
 						type='submit'
-						className='bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg px-4 py-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-medium'
+						className='bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg px-3 sm:px-4 py-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-medium'
 					>
 						<Search className='w-4 h-4' />
 					</button>
@@ -751,46 +666,46 @@ export default function CompactSearchHeader() {
 
 				<button
 					onClick={() => setShowAdvancedModal(true)}
-					className='flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 text-sm font-medium'
+					className='flex items-center gap-2 px-2 sm:px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-gray-700 rounded-lg transition-all duration-200 text-sm font-medium border border-purple-200 hover:border-purple-300'
 				>
-					<SlidersHorizontal className='w-4 h-4' />
+					<Sparkles className='w-4 h-4 text-purple-600' />
 					<span className='hidden sm:inline'>{t.advancedSearch}</span>
 				</button>
 			</div>
 
 			{/* Advanced Search Modal */}
 			{showAdvancedModal && (
-				<div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200'
-				onClick={() => setShowAdvancedModal(false)}
-				>
-					<div className='bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200'>
+				<div className='fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200'>
+					<div
+						ref={modalRef}
+						className='bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200'
+					>
 						{/* Modal Header */}
-						<div className='flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50'>
-							<div className='flex items-center gap-3'>
-								<div className='p-2 bg-blue-500 rounded-lg'>
-									<SlidersHorizontal className='w-6 h-6 text-white' />
+						<div className='flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-purple-50 to-indigo-50'>
+							<div className='flex items-center gap-2 sm:gap-3'>
+								<div className='p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg'>
+									<Sparkles className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
 								</div>
 								<div>
-									<h2 className='text-2xl font-bold text-gray-900'>
+									<h2 className='text-xl sm:text-2xl font-bold text-gray-900'>
 										{t.advancedSearch}
 									</h2>
-									<p className='text-sm text-gray-600'>{t.refineSearch}</p>
 								</div>
 							</div>
 							<button
 								onClick={() => setShowAdvancedModal(false)}
 								className='p-2 hover:bg-white rounded-lg transition-colors'
 							>
-								<X className='w-6 h-6 text-gray-500' />
+								<X className='w-5 h-5 sm:w-6 sm:h-6 text-gray-500' />
 							</button>
 						</div>
 
 						{/* Modal Content */}
-						<div className='overflow-y-auto max-h-[calc(90vh-80px)] p-6'>
+						<div className='overflow-y-auto max-h-[calc(95vh-80px)] sm:max-h-[calc(90vh-80px)] p-4 sm:p-6'>
 							{/* Property Type Selection */}
-							<div className='mb-8'>
-								<div className='flex items-center justify-between mb-6'>
-									<label className='text-lg font-semibold text-gray-800'>
+							<div className='mb-6 sm:mb-8'>
+								<div className='flex items-center justify-between mb-4 sm:mb-6'>
+									<label className='text-base sm:text-lg font-semibold text-gray-800'>
 										{t.selectPropertyType}
 									</label>
 									{(selectedPropertyType ||
@@ -799,14 +714,16 @@ export default function CompactSearchHeader() {
 										advancedSearch.max_price) && (
 										<button
 											onClick={clearAdvancedSearch}
-											className='inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium'
+											className='inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-xs sm:text-sm font-medium'
 										>
-											<X className='w-4 h-4 mr-1' />
-											Clear All
+											<X className='w-3 h-3 sm:w-4 sm:h-4 mr-1' />
+											<span className='hidden sm:inline cursor-pointer'>
+												{t.clearAll}
+											</span>
 										</button>
 									)}
 								</div>
-								<div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+								<div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4'>
 									{propertyTypes.map(
 										({ type, icon: Icon, label, color, gradient }) => (
 											<button
@@ -817,21 +734,21 @@ export default function CompactSearchHeader() {
 														selectedPropertyType === type ? '' : type
 													)
 												}
-												className={`group relative p-6 rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${
+												className={`group cursor-pointer relative p-4 sm:p-6 rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${
 													selectedPropertyType === type
 														? `border-${color}-300 bg-gradient-to-br ${gradient} text-white shadow-xl scale-105`
 														: 'border-gray-200 hover:border-gray-300 hover:shadow-md bg-white'
 												}`}
 											>
 												<div
-													className={`w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 transition-all duration-300 ${
+													className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4 transition-all duration-300 ${
 														selectedPropertyType === type
 															? 'bg-white/20 backdrop-blur-sm'
 															: `bg-${color}-100 group-hover:bg-${color}-200`
 													}`}
 												>
 													<Icon
-														className={`w-7 h-7 transition-all duration-300 ${
+														className={`w-5 h-5 sm:w-7 sm:h-7 transition-all duration-300 ${
 															selectedPropertyType === type
 																? 'text-white'
 																: `text-${color}-600`
@@ -839,7 +756,7 @@ export default function CompactSearchHeader() {
 													/>
 												</div>
 												<span
-													className={`text-sm font-semibold block transition-colors ${
+													className={`text-xs sm:text-sm font-semibold block transition-colors ${
 														selectedPropertyType === type
 															? 'text-white'
 															: 'text-gray-700'
@@ -854,15 +771,15 @@ export default function CompactSearchHeader() {
 							</div>
 
 							<form onSubmit={handleAdvancedSearch}>
-								<div className='bg-gray-50 rounded-xl p-6 mb-6'>
-									<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+								<div className='bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6'>
+									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
 										{/* Listing Type */}
 										<div className='relative group'>
-											<label className='block text-sm font-semibold text-gray-700 mb-3'>
+											<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 												{t.listingType}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 												<select
 													value={advancedSearch.listing_type}
 													onChange={e =>
@@ -871,24 +788,24 @@ export default function CompactSearchHeader() {
 															listing_type: e.target.value as ListingType | '',
 														})
 													}
-													className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
 												>
 													<option value=''>{t.anyType}</option>
 													<option value='sale'>{t.forSale}</option>
 													<option value='rent'>{t.forRent}</option>
 													<option value='daily_rent'>{t.forDailyRent}</option>
 												</select>
-												<ChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+												<ChevronDown className='absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' />
 											</div>
 										</div>
 
 										{/* Location - State */}
 										<div className='relative group'>
-											<label className='block text-sm font-semibold text-gray-700 mb-3'>
+											<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 												{t.location}
 											</label>
 											<div className='relative'>
-												<MapPin className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+												<MapPin className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 												<select
 													value={advancedSearch.state_id || ''}
 													onChange={e => {
@@ -902,7 +819,7 @@ export default function CompactSearchHeader() {
 															district_id: undefined,
 														})
 													}}
-													className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
 												>
 													<option value=''>{t.allStates}</option>
 													{states.map(state => (
@@ -911,18 +828,18 @@ export default function CompactSearchHeader() {
 														</option>
 													))}
 												</select>
-												<ChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+												<ChevronDown className='absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' />
 											</div>
 										</div>
 
 										{/* District Selection */}
 										{selectedState?.uses_districts && (
 											<div className='relative group'>
-												<label className='block text-sm font-semibold text-gray-700 mb-3'>
+												<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 													{t.district}
 												</label>
 												<div className='relative'>
-													<Building2 className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+													<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 													<select
 														value={advancedSearch.district_id || ''}
 														onChange={e =>
@@ -933,7 +850,7 @@ export default function CompactSearchHeader() {
 																	: undefined,
 															})
 														}
-														className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer disabled:bg-gray-50'
+														className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer disabled:bg-gray-50'
 														disabled={!advancedSearch.state_id}
 													>
 														<option value=''>{t.allDistricts}</option>
@@ -943,7 +860,7 @@ export default function CompactSearchHeader() {
 															</option>
 														))}
 													</select>
-													<ChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+													<ChevronDown className='absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' />
 												</div>
 											</div>
 										)}
@@ -951,11 +868,11 @@ export default function CompactSearchHeader() {
 										{/* City Selection */}
 										{selectedState && !selectedState.uses_districts && (
 											<div className='relative group'>
-												<label className='block text-sm font-semibold text-gray-700 mb-3'>
+												<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 													{t.city}
 												</label>
 												<div className='relative'>
-													<Building2 className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+													<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 													<select
 														value={advancedSearch.city_id || ''}
 														onChange={e =>
@@ -966,7 +883,7 @@ export default function CompactSearchHeader() {
 																	: undefined,
 															})
 														}
-														className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer disabled:bg-gray-50'
+														className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer disabled:bg-gray-50'
 														disabled={!advancedSearch.state_id}
 													>
 														<option value=''>{t.allCities}</option>
@@ -976,18 +893,18 @@ export default function CompactSearchHeader() {
 															</option>
 														))}
 													</select>
-													<ChevronDown className='absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' />
+													<ChevronDown className='absolute right-3 md:right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 pointer-events-none' />
 												</div>
 											</div>
 										)}
 
 										{/* Min Price */}
 										<div className='relative group'>
-											<label className='block text-sm font-semibold text-gray-700 mb-3'>
+											<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 												{t.minPrice}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
 												<input
 													type='number'
 													placeholder='0'
@@ -998,18 +915,18 @@ export default function CompactSearchHeader() {
 															min_price: e.target.value,
 														})
 													}
-													className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 												/>
 											</div>
 										</div>
 
 										{/* Max Price */}
 										<div className='relative group'>
-											<label className='block text-sm font-semibold text-gray-700 mb-3'>
+											<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 												{t.maxPrice}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors' />
+												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-red-500 transition-colors' />
 												<input
 													type='number'
 													placeholder={t.noLimit}
@@ -1020,7 +937,7 @@ export default function CompactSearchHeader() {
 															max_price: e.target.value,
 														})
 													}
-													className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 												/>
 											</div>
 										</div>
@@ -1033,11 +950,11 @@ export default function CompactSearchHeader() {
 											<>
 												{/* Min Area */}
 												<div className='relative group'>
-													<label className='block text-sm font-semibold text-gray-700 mb-3'>
+													<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 														{t.minArea}
 													</label>
 													<div className='relative'>
-														<Square className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+														<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
 														<input
 															type='number'
 															placeholder='0'
@@ -1048,18 +965,18 @@ export default function CompactSearchHeader() {
 																	min_area: e.target.value,
 																})
 															}
-															className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 														/>
 													</div>
 												</div>
 
 												{/* Max Area */}
 												<div className='relative group'>
-													<label className='block text-sm font-semibold text-gray-700 mb-3'>
+													<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
 														{t.maxArea}
 													</label>
 													<div className='relative'>
-														<Square className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+														<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
 														<input
 															type='number'
 															placeholder={t.noLimit}
@@ -1070,7 +987,7 @@ export default function CompactSearchHeader() {
 																	max_area: e.target.value,
 																})
 															}
-															className='w-full text-gray-600 pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 														/>
 													</div>
 												</div>
@@ -1082,20 +999,23 @@ export default function CompactSearchHeader() {
 									</div>
 								</div>
 
-								<div className='flex gap-3'>
+								<div className='flex flex-col sm:flex-row gap-3'>
 									<button
 										type='submit'
-										className='flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-8 py-4 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5'
+										className='flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl px-6 sm:px-8 py-3 sm:py-4 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center font-semibold shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5'
 									>
-										<Search className='w-5 h-5 mr-2' />
-										{t.search} {t.properties}
+										<Search className='w-4 h-4 sm:w-5 sm:h-5 mr-2' />
+										<span className='text-sm sm:text-base'>
+											{t.search} {t.properties}
+										</span>
 									</button>
 									<button
 										type='button'
 										onClick={clearAdvancedSearch}
-										className='px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 flex items-center justify-center font-semibold border-2 border-gray-200 hover:border-gray-300'
+										className='sm:w-auto px-4 sm:px-6 py-3 sm:py-4 bg-gray-100 text-gray-700 rounded-xl cursor-pointer hover:bg-gray-200 transition-all duration-200 flex items-center justify-center font-semibold border-2 border-gray-200 hover:border-gray-300'
 									>
-										<X className='w-5 h-5' />
+										<X className='w-4 h-4 sm:w-5 sm:h-5 sm:mr-0' />
+										<span className='ml-2 sm:hidden'>Clear</span>
 									</button>
 								</div>
 							</form>
