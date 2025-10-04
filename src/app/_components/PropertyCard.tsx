@@ -23,6 +23,7 @@ import {
 	AlertCircle,
 	Pause,
 	Crown,
+	Layers3,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -440,7 +441,7 @@ export default function PropertyCard({
 							)}
 							{houseAttrs.floors && (
 								<div className='flex items-center'>
-									<Building2 className='w-4 h-4 mr-1 text-blue-500' />
+									<Layers3 className='w-4 h-4 mr-1 text-blue-500' />
 									<span>
 										{houseAttrs.floors} {t.floors || 'floors'}
 									</span>

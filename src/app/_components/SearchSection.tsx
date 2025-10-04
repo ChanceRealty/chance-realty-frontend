@@ -27,11 +27,14 @@ import {
 	DollarSign,
 	Bed,
 	Bath,
-	Square,
 	ChevronDown,
 	X,
-	Sparkles,
+	SlidersHorizontal,
+	Layers3,
+	Maximize,
+	KeyRound,
 } from 'lucide-react'
+import { RxHeight } from 'react-icons/rx'
 
 export default function CompactSearchHeader() {
 	const t = useTranslations()
@@ -101,10 +104,16 @@ export default function CompactSearchHeader() {
 		}
 	}, [advancedSearch.state_id, states])
 
+
+
 	useEffect(() => {
 		if (!showAdvancedModal) return
 
 		const handleClickOutside = (event: MouseEvent) => {
+			if (advancedButtonRef.current?.contains(event.target as Node)) {
+				return
+			}
+
 			if (
 				modalRef.current &&
 				!modalRef.current.contains(event.target as Node)
@@ -113,10 +122,14 @@ export default function CompactSearchHeader() {
 			}
 		}
 
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('mousedown', handleClickOutside)
+		}, 100)
+
 		document.body.style.overflow = 'hidden'
-		document.addEventListener('mousedown', handleClickOutside)
 
 		return () => {
+			clearTimeout(timeoutId)
 			document.body.style.overflow = 'unset'
 			document.removeEventListener('mousedown', handleClickOutside)
 		}
@@ -155,9 +168,9 @@ export default function CompactSearchHeader() {
 			bathrooms: { hy: 'Լոգարաններ', ru: 'Ванные', en: 'Bathrooms' },
 			area_sqft: { hy: 'Մակերես', ru: 'Площадь', en: 'Area' },
 			lot_size_sqft: {
-				hy: 'Հողատարածքի չափ',
-				ru: 'Размер участка',
-				en: 'Lot Size',
+				hy: 'Հողատարածքի մակերես (մ²)',
+				ru: 'Размер участка (м²)',
+				en: 'Lot Size (m²)',
 			},
 			floors: { hy: 'Հարկեր', ru: 'Этажи', en: 'Floors' },
 			floor: { hy: 'Հարկ', ru: 'Этаж', en: 'Floor' },
@@ -177,9 +190,9 @@ export default function CompactSearchHeader() {
 				en: 'Business Type',
 			},
 			area_acres: {
-				hy: 'Մակերես (մետրեր)',
-				ru: 'Площадь (метры)',
-				en: 'Area (meters)',
+				hy: 'Մակերես (մ²)',
+				ru: 'Площадь (м²)',
+				en: 'Area (m²)',
 			},
 		}
 		return labels[key]?.[language] || key
@@ -232,6 +245,9 @@ export default function CompactSearchHeader() {
 		window.location.href = `/${language}/properties?${params.toString()}`
 	}
 
+		const advancedButtonRef = useRef<HTMLButtonElement>(null)
+
+
 	const clearAdvancedSearch = () => {
 		setSelectedPropertyType('')
 		setAdvancedSearch({
@@ -264,6 +280,10 @@ export default function CompactSearchHeader() {
 			label: t.house,
 			color: 'blue',
 			gradient: 'from-blue-500 to-blue-600',
+			bgColor: 'bg-blue-100',
+			hoverBgColor: 'group-hover:bg-blue-200',
+			textColor: 'text-blue-600',
+			borderColor: 'border-blue-400',
 		},
 		{
 			type: 'apartment' as PropertyType,
@@ -271,6 +291,10 @@ export default function CompactSearchHeader() {
 			label: t.apartment,
 			color: 'emerald',
 			gradient: 'from-emerald-500 to-emerald-600',
+			bgColor: 'bg-emerald-100',
+			hoverBgColor: 'group-hover:bg-emerald-200',
+			textColor: 'text-emerald-600',
+			borderColor: 'border-emerald-400',
 		},
 		{
 			type: 'commercial' as PropertyType,
@@ -278,6 +302,10 @@ export default function CompactSearchHeader() {
 			label: t.commercial,
 			color: 'violet',
 			gradient: 'from-violet-500 to-violet-600',
+			bgColor: 'bg-violet-100',
+			hoverBgColor: 'group-hover:bg-violet-200',
+			textColor: 'text-violet-600',
+			borderColor: 'border-violet-400',
 		},
 		{
 			type: 'land' as PropertyType,
@@ -285,6 +313,10 @@ export default function CompactSearchHeader() {
 			label: t.land,
 			color: 'amber',
 			gradient: 'from-amber-500 to-amber-600',
+			bgColor: 'bg-amber-100',
+			hoverBgColor: 'group-hover:bg-amber-200',
+			textColor: 'text-amber-600',
+			borderColor: 'border-amber-400',
 		},
 	]
 
@@ -340,7 +372,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('floors')}
 							</label>
 							<div className='relative'>
-								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+								<Layers3 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -351,7 +383,7 @@ export default function CompactSearchHeader() {
 											floors: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='1'
 								/>
 							</div>
@@ -362,7 +394,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('lot_size_sqft')}
 							</label>
 							<div className='relative'>
-								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -373,7 +405,7 @@ export default function CompactSearchHeader() {
 											lot_size_sqft: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='0'
 								/>
 							</div>
@@ -384,7 +416,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('ceiling_height')}
 							</label>
 							<div className='relative'>
-								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<RxHeight className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -395,7 +427,7 @@ export default function CompactSearchHeader() {
 											ceiling_height: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='0'
 								/>
 							</div>
@@ -453,7 +485,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('floor')}
 							</label>
 							<div className='relative'>
-								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<Layers3 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -475,7 +507,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('total_floors')}
 							</label>
 							<div className='relative'>
-								<Building2 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+								<Layers3 className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -486,7 +518,7 @@ export default function CompactSearchHeader() {
 											total_floors: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='1'
 								/>
 							</div>
@@ -497,7 +529,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('ceiling_height')}
 							</label>
 							<div className='relative'>
-								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<RxHeight className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -508,7 +540,7 @@ export default function CompactSearchHeader() {
 											ceiling_height: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='0'
 								/>
 							</div>
@@ -524,7 +556,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('business_type')}
 							</label>
 							<div className='relative'>
-								<Landmark className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+								<Landmark className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<select
 									value={advancedSearch.business_type}
 									onChange={e =>
@@ -533,7 +565,7 @@ export default function CompactSearchHeader() {
 											business_type: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-8 md:pr-10 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none cursor-pointer'
 								>
 									<option value=''>{t.any}</option>
 									<option value='office'>
@@ -567,7 +599,7 @@ export default function CompactSearchHeader() {
 								{getAttributeLabel('ceiling_height')}
 							</label>
 							<div className='relative'>
-								<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+								<RxHeight className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
@@ -578,7 +610,7 @@ export default function CompactSearchHeader() {
 											ceiling_height: e.target.value,
 										})
 									}
-									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									min='0'
 								/>
 							</div>
@@ -593,7 +625,7 @@ export default function CompactSearchHeader() {
 							{getAttributeLabel('area_acres')}
 						</label>
 						<div className='relative'>
-							<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+							<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 							<input
 								type='number'
 								placeholder={t.any}
@@ -604,7 +636,7 @@ export default function CompactSearchHeader() {
 										area_acres: e.target.value,
 									})
 								}
-								className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 								min='0'
 							/>
 						</div>
@@ -652,7 +684,7 @@ export default function CompactSearchHeader() {
 							placeholder={t.searchPlaceholder}
 							value={customId}
 							onChange={e => setCustomId(e.target.value)}
-							className='w-24 sm:w-42 pl-2 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200'
+							className='w-32 sm:w-48 pl-2 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200'
 						/>
 					</div>
 					<button
@@ -664,11 +696,11 @@ export default function CompactSearchHeader() {
 				</form>
 
 				<button
+					ref={advancedButtonRef}
 					onClick={() => setShowAdvancedModal(true)}
-					className='flex items-center gap-2 px-2 sm:px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-gray-700 rounded-lg transition-all duration-200 text-sm font-medium border border-purple-200 hover:border-purple-300'
+					className='flex items-center gap-2 px-3 sm:px-3 py-2 text-gray-700 rounded-lg transition-all duration-200 text-sm font-medium'
 				>
-					<Sparkles className='w-4 h-4 text-purple-600' />
-					<span className='hidden sm:inline'>{t.advancedSearch}</span>
+					<SlidersHorizontal width={20} height={20} />
 				</button>
 			</div>
 
@@ -683,7 +715,7 @@ export default function CompactSearchHeader() {
 						<div className='flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 via-purple-50 to-indigo-50'>
 							<div className='flex items-center gap-2 sm:gap-3'>
 								<div className='p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg'>
-									<Sparkles className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
+									<SlidersHorizontal className='w-5 h-5 sm:w-6 sm:h-6 text-white' />
 								</div>
 								<div>
 									<h2 className='text-xl sm:text-2xl font-bold text-gray-900'>
@@ -724,7 +756,16 @@ export default function CompactSearchHeader() {
 								</div>
 								<div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4'>
 									{propertyTypes.map(
-										({ type, icon: Icon, label, color, gradient }) => (
+										({
+											type,
+											icon: Icon,
+											label,
+											gradient,
+											bgColor,
+											hoverBgColor,
+											textColor,
+											borderColor,
+										}) => (
 											<button
 												key={type}
 												type='button'
@@ -735,7 +776,7 @@ export default function CompactSearchHeader() {
 												}
 												className={`group cursor-pointer relative p-4 sm:p-6 rounded-xl border-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${
 													selectedPropertyType === type
-														? `border-${color}-300 bg-gradient-to-br ${gradient} text-white shadow-xl scale-105`
+														? `${borderColor} bg-gradient-to-br ${gradient} text-white shadow-xl scale-105`
 														: 'border-gray-200 hover:border-gray-300 hover:shadow-md bg-white'
 												}`}
 											>
@@ -743,14 +784,14 @@ export default function CompactSearchHeader() {
 													className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-4 transition-all duration-300 ${
 														selectedPropertyType === type
 															? 'bg-white/20 backdrop-blur-sm'
-															: `bg-${color}-100 group-hover:bg-${color}-200`
+															: `${bgColor} ${hoverBgColor}`
 													}`}
 												>
 													<Icon
 														className={`w-5 h-5 sm:w-7 sm:h-7 transition-all duration-300 ${
 															selectedPropertyType === type
 																? 'text-white'
-																: `text-${color}-600`
+																: textColor
 														}`}
 													/>
 												</div>
@@ -778,7 +819,7 @@ export default function CompactSearchHeader() {
 												{t.listingType}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+												<KeyRound  className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 												<select
 													value={advancedSearch.listing_type}
 													onChange={e =>
@@ -903,7 +944,7 @@ export default function CompactSearchHeader() {
 												{t.minPrice}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-green-500 transition-colors' />
+												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 												<input
 													type='number'
 													placeholder='0'
@@ -914,7 +955,7 @@ export default function CompactSearchHeader() {
 															min_price: e.target.value,
 														})
 													}
-													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 												/>
 											</div>
 										</div>
@@ -925,7 +966,7 @@ export default function CompactSearchHeader() {
 												{t.maxPrice}
 											</label>
 											<div className='relative'>
-												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-red-500 transition-colors' />
+												<DollarSign className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 												<input
 													type='number'
 													placeholder={t.noLimit}
@@ -936,7 +977,7 @@ export default function CompactSearchHeader() {
 															max_price: e.target.value,
 														})
 													}
-													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+													className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 												/>
 											</div>
 										</div>
@@ -953,7 +994,7 @@ export default function CompactSearchHeader() {
 														{t.minArea}
 													</label>
 													<div className='relative'>
-														<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+														<Maximize className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 														<input
 															type='number'
 															placeholder='0'
@@ -964,7 +1005,7 @@ export default function CompactSearchHeader() {
 																	min_area: e.target.value,
 																})
 															}
-															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 														/>
 													</div>
 												</div>
@@ -975,7 +1016,7 @@ export default function CompactSearchHeader() {
 														{t.maxArea}
 													</label>
 													<div className='relative'>
-														<Square className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-purple-500 transition-colors' />
+														<Maximize className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
 														<input
 															type='number'
 															placeholder={t.noLimit}
@@ -986,7 +1027,7 @@ export default function CompactSearchHeader() {
 																	max_area: e.target.value,
 																})
 															}
-															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 														/>
 													</div>
 												</div>

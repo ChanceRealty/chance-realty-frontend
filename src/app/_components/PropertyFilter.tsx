@@ -743,10 +743,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Հողատարածքի մակերես (քառ.մ)'
+											? 'Հողատարածքի մակերես (մ²)'
 											: language === 'ru'
-											? 'Площадь участка (кв.м)'
-											: 'Lot Size (sq ft)'}
+											? 'Площадь участка (м²)'
+											: 'Lot Size (m²)'}
 									</label>
 									<input
 										type='number'
@@ -767,10 +767,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Մակերես (քառ.մ)'
+											? 'Մակերես (մ²)'
 											: language === 'ru'
-											? 'Площадь (кв.м)'
-											: 'Area (sq ft)'}
+											? 'Площадь (м²)'
+											: 'Area (m²)'}
 									</label>
 									<input
 										type='number'
@@ -791,10 +791,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ)'
+											? 'Առաստաղի բարձրություն (մ²)'
 											: language === 'ru'
-											? 'Высота потолка (м)'
-											: 'Ceiling Height (m)'}
+											? 'Высота потолка (м²)'
+											: 'Ceiling Height (m²)'}
 									</label>
 									<input
 										type='number'
@@ -873,10 +873,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ)'
+											? 'Առաստաղի բարձրություն (մ²)'
 											: language === 'ru'
-											? 'Высота потолка (м)'
-											: 'Ceiling Height (m)'}
+											? 'Высота потолка (м²)'
+											: 'Ceiling Height (m²)'}
 									</label>
 									<input
 										type='number'
@@ -899,10 +899,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Մակերես (քառ.մ)'
+											? 'Մակերես (մ²)'
 											: language === 'ru'
-											? 'Площадь (кв.м)'
-											: 'Area (sq ft)'}
+											? 'Площадь (м²)'
+											: 'Area (m²)'}
 									</label>
 									<input
 										type='number'
@@ -1017,10 +1017,10 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<label className='block text-xs font-semibold text-gray-700 mb-2'>
 										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ)'
+											? 'Առաստաղի բարձրություն (մ²)'
 											: language === 'ru'
-											? 'Высота потолка (м)'
-											: 'Ceiling Height (m)'}
+											? 'Высота потолка (м²)'
+											: 'Ceiling Height (m²)'}
 									</label>
 									<input
 										type='number'
@@ -1044,10 +1044,10 @@ export default function PropertyFilter({
 							<div className='relative'>
 								<label className='block text-xs font-semibold text-gray-700 mb-2'>
 									{language === 'hy'
-										? 'Մակերես (քառ.մ)'
+										? 'Մակերես (մ²)'
 										: language === 'ru'
-										? 'Площадь (кв.м)'
-										: 'Area (sq m)'}
+										? 'Площадь (м²)'
+										: 'Area (m²)'}
 								</label>
 								<input
 									type='number'
@@ -1073,10 +1073,10 @@ export default function PropertyFilter({
 							<div className='relative'>
 								<label className='block text-xs font-semibold text-gray-700 mb-2'>
 									{language === 'hy'
-										? 'Մակերես (քառ.մ)'
+										? 'Մակերես (մ²)'
 										: language === 'ru'
-										? 'Площадь (кв.м)'
-										: 'Area (sq m)'}
+										? 'Площадь (м²)'
+										: 'Area (m²)'}
 								</label>
 								<input
 									type='number'

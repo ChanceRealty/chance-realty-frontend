@@ -165,26 +165,30 @@ const Header = () => {
 						<LanguageSwitcher />
 					</div>
 
-					{/* Mobile Menu Button */}
+					{/* Mobile Menu Button - Improved */}
 					<button
-						className='lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors'
+						className='lg:hidden relative p-3 rounded-xl hover:bg-blue-50 active:bg-blue-100 transition-all duration-300 group mt-1'
 						onClick={() => setIsMenuOpen(!isMenuOpen)}
 						aria-label='Toggle mobile menu'
 					>
-						<div className='relative w-6 h-6'>
+						<div className='relative w-6 h-5 flex flex-col justify-center'>
 							<span
-								className={`absolute block h-0.5 w-6 bg-gray-700 transform transition-all duration-300 ${
-									isMenuOpen ? 'rotate-45 translate-y-1.5' : '-translate-y-1'
+								className={`absolute block h-0.5 w-full bg-gray-700 rounded-full transform transition-all duration-300 ease-in-out ${
+									isMenuOpen
+										? 'rotate-45 top-1/2 -translate-y-1/2 bg-blue-600'
+										: 'top-0'
 								}`}
 							></span>
 							<span
-								className={`absolute block h-0.5 w-6 bg-gray-700 transform transition-all duration-300 ${
-									isMenuOpen ? 'opacity-0' : 'translate-y-0'
+								className={`absolute block h-0.5 bg-gray-700 rounded-full transform transition-all duration-300 ease-in-out top-1/2 -translate-y-1/2 ${
+									isMenuOpen ? 'w-0 opacity-0' : 'w-full opacity-100'
 								}`}
 							></span>
 							<span
-								className={`absolute block h-0.5 w-6 bg-gray-700 transform transition-all duration-300 ${
-									isMenuOpen ? '-rotate-45 -translate-y-1.5' : 'translate-y-1'
+								className={`absolute block h-0.5 w-full bg-gray-700 rounded-full transform transition-all duration-300 ease-in-out ${
+									isMenuOpen
+										? '-rotate-45 top-1/2 -translate-y-1/2 bg-blue-600'
+										: 'bottom-0'
 								}`}
 							></span>
 						</div>
@@ -213,7 +217,7 @@ const Header = () => {
 						</div>
 
 						{/* Mobile Nav Items */}
-						{navItems.map((item) => (
+						{navItems.map(item => (
 							<div key={item.label} className='space-y-2'>
 								<Link
 									href={item.href}
