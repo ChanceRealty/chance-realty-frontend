@@ -210,56 +210,71 @@ export default function CompactSearchHeader() {
 		return labels[key]?.[language] || key
 	}
 
-	const handleAdvancedSearch = (e: React.FormEvent) => {
-		e.preventDefault()
-		const params = new URLSearchParams()
+		const handleAdvancedSearch = (e: React.FormEvent) => {
+			e.preventDefault()
+			const params = new URLSearchParams()
 
-		if (selectedPropertyType)
-			params.append('property_type', selectedPropertyType)
-		if (advancedSearch.listing_type)
-			params.append('listing_type', advancedSearch.listing_type)
-		if (advancedSearch.location)
-			params.append('location', advancedSearch.location)
-		if (advancedSearch.min_price)
-			params.append('min_price', advancedSearch.min_price)
-		if (advancedSearch.max_price)
-			params.append('max_price', advancedSearch.max_price)
-		if (advancedSearch.bedrooms)
-			params.append('bedrooms', advancedSearch.bedrooms)
-		if (advancedSearch.bathrooms)
-			params.append('bathrooms', advancedSearch.bathrooms)
-		if (advancedSearch.min_area)
-			params.append('min_area', advancedSearch.min_area)
-		if (advancedSearch.max_area)
-			params.append('max_area', advancedSearch.max_area)
-		if (advancedSearch.state_id)
-			params.append('state_id', advancedSearch.state_id.toString())
-		if (advancedSearch.city_id)
-			params.append('city_id', advancedSearch.city_id.toString())
-		if (advancedSearch.district_id)
-			params.append('district_id', advancedSearch.district_id.toString())
-		if (advancedSearch.floors) params.append('floors', advancedSearch.floors)
-		if (advancedSearch.floor) params.append('floor', advancedSearch.floor)
-		if (advancedSearch.total_floors)
-			params.append('total_floors', advancedSearch.total_floors)
-		if (advancedSearch.ceiling_height)
-			params.append('ceiling_height', advancedSearch.ceiling_height)
-		if (advancedSearch.min_lot_size_sqft)
-			params.append('min_lot_size_sqft', advancedSearch.min_lot_size_sqft)
-		if (advancedSearch.max_lot_size_sqft)
-			params.append('max_lot_size_sqft', advancedSearch.max_lot_size_sqft)
-		if (advancedSearch.business_type)
-			params.append('business_type', advancedSearch.business_type)
-		if (advancedSearch.min_area_acres)
-			params.append('min_area_acres', advancedSearch.min_area_acres)
-		if (advancedSearch.max_area_acres)
-			params.append('max_area_acres', advancedSearch.max_area_acres)
-		if (advancedSearch.features.length > 0) {
-			params.append('features', advancedSearch.features.join(','))
+			// Property Type & Listing Type
+			if (selectedPropertyType)
+				params.append('property_type', selectedPropertyType)
+			if (advancedSearch.listing_type)
+				params.append('listing_type', advancedSearch.listing_type)
+
+			// Location
+			if (advancedSearch.state_id)
+				params.append('state_id', advancedSearch.state_id.toString())
+			if (advancedSearch.city_id)
+				params.append('city_id', advancedSearch.city_id.toString())
+			if (advancedSearch.district_id)
+				params.append('district_id', advancedSearch.district_id.toString())
+
+			// Price
+			if (advancedSearch.min_price)
+				params.append('min_price', advancedSearch.min_price)
+			if (advancedSearch.max_price)
+				params.append('max_price', advancedSearch.max_price)
+
+			// Common attributes (house & apartment)
+			if (advancedSearch.bedrooms)
+				params.append('bedrooms', advancedSearch.bedrooms)
+			if (advancedSearch.bathrooms)
+				params.append('bathrooms', advancedSearch.bathrooms)
+
+			// Area attributes
+			if (advancedSearch.min_area)
+				params.append('min_area', advancedSearch.min_area)
+			if (advancedSearch.max_area)
+				params.append('max_area', advancedSearch.max_area)
+
+			if (advancedSearch.floors) params.append('floors', advancedSearch.floors)
+			if (advancedSearch.min_lot_size_sqft)
+				params.append('min_lot_size_sqft', advancedSearch.min_lot_size_sqft)
+			if (advancedSearch.max_lot_size_sqft)
+				params.append('max_lot_size_sqft', advancedSearch.max_lot_size_sqft)
+
+			if (advancedSearch.floor) params.append('floor', advancedSearch.floor)
+			if (advancedSearch.total_floors)
+				params.append('total_floors', advancedSearch.total_floors)
+
+			if (advancedSearch.ceiling_height)
+				params.append('ceiling_height', advancedSearch.ceiling_height)
+
+			if (advancedSearch.business_type)
+				params.append('business_type', advancedSearch.business_type)
+
+			if (advancedSearch.min_area_acres)
+				params.append('min_area_acres', advancedSearch.min_area_acres)
+			if (advancedSearch.max_area_acres)
+				params.append('max_area_acres', advancedSearch.max_area_acres)
+
+			// Features
+			if (advancedSearch.features.length > 0) {
+				params.append('features', advancedSearch.features.join(','))
+			}
+
+			window.location.href = `/${language}/properties?${params.toString()}`
 		}
 
-		window.location.href = `/${language}/properties?${params.toString()}`
-	}
 
 		const advancedButtonRef = useRef<HTMLButtonElement>(null)
 

@@ -65,29 +65,61 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			limit: 12,
 		}
 
-		// Parse URL parameters
+		// Parse ALL URL parameters
 		const property_type = searchParams.get('property_type')
 		const listing_type = searchParams.get('listing_type')
 		const state_id = searchParams.get('state_id')
 		const city_id = searchParams.get('city_id')
+		const district_id = searchParams.get('district_id')
 		const min_price = searchParams.get('min_price')
 		const max_price = searchParams.get('max_price')
 		const exclusive = searchParams.get('exclusive')
 
+		// ✅ FIXED: Parse property attribute parameters
+		const bedrooms = searchParams.get('bedrooms')
+		const bathrooms = searchParams.get('bathrooms')
+		const min_area = searchParams.get('min_area')
+		const max_area = searchParams.get('max_area')
+		const floors = searchParams.get('floors')
+		const floor = searchParams.get('floor')
+		const total_floors = searchParams.get('total_floors')
+		const ceiling_height = searchParams.get('ceiling_height')
+		const min_lot_size_sqft = searchParams.get('min_lot_size_sqft')
+		const max_lot_size_sqft = searchParams.get('max_lot_size_sqft')
+		const business_type = searchParams.get('business_type')
+		const area_sqft = searchParams.get('area_sqft')
+
+		// Basic filters
 		if (property_type)
 			initialFilter.property_type = property_type as PropertyType
 		if (listing_type) initialFilter.listing_type = listing_type as ListingType
 		if (state_id) initialFilter.state_id = parseInt(state_id)
 		if (city_id) initialFilter.city_id = parseInt(city_id)
+		if (district_id) initialFilter.district_id = parseInt(district_id)
 		if (min_price) initialFilter.min_price = parseFloat(min_price)
 		if (max_price) initialFilter.max_price = parseFloat(max_price)
 		if (exclusive === 'true') setShowExclusiveOnly(true)
+
+		// ✅ FIXED: Apply ALL property attributes
+		if (bedrooms) initialFilter.bedrooms = parseInt(bedrooms)
+		if (bathrooms) initialFilter.bathrooms = parseFloat(bathrooms)
+		if (min_area) initialFilter.min_area = parseInt(min_area)
+		if (max_area) initialFilter.max_area = parseInt(max_area)
+		if (floors) initialFilter.floors = parseInt(floors)
+		if (floor) initialFilter.floor = parseInt(floor)
+		if (total_floors) initialFilter.total_floors = parseInt(total_floors)
+		if (ceiling_height)
+			initialFilter.ceiling_height = parseFloat(ceiling_height)
+		if (min_lot_size_sqft)
+			initialFilter.lot_size_sqft = parseInt(min_lot_size_sqft)
+		if (business_type) initialFilter.business_type = business_type
+		if (area_sqft) initialFilter.area_sqft = parseInt(area_sqft)
 
 		return initialFilter
 	})
 
 	useEffect(() => {
-		setCurrentPage(1) // Reset to first page when filter changes
+		setCurrentPage(1)
 		fetchProperties()
 	}, [
 		filter.property_type,
@@ -97,7 +129,18 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		filter.district_id,
 		filter.min_price,
 		filter.max_price,
-		showExclusiveOnly, // Add exclusive filter dependency
+		// ✅ Add property attributes
+		filter.bedrooms,
+		filter.bathrooms,
+		filter.min_area,
+		filter.max_area,
+		filter.floors,
+		filter.floor,
+		filter.total_floors,
+		filter.ceiling_height,
+		filter.lot_size_sqft,
+		filter.business_type,
+		showExclusiveOnly,
 	])
 
 	const fetchProperties = useCallback(async () => {
@@ -114,15 +157,15 @@ export default function PropertiesContent({}: PropertyCardProps) {
 				show_hidden: false, // Explicitly hide hidden properties
 			})
 
-			const data = await getProperties({
-				...filter,
-				page: currentPage,
-				sort_by: sortBy,
-				sort_order: sortOrder,
-				limit: 50,
-				is_exclusive: showExclusiveOnly ? true : undefined, // Only show exclusive if filter is on
-				show_hidden: false, // Never show hidden properties in public view
-			})
+				const data = await getProperties({
+					...filter, // This now includes ALL parameters
+					page: currentPage,
+					sort_by: sortBy,
+					sort_order: sortOrder,
+					limit: 50,
+					is_exclusive: showExclusiveOnly ? true : undefined,
+					show_hidden: false,
+				})
 
 			console.log('Received properties data:', data)
 

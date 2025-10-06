@@ -28,7 +28,7 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		const language = getCurrentLanguage()
 		params.append('lang', language)
 
-		// Add filter parameters to URL
+		// Basic filters
 		if (filter.property_type)
 			params.append('property_type', filter.property_type)
 		if (filter.listing_type) params.append('listing_type', filter.listing_type)
@@ -40,28 +40,57 @@ export async function getProperties(filter: PropertyFilter = {}) {
 			params.append('min_price', filter.min_price.toString())
 		if (filter.max_price)
 			params.append('max_price', filter.max_price.toString())
+
+		// Common attributes (house & apartment)
 		if (filter.bedrooms) params.append('bedrooms', filter.bedrooms.toString())
 		if (filter.bathrooms)
 			params.append('bathrooms', filter.bathrooms.toString())
+
+		// Area filters
+		if (filter.min_area) params.append('min_area', filter.min_area.toString())
+		if (filter.max_area) params.append('max_area', filter.max_area.toString())
+		if (filter.area_sqft)
+			params.append('area_sqft', filter.area_sqft.toString())
+
+		// House-specific
+		if (filter.floors) params.append('floors', filter.floors.toString())
+		if (filter.lot_size_sqft)
+			params.append('lot_size_sqft', filter.lot_size_sqft.toString())
+
+		// Apartment-specific
+		if (filter.floor) params.append('floor', filter.floor.toString())
+		if (filter.total_floors)
+			params.append('total_floors', filter.total_floors.toString())
+
+		// Common attribute
+		if (filter.ceiling_height)
+			params.append('ceiling_height', filter.ceiling_height.toString())
+
+		// Commercial-specific
+		if (filter.business_type)
+			params.append('business_type', filter.business_type)
+
+		// Land-specific
+		if (filter.area_acres)
+			params.append('area_acres', filter.area_acres.toString())
+
+		// Features
+		if (filter.features && filter.features.length > 0) {
+			params.append('features', filter.features.join(','))
+		}
+
+		// Sorting and pagination
 		if (filter.sort_by) params.append('sort_by', filter.sort_by)
 		if (filter.sort_order) params.append('sort_order', filter.sort_order)
 		if (filter.page) params.append('page', filter.page.toString())
 		if (filter.limit) params.append('limit', filter.limit.toString())
 
-		// ✅ NEW: Add visibility and exclusivity filters
+		// Visibility filters
 		if (filter.is_exclusive === true) {
 			params.append('exclusive', 'true')
 		}
 
-		// ✅ For public frontend, we never want to show hidden properties
-		// This is handled server-side, but we can also filter client-side as backup
-		if (filter.show_hidden === true) {
-			// Only admins should be able to see hidden properties
-			// For public frontend, this should always be false or undefined
-			console.warn('show_hidden should not be true in public frontend')
-		}
-
-		// Set default pagination with higher limits
+		// Set defaults
 		if (!filter.page) params.append('page', '1')
 		if (!filter.limit) params.append('limit', '50')
 
@@ -118,16 +147,13 @@ export async function getProperties(filter: PropertyFilter = {}) {
 			properties = []
 		}
 
-		// ✅ NEW: Client-side filtering as backup for hidden properties
-		// The server should already filter these, but this ensures safety
+		// Filter hidden properties
 		const visibleProperties = properties.filter(property => {
-			// Never show hidden properties in public frontend
 			if (property.is_hidden === true) {
 				console.warn(`Filtered out hidden property: ${property.custom_id}`)
 				return false
 			}
 
-			// If exclusive filter is active, only show exclusive properties
 			if (filter.is_exclusive === true && property.is_exclusive !== true) {
 				return false
 			}
