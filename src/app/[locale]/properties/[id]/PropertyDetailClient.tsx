@@ -1099,7 +1099,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 				<div className='text-center'>
 					<Loader2 className='w-12 h-12 animate-spin text-blue-600 mx-auto mb-4' />
 					<p className='text-blue-800 font-medium'>
-						Loading property details...
+						{t.loadingPropertyText}
 					</p>
 				</div>
 			</div>
@@ -1121,7 +1121,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 						className='mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
 					>
 						<ChevronLeft className='w-4 h-4 mr-2' />
-						Back to properties
+						{t.backToListings}
 					</Link>
 				</div>
 			</div>

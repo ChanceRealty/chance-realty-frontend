@@ -52,8 +52,8 @@ export const translations = {
 		area: 'մակերես',
 		floor: 'հարկ',
 		floors: 'հարկ',
-		sqft: 'քառ. մետր',
-		acres: 'քառ. մետր',
+		sqft: 'մ²',
+		acres: 'մ²',
 		month: '/ամիս',
 		day: '/օր',
 
@@ -134,7 +134,7 @@ export const translations = {
 		// Property details
 		backToListings: 'Վերադառնալ ցուցակին',
 		propertyDetails: 'Գույքի մանրամասներ',
-		overview: 'Ընդհանուր ակնարկ',
+		overview: 'Նկարագիր',
 		description: 'Նկարագրություն',
 		noDescription: 'Նկարագրություն չկա',
 		propertyId: 'Գույքի ID',
@@ -157,6 +157,7 @@ export const translations = {
 		shopping: 'Գնումներ',
 		restaurants: 'Ռեստորաններ',
 		transportation: 'Տրանսպորտ',
+		loadingPropertyText: 'Բեռնվում են գույքի տվյալները...',
 
 		// Footer
 		quickLinks: 'Արագ հղումներ',
@@ -419,8 +420,8 @@ export const translations = {
 		area: 'area',
 		floor: 'floor',
 		floors: 'floors',
-		sqft: 'sq meter',
-		acres: 'sq meter',
+		sqft: 'm²',
+		acres: 'm²',
 		month: '/month',
 		day: '/day',
 
@@ -514,6 +515,7 @@ export const translations = {
 		shareProperty: 'Share Property',
 		getDirections: 'Get Directions',
 		streetView: 'Street View',
+		loadingPropertyText: 'Loading property details...',
 
 		// About page
 		aboutTitle: 'About Us',
@@ -769,8 +771,8 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		area: 'площадь',
 		floor: 'этаж',
 		floors: 'этажей',
-		sqft: 'кв. м',
-		acres: 'кв. м',
+		sqft: 'м²',
+		acres: 'м²',
 		month: '/месяц',
 		day: '/день',
 
@@ -874,6 +876,7 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		shopping: 'Магазины',
 		restaurants: 'Рестораны',
 		transportation: 'Транспорт',
+		loadingPropertyText: 'Загрузка данных недвижимости...',
 
 		// About page
 		aboutTitle: 'О нас',

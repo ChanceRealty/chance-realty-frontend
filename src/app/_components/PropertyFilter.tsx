@@ -33,7 +33,7 @@ import {
 	X,
 	ChevronDown,
 	Filter,
-	Tag,
+	KeyRound,
 } from 'lucide-react'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
@@ -422,7 +422,7 @@ export default function PropertyFilter({
 				<FilterSection
 					title={t.listingType}
 					sectionKey='listingType'
-					icon={Tag}
+					icon={KeyRound}
 					badge={filter.listing_type ? '1' : undefined}
 				>
 					<div className='space-y-3'>

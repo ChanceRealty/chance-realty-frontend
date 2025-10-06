@@ -67,9 +67,11 @@ export default function CompactSearchHeader() {
 		floor: '',
 		total_floors: '',
 		ceiling_height: '',
-		lot_size_sqft: '',
+		min_lot_size_sqft: '',
+		max_lot_size_sqft: '',
 		business_type: '',
-		area_acres: '',
+		min_area_acres: '',
+		max_area_acres: '',
 		features: [] as number[],
 	})
 
@@ -167,10 +169,15 @@ export default function CompactSearchHeader() {
 			bedrooms: { hy: 'Ննջարաններ', ru: 'Спальни', en: 'Bedrooms' },
 			bathrooms: { hy: 'Լոգարաններ', ru: 'Ванные', en: 'Bathrooms' },
 			area_sqft: { hy: 'Մակերես', ru: 'Площадь', en: 'Area' },
-			lot_size_sqft: {
-				hy: 'Հողատարածքի մակերես (մ²)',
-				ru: 'Размер участка (м²)',
-				en: 'Lot Size (m²)',
+			min_lot_size_sqft: {
+				hy: 'Նվազագույն հողատարածքի մակերես (մ²)',
+				ru: 'Минимальный размер участка (м²)',
+				en: 'Min. Lot Size (m²)',
+			},
+			max_lot_size_sqft: {
+				hy: 'Առավելագույն հողատարածքի մակերես (մ²)',
+				ru: 'Максимальный размер участка (м²)',
+				en: 'Max. Lot Size (m²)',
 			},
 			floors: { hy: 'Հարկեր', ru: 'Этажи', en: 'Floors' },
 			floor: { hy: 'Հարկ', ru: 'Этаж', en: 'Floor' },
@@ -189,10 +196,15 @@ export default function CompactSearchHeader() {
 				ru: 'Тип бизнеса',
 				en: 'Business Type',
 			},
-			area_acres: {
-				hy: 'Մակերես (մ²)',
-				ru: 'Площадь (м²)',
-				en: 'Area (m²)',
+			min_area_acres: {
+				hy: 'Նվազագույն մակերես (մ²)',
+				ru: 'Мин. Площадь (м²)',
+				en: 'Min. Area (m²)',
+			},
+			max_area_acres: {
+				hy: 'Առավելագույն մակերես (մ²)',
+				ru: 'Максимальная площадь (м²)',
+				en: 'Max. Area (m²)',
 			},
 		}
 		return labels[key]?.[language] || key
@@ -232,12 +244,16 @@ export default function CompactSearchHeader() {
 			params.append('total_floors', advancedSearch.total_floors)
 		if (advancedSearch.ceiling_height)
 			params.append('ceiling_height', advancedSearch.ceiling_height)
-		if (advancedSearch.lot_size_sqft)
-			params.append('lot_size_sqft', advancedSearch.lot_size_sqft)
+		if (advancedSearch.min_lot_size_sqft)
+			params.append('min_lot_size_sqft', advancedSearch.min_lot_size_sqft)
+		if (advancedSearch.max_lot_size_sqft)
+			params.append('max_lot_size_sqft', advancedSearch.max_lot_size_sqft)
 		if (advancedSearch.business_type)
 			params.append('business_type', advancedSearch.business_type)
-		if (advancedSearch.area_acres)
-			params.append('area_acres', advancedSearch.area_acres)
+		if (advancedSearch.min_area_acres)
+			params.append('min_area_acres', advancedSearch.min_area_acres)
+		if (advancedSearch.max_area_acres)
+			params.append('max_area_acres', advancedSearch.max_area_acres)
 		if (advancedSearch.features.length > 0) {
 			params.append('features', advancedSearch.features.join(','))
 		}
@@ -266,9 +282,11 @@ export default function CompactSearchHeader() {
 			floor: '',
 			total_floors: '',
 			ceiling_height: '',
-			lot_size_sqft: '',
+			min_lot_size_sqft: '',
+			max_lot_size_sqft: '',
 			business_type: '',
-			area_acres: '',
+			min_area_acres: '',
+			max_area_acres: '',
 			features: [],
 		})
 	}
@@ -391,18 +409,39 @@ export default function CompactSearchHeader() {
 
 						<div className='relative group'>
 							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
-								{getAttributeLabel('lot_size_sqft')}
+								{getAttributeLabel('min_lot_size_sqft')}
 							</label>
 							<div className='relative'>
 								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
 								<input
 									type='number'
 									placeholder={t.any}
-									value={advancedSearch.lot_size_sqft}
+									value={advancedSearch.min_lot_size_sqft}
 									onChange={e =>
 										setAdvancedSearch({
 											...advancedSearch,
-											lot_size_sqft: e.target.value,
+											min_lot_size_sqft: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
+								/>
+							</div>
+						</div>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('max_lot_size_sqft')}
+							</label>
+							<div className='relative'>
+								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-500 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.max_lot_size_sqft}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											max_lot_size_sqft: e.target.value,
 										})
 									}
 									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
@@ -620,27 +659,50 @@ export default function CompactSearchHeader() {
 
 			case 'land':
 				return (
-					<div className='relative group'>
-						<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
-							{getAttributeLabel('area_acres')}
-						</label>
-						<div className='relative'>
-							<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
-							<input
-								type='number'
-								placeholder={t.any}
-								value={advancedSearch.area_acres}
-								onChange={e =>
-									setAdvancedSearch({
-										...advancedSearch,
-										area_acres: e.target.value,
-									})
-								}
-								className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
-								min='0'
-							/>
+					<>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('min_area_acres')}
+							</label>
+							<div className='relative'>
+								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.min_area_acres}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											min_area_acres: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
+								/>
+							</div>
 						</div>
-					</div>
+						<div className='relative group'>
+							<label className='block text-sm font-semibold text-gray-700 mb-2 sm:mb-3'>
+								{getAttributeLabel('max_area_acres')}
+							</label>
+							<div className='relative'>
+								<Trees className='absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-blue-600 transition-colors' />
+								<input
+									type='number'
+									placeholder={t.any}
+									value={advancedSearch.max_area_acres}
+									onChange={e =>
+										setAdvancedSearch({
+											...advancedSearch,
+											max_area_acres: e.target.value,
+										})
+									}
+									className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+									min='0'
+								/>
+							</div>
+						</div>
+					</>
 				)
 
 			default:

@@ -12,7 +12,9 @@ import {
 	Landmark,
 	Trees,
 	ArrowRight,
+	Images,
 } from 'lucide-react'
+import Image from 'next/image'
 
 export default function HomePage() {
 	const t = useTranslations()
@@ -51,13 +53,13 @@ export default function HomePage() {
 							className='object-cover object-center'
 							priority
 						/> */}
-						 <video
+						<video
 							src='/vv2.mp4'
 							className='w-full h-full object-cover'
 							autoPlay
 							muted
-							></video>
-							{/* <Image
+						></video>
+						{/* <Image
 								src='/cclogo.png'
 								alt='Hero background'
 								fill
@@ -80,7 +82,6 @@ export default function HomePage() {
 								<p className='text-xl md:text-2xl mb-10 opacity-90 drop-shadow-md'>
 									{t.heroSubtitle}
 								</p>
-								
 							</div>
 						</div>
 					</div>
@@ -223,8 +224,14 @@ export default function HomePage() {
 
 					<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10'>
 						{/* Icon */}
-						<div className='inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-8 shadow-2xl animate-bounce'>
-							<span className='text-4xl'>🚀</span>
+						<div className='inline-flex items-center justify-center w-40 h-40 bg-white rounded-full mb-8 shadow-2xl animate-bounce'>
+							<Image
+								src='/cclogo2.png'
+								alt=''
+								width={96}
+								height={96}
+								className='absolute inset-0 w-full h-full object-contain'
+							/>
 						</div>
 
 						{/* Heading */}
