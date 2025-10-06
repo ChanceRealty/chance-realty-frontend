@@ -78,8 +78,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		// ✅ FIXED: Parse property attribute parameters
 		const bedrooms = searchParams.get('bedrooms')
 		const bathrooms = searchParams.get('bathrooms')
-		const min_area = searchParams.get('min_area')
-		const max_area = searchParams.get('max_area')
 		const floors = searchParams.get('floors')
 		const floor = searchParams.get('floor')
 		const total_floors = searchParams.get('total_floors')
@@ -87,7 +85,11 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		const min_lot_size_sqft = searchParams.get('min_lot_size_sqft')
 		const max_lot_size_sqft = searchParams.get('max_lot_size_sqft')
 		const business_type = searchParams.get('business_type')
-		const area_sqft = searchParams.get('area_sqft')
+		const min_area_acres = searchParams.get('min_area_acres')
+		const max_area_acres = searchParams.get('max_area_acres')
+		const min_area_sqft = searchParams.get('min_area_sqft')
+		const max_area_sqft = searchParams.get('max_area_sqft')
+
 
 		// Basic filters
 		if (property_type)
@@ -103,18 +105,19 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		// ✅ FIXED: Apply ALL property attributes
 		if (bedrooms) initialFilter.bedrooms = parseInt(bedrooms)
 		if (bathrooms) initialFilter.bathrooms = parseFloat(bathrooms)
-		if (min_area) initialFilter.min_area = parseInt(min_area)
-		if (max_area) initialFilter.max_area = parseInt(max_area)
+
 		if (floors) initialFilter.floors = parseInt(floors)
 		if (floor) initialFilter.floor = parseInt(floor)
 		if (total_floors) initialFilter.total_floors = parseInt(total_floors)
 		if (ceiling_height)
 			initialFilter.ceiling_height = parseFloat(ceiling_height)
-		if (min_lot_size_sqft)
-			initialFilter.lot_size_sqft = parseInt(min_lot_size_sqft)
+		if (min_lot_size_sqft) initialFilter.min_lot_size_sqft = parseInt(min_lot_size_sqft)
+		if (max_lot_size_sqft) initialFilter.max_lot_size_sqft = parseInt(max_lot_size_sqft)
 		if (business_type) initialFilter.business_type = business_type
-		if (area_sqft) initialFilter.area_sqft = parseInt(area_sqft)
-
+		if (min_area_sqft) initialFilter.min_area_sqft = parseInt(min_area_sqft)
+		if (max_area_sqft) initialFilter.max_area_sqft = parseInt(max_area_sqft)
+		if (min_area_acres) initialFilter.min_area_acres = parseFloat(min_area_acres)
+		if (max_area_acres) initialFilter.max_area_acres = parseFloat(max_area_acres)
 		return initialFilter
 	})
 
@@ -129,16 +132,18 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		filter.district_id,
 		filter.min_price,
 		filter.max_price,
-		// ✅ Add property attributes
 		filter.bedrooms,
 		filter.bathrooms,
-		filter.min_area,
-		filter.max_area,
 		filter.floors,
 		filter.floor,
 		filter.total_floors,
 		filter.ceiling_height,
-		filter.lot_size_sqft,
+		filter.min_lot_size_sqft,
+		filter.max_lot_size_sqft,
+		filter.min_area_sqft,
+		filter.max_area_sqft,
+		filter.min_area_acres,
+		filter.max_area_acres,
 		filter.business_type,
 		showExclusiveOnly,
 	])

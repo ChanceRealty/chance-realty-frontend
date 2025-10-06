@@ -137,8 +137,6 @@ export interface PropertyFilter {
 	max_price?: number
 	bedrooms?: number
 	bathrooms?: number
-	min_area?: number
-	max_area?: number
 	features?: number[]
 	status?: string // Added status filter
 	sort_by?: 'price' | 'created_at' | 'views'
@@ -149,10 +147,13 @@ export interface PropertyFilter {
 	floor?: number
 	total_floors?: number
 	ceiling_height?: number
-	lot_size_sqft?: number
-	area_sqft?: number
+	min_lot_size_sqft?: number
+	max_lot_size_sqft?: number
+	min_area_sqft?: number
+	max_area_sqft?: number
 	business_type?: string
-	area_acres?: number
+	min_area_acres?: number
+	max_area_acres?: number
 	is_hidden?: boolean
 	is_exclusive?: boolean
 	show_hidden?: boolean

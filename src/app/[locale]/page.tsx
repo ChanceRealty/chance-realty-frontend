@@ -12,7 +12,6 @@ import {
 	Landmark,
 	Trees,
 	ArrowRight,
-	Images,
 } from 'lucide-react'
 import Image from 'next/image'
 

@@ -58,8 +58,8 @@ export default function CompactSearchHeader() {
 		max_price: '',
 		bedrooms: '',
 		bathrooms: '',
-		min_area: '',
-		max_area: '',
+		min_area_sqft: '',
+		max_area_sqft: '',
 		state_id: undefined as number | undefined,
 		city_id: undefined as number | undefined,
 		district_id: undefined as number | undefined,
@@ -168,7 +168,12 @@ export default function CompactSearchHeader() {
 		const labels: Record<string, Record<string, string>> = {
 			bedrooms: { hy: 'Ննջարաններ', ru: 'Спальни', en: 'Bedrooms' },
 			bathrooms: { hy: 'Լոգարաններ', ru: 'Ванные', en: 'Bathrooms' },
-			area_sqft: { hy: 'Մակերես', ru: 'Площадь', en: 'Area' },
+			min_area_sqft: { hy: 'Նվազագույն մակերես (մ²)', ru: 'Минимальная площадь (м²)', en: 'Min. Area (m²)' },
+			max_area_sqft: {
+				hy: 'Առավելագույն մակերես (մ²)',
+				ru: 'Максимальная площадь (м²)',
+				en: 'Max. Area (m²)',
+			},
 			min_lot_size_sqft: {
 				hy: 'Նվազագույն հողատարածքի մակերես (մ²)',
 				ru: 'Минимальный размер участка (м²)',
@@ -241,10 +246,10 @@ export default function CompactSearchHeader() {
 				params.append('bathrooms', advancedSearch.bathrooms)
 
 			// Area attributes
-			if (advancedSearch.min_area)
-				params.append('min_area', advancedSearch.min_area)
-			if (advancedSearch.max_area)
-				params.append('max_area', advancedSearch.max_area)
+			if (advancedSearch.min_area_sqft)
+				params.append('min_area_sqft', advancedSearch.min_area_sqft)
+			if (advancedSearch.max_area_sqft)
+				params.append('max_area_sqft', advancedSearch.max_area_sqft)
 
 			if (advancedSearch.floors) params.append('floors', advancedSearch.floors)
 			if (advancedSearch.min_lot_size_sqft)
@@ -288,8 +293,8 @@ export default function CompactSearchHeader() {
 			max_price: '',
 			bedrooms: '',
 			bathrooms: '',
-			min_area: '',
-			max_area: '',
+			min_area_sqft: '',
+			max_area_sqft: '',
 			state_id: undefined,
 			city_id: undefined,
 			district_id: undefined,
@@ -1075,11 +1080,11 @@ export default function CompactSearchHeader() {
 														<input
 															type='number'
 															placeholder='0'
-															value={advancedSearch.min_area}
+															value={advancedSearch.min_area_sqft}
 															onChange={e =>
 																setAdvancedSearch({
 																	...advancedSearch,
-																	min_area: e.target.value,
+																	min_area_sqft: e.target.value,
 																})
 															}
 															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
@@ -1097,11 +1102,11 @@ export default function CompactSearchHeader() {
 														<input
 															type='number'
 															placeholder={t.noLimit}
-															value={advancedSearch.max_area}
+															value={advancedSearch.max_area_sqft}
 															onChange={e =>
 																setAdvancedSearch({
 																	...advancedSearch,
-																	max_area: e.target.value,
+																	max_area_sqft: e.target.value,
 																})
 															}
 															className='w-full text-gray-600 pl-10 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'

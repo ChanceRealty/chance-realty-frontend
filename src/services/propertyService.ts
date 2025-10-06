@@ -47,15 +47,22 @@ export async function getProperties(filter: PropertyFilter = {}) {
 			params.append('bathrooms', filter.bathrooms.toString())
 
 		// Area filters
-		if (filter.min_area) params.append('min_area', filter.min_area.toString())
-		if (filter.max_area) params.append('max_area', filter.max_area.toString())
-		if (filter.area_sqft)
-			params.append('area_sqft', filter.area_sqft.toString())
+
+		if (filter.min_area_sqft)
+			params.append('min_area_sqft', filter.min_area_sqft.toString())
+		if (filter.max_area_sqft)
+			params.append('max_area_sqft', filter.max_area_sqft.toString())
+		if (filter.min_area_acres)
+			params.append('min_area_acres', filter.min_area_acres.toString())
+		if (filter.max_area_acres)
+			params.append('max_area_acres', filter.max_area_acres.toString())
 
 		// House-specific
 		if (filter.floors) params.append('floors', filter.floors.toString())
-		if (filter.lot_size_sqft)
-			params.append('lot_size_sqft', filter.lot_size_sqft.toString())
+		if (filter.min_lot_size_sqft)
+			params.append('min_lot_size_sqft', filter.min_lot_size_sqft.toString())
+		if (filter.max_lot_size_sqft)
+			params.append('max_lot_size_sqft', filter.max_lot_size_sqft.toString())
 
 		// Apartment-specific
 		if (filter.floor) params.append('floor', filter.floor.toString())
@@ -69,10 +76,6 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		// Commercial-specific
 		if (filter.business_type)
 			params.append('business_type', filter.business_type)
-
-		// Land-specific
-		if (filter.area_acres)
-			params.append('area_acres', filter.area_acres.toString())
 
 		// Features
 		if (filter.features && filter.features.length > 0) {
