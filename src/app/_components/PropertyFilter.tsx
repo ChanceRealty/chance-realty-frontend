@@ -652,9 +652,13 @@ export default function PropertyFilter({
 						filter.floor ||
 						filter.total_floors ||
 						filter.ceiling_height ||
-						filter.lot_size_sqft ||
+						filter.min_lot_size_sqft ||
+						filter.max_lot_size_sqft ||
 						filter.business_type ||
-						filter.area_acres
+						filter.min_area_acres ||
+						filter.max_area_acres ||
+						filter.min_area_sqft ||
+						filter.max_area_sqft
 							? '1'
 							: undefined
 					}
@@ -751,10 +755,32 @@ export default function PropertyFilter({
 									<input
 										type='number'
 										placeholder={t.any}
-										value={filter.lot_size_sqft || ''}
+										value={filter.min_lot_size_sqft || ''}
 										onChange={e =>
 											handleFilterChange(
-												'lot_size_sqft',
+												'min_lot_size_sqft',
+												e.target.value ? parseInt(e.target.value) : undefined
+											)
+										}
+										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										min='0'
+									/>
+								</div>
+								<div className='relative'>
+									<label className='block text-xs font-semibold text-gray-700 mb-2'>
+										{language === 'hy'
+											? 'Հողատարածքի մակերես (մ²)'
+											: language === 'ru'
+											? 'Площадь участка (м²)'
+											: 'Lot Size (m²)'}
+									</label>
+									<input
+										type='number'
+										placeholder={t.any}
+										value={filter.max_lot_size_sqft || ''}
+										onChange={e =>
+											handleFilterChange(
+												'max_lot_size_sqft',
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
@@ -775,10 +801,33 @@ export default function PropertyFilter({
 									<input
 										type='number'
 										placeholder={t.any}
-										value={filter.area_sqft || ''}
+										value={filter.min_area_sqft || ''}
 										onChange={e =>
 											handleFilterChange(
-												'area_sqft',
+												'min_area_sqft',
+												e.target.value ? parseInt(e.target.value) : undefined
+											)
+										}
+										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										min='0'
+									/>
+								</div>
+
+								<div className='relative'>
+									<label className='block text-xs font-semibold text-gray-700 mb-2'>
+										{language === 'hy'
+											? 'Մակերես (մ²)'
+											: language === 'ru'
+											? 'Площадь (м²)'
+											: 'Area (m²)'}
+									</label>
+									<input
+										type='number'
+										placeholder={t.any}
+										value={filter.max_area_sqft || ''}
+										onChange={e =>
+											handleFilterChange(
+												'max_area_sqft',
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
@@ -907,10 +956,32 @@ export default function PropertyFilter({
 									<input
 										type='number'
 										placeholder={t.any}
-										value={filter.area_sqft || ''}
+										value={filter.min_area_sqft || ''}
 										onChange={e =>
 											handleFilterChange(
-												'area_sqft',
+												'min_area_sqft',
+												e.target.value ? parseFloat(e.target.value) : undefined
+											)
+										}
+										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+										min='0'
+									/>
+								</div>
+								<div className='relative'>
+									<label className='block text-xs font-semibold text-gray-700 mb-2'>
+										{language === 'hy'
+											? 'Մակերես (մ²)'
+											: language === 'ru'
+											? 'Площадь (м²)'
+											: 'Area (m²)'}
+									</label>
+									<input
+										type='number'
+										placeholder={t.any}
+										value={filter.max_area_sqft || ''}
+										onChange={e =>
+											handleFilterChange(
+												'max_area_sqft',
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
@@ -1052,10 +1123,32 @@ export default function PropertyFilter({
 								<input
 									type='number'
 									placeholder={t.any}
-									value={filter.min_area || ''}
+									value={filter.min_area_sqft || ''}
 									onChange={e =>
 										handleFilterChange(
-											'min_area',
+											'min_area_sqft',
+											e.target.value ? parseInt(e.target.value) : undefined
+										)
+									}
+									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+									min='0'
+								/>
+							</div>
+							<div className='relative'>
+								<label className='block text-xs font-semibold text-gray-700 mb-2'>
+									{language === 'hy'
+										? 'Մակերես (մ²)'
+										: language === 'ru'
+										? 'Площадь (м²)'
+										: 'Area (m²)'}
+								</label>
+								<input
+									type='number'
+									placeholder={t.any}
+									value={filter.max_area_sqft || ''}
+									onChange={e =>
+										handleFilterChange(
+											'max_area_sqft',
 											e.target.value ? parseInt(e.target.value) : undefined
 										)
 									}
@@ -1081,10 +1174,33 @@ export default function PropertyFilter({
 								<input
 									type='number'
 									placeholder={t.any}
-									value={filter.min_area || ''}
+									value={filter.min_area_acres || ''}
 									onChange={e =>
 										handleFilterChange(
-											'min_area',
+											'min_area_acres',
+											e.target.value ? parseInt(e.target.value) : undefined
+										)
+									}
+									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
+									min='0'
+								/>
+							</div>
+
+							<div className='relative'>
+								<label className='block text-xs font-semibold text-gray-700 mb-2'>
+									{language === 'hy'
+										? 'Մակերես (մ²)'
+										: language === 'ru'
+										? 'Площадь (м²)'
+										: 'Area (m²)'}
+								</label>
+								<input
+									type='number'
+									placeholder={t.any}
+									value={filter.max_area_acres || ''}
+									onChange={e =>
+										handleFilterChange(
+											'max_area_acres',
 											e.target.value ? parseInt(e.target.value) : undefined
 										)
 									}
@@ -1148,8 +1264,8 @@ export default function PropertyFilter({
 										<button
 											key={index}
 											onClick={() => {
-												handleFilterChange('min_area', range.min)
-												handleFilterChange('max_area', range.max)
+												handleFilterChange('min_area_acres', range.min)
+												handleFilterChange('max_area_acres', range.max)
 											}}
 											className='px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-green-100 hover:text-green-700 rounded-lg transition-colors'
 										>
