@@ -22,6 +22,7 @@ export function getCurrentLanguage(): 'hy' | 'en' | 'ru' {
 	return 'hy' // Default to Armenian
 }
 
+// Enhanced getProperties with better logging and parameter handling
 export async function getProperties(filter: PropertyFilter = {}) {
 	try {
 		const params = new URLSearchParams()
@@ -46,8 +47,7 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		if (filter.bathrooms)
 			params.append('bathrooms', filter.bathrooms.toString())
 
-		// Area filters
-
+		// Area filters - THIS IS THE KEY PART
 		if (filter.min_area_sqft)
 			params.append('min_area_sqft', filter.min_area_sqft.toString())
 		if (filter.max_area_sqft)
@@ -97,20 +97,19 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		if (!filter.page) params.append('page', '1')
 		if (!filter.limit) params.append('limit', '50')
 
-		console.log(
-			`✅ Fetching from PUBLIC endpoint: ${API_BASE_URL}/api/public/properties?${params.toString()}`
-		)
+		const apiUrl = `${API_BASE_URL}/api/public/properties?${params.toString()}`
+		
+		// ✅ ADD THIS: Log the full URL to see what's being sent
+		console.log('🔍 FULL API URL:', apiUrl)
+		console.log('🔍 FILTER OBJECT:', filter)
 
-		const response = await fetch(
-			`${API_BASE_URL}/api/public/properties?${params.toString()}`,
-			{
-				method: 'GET',
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-				},
-			}
-		)
+		const response = await fetch(apiUrl, {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+		})
 
 		if (!response.ok) {
 			console.error(`API Error: ${response.status} ${response.statusText}`)
@@ -122,7 +121,7 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		}
 
 		const data = await response.json()
-		console.log('Raw API Response:', data)
+		console.log('📦 Raw API Response:', data)
 
 		let properties = []
 
@@ -164,10 +163,6 @@ export async function getProperties(filter: PropertyFilter = {}) {
 			return true
 		})
 
-		console.log(
-			`✅ Processed ${visibleProperties.length} visible properties out of ${properties.length} total`
-		)
-		return visibleProperties
 	} catch (error) {
 		console.error('Error fetching properties:', error)
 		return []

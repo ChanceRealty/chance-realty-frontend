@@ -239,38 +239,70 @@ export default function CompactSearchHeader() {
 			if (advancedSearch.max_price)
 				params.append('max_price', advancedSearch.max_price)
 
-			// Common attributes (house & apartment)
-			if (advancedSearch.bedrooms)
-				params.append('bedrooms', advancedSearch.bedrooms)
-			if (advancedSearch.bathrooms)
-				params.append('bathrooms', advancedSearch.bathrooms)
-
-			// Area attributes
-			if (advancedSearch.min_area_sqft)
-				params.append('min_area_sqft', advancedSearch.min_area_sqft)
-			if (advancedSearch.max_area_sqft)
-				params.append('max_area_sqft', advancedSearch.max_area_sqft)
-
-			if (advancedSearch.floors) params.append('floors', advancedSearch.floors)
-			if (advancedSearch.min_lot_size_sqft)
-				params.append('min_lot_size_sqft', advancedSearch.min_lot_size_sqft)
-			if (advancedSearch.max_lot_size_sqft)
-				params.append('max_lot_size_sqft', advancedSearch.max_lot_size_sqft)
-
-			if (advancedSearch.floor) params.append('floor', advancedSearch.floor)
-			if (advancedSearch.total_floors)
-				params.append('total_floors', advancedSearch.total_floors)
-
-			if (advancedSearch.ceiling_height)
-				params.append('ceiling_height', advancedSearch.ceiling_height)
-
-			if (advancedSearch.business_type)
-				params.append('business_type', advancedSearch.business_type)
-
-			if (advancedSearch.min_area_acres)
-				params.append('min_area_acres', advancedSearch.min_area_acres)
-			if (advancedSearch.max_area_acres)
-				params.append('max_area_acres', advancedSearch.max_area_acres)
+			// ✅ FIX: Only add property-specific attributes based on selected type
+			if (selectedPropertyType === 'house') {
+				// House-specific attributes
+				if (advancedSearch.bedrooms)
+					params.append('bedrooms', advancedSearch.bedrooms)
+				if (advancedSearch.bathrooms)
+					params.append('bathrooms', advancedSearch.bathrooms)
+				if (advancedSearch.floors)
+					params.append('floors', advancedSearch.floors)
+				if (advancedSearch.min_lot_size_sqft)
+					params.append('min_lot_size_sqft', advancedSearch.min_lot_size_sqft)
+				if (advancedSearch.max_lot_size_sqft)
+					params.append('max_lot_size_sqft', advancedSearch.max_lot_size_sqft)
+				if (advancedSearch.ceiling_height)
+					params.append('ceiling_height', advancedSearch.ceiling_height)
+				if (advancedSearch.min_area_sqft)
+					params.append('min_area_sqft', advancedSearch.min_area_sqft)
+				if (advancedSearch.max_area_sqft)
+					params.append('max_area_sqft', advancedSearch.max_area_sqft)
+			} else if (selectedPropertyType === 'apartment') {
+				// Apartment-specific attributes
+				if (advancedSearch.bedrooms)
+					params.append('bedrooms', advancedSearch.bedrooms)
+				if (advancedSearch.bathrooms)
+					params.append('bathrooms', advancedSearch.bathrooms)
+				if (advancedSearch.floor) params.append('floor', advancedSearch.floor)
+				if (advancedSearch.total_floors)
+					params.append('total_floors', advancedSearch.total_floors)
+				if (advancedSearch.ceiling_height)
+					params.append('ceiling_height', advancedSearch.ceiling_height)
+				if (advancedSearch.min_area_sqft)
+					params.append('min_area_sqft', advancedSearch.min_area_sqft)
+				if (advancedSearch.max_area_sqft)
+					params.append('max_area_sqft', advancedSearch.max_area_sqft)
+			} else if (selectedPropertyType === 'commercial') {
+				// Commercial-specific attributes
+				if (advancedSearch.business_type)
+					params.append('business_type', advancedSearch.business_type)
+				if (advancedSearch.floors)
+					params.append('floors', advancedSearch.floors)
+				if (advancedSearch.ceiling_height)
+					params.append('ceiling_height', advancedSearch.ceiling_height)
+				if (advancedSearch.min_area_sqft)
+					params.append('min_area_sqft', advancedSearch.min_area_sqft)
+				if (advancedSearch.max_area_sqft)
+					params.append('max_area_sqft', advancedSearch.max_area_sqft)
+			} else if (selectedPropertyType === 'land') {
+				// Land-specific attributes
+				if (advancedSearch.min_area_acres)
+					params.append('min_area_acres', advancedSearch.min_area_acres)
+				if (advancedSearch.max_area_acres)
+					params.append('max_area_acres', advancedSearch.max_area_acres)
+			} else {
+				// ✅ NEW: If no property type selected, add common attributes
+				// This allows searching across all property types with common filters
+				if (advancedSearch.bedrooms)
+					params.append('bedrooms', advancedSearch.bedrooms)
+				if (advancedSearch.bathrooms)
+					params.append('bathrooms', advancedSearch.bathrooms)
+				if (advancedSearch.min_area_sqft)
+					params.append('min_area_sqft', advancedSearch.min_area_sqft)
+				if (advancedSearch.max_area_sqft)
+					params.append('max_area_sqft', advancedSearch.max_area_sqft)
+			}
 
 			// Features
 			if (advancedSearch.features.length > 0) {
