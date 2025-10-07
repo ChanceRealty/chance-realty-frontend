@@ -12,15 +12,15 @@ import {
 	Maximize,
 	Home,
 	Play,
-	CheckCircle,
-	Clock,
-	XCircle,
+	// CheckCircle,
+	// Clock,
+	// XCircle,
 	Landmark,
 	Trees,
 	ChevronLeft,
 	ChevronRight,
-	AlertCircle,
-	Pause,
+	// AlertCircle,
+	// Pause,
 	Crown,
 	Layers3,
 } from 'lucide-react'
@@ -31,7 +31,7 @@ import {
 	LandAttributes,
 	Property,
 	PropertyMedia,
-	PropertyStatus,
+	// PropertyStatus,
 } from '@/types/property'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
