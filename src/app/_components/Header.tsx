@@ -61,7 +61,6 @@ const Header = () => {
 			dailyRent: 'Посуточная аренда',
 		},
 	}
-
 	const t = navTranslations[currentLang]
 
 	const navItems = [
@@ -105,14 +104,8 @@ const Header = () => {
 				},
 			],
 		},
-		{
-			label: t.contact,
-			href: `/${currentLang}/contact`,
-		},
-		{
-			label: t.about,
-			href: `/${currentLang}/about`,
-		},
+		{ label: t.contact, href: `/${currentLang}/contact` },
+		{ label: t.about, href: `/${currentLang}/about` },
 	]
 
 	const getNavItemClass = (href: string) => {
@@ -126,10 +119,10 @@ const Header = () => {
 		<header className='sticky top-0 z-50 bg-white shadow-md border-b border-gray-200'>
 			<div className='container mx-auto px-4 sm:px-6'>
 				<div className='flex items-center justify-between h-16 sm:h-20'>
-					{/* Logo */}
+					{/* Logo с небольшим сдвигом вправо на десктопе */}
 					<Link
 						href={`/${currentLang}`}
-						className='flex items-center group flex-shrink-0'
+						className='flex items-center group flex-shrink-0 lg:ml-24'
 					>
 						<div className='relative overflow-hidden rounded-xl'>
 							<Image
@@ -144,7 +137,7 @@ const Header = () => {
 					</Link>
 
 					{/* Desktop Navigation */}
-					<nav className='hidden lg:flex items-center space-x-1 flex-1 justify-center'>
+					<nav className='hidden lg:flex items-center space-x-1 flex-1 justify-center lg:ml-20'>
 						{navItems.map(item => (
 							<div key={item.label} className='relative group'>
 								<Link
@@ -160,12 +153,12 @@ const Header = () => {
 					</nav>
 
 					{/* Search & Language Switcher - Desktop */}
-					<div className='hidden lg:flex items-center gap-3 flex-shrink-0'>
+					<div className='hidden lg:flex items-center gap-3 flex-shrink-0 lg:mr-24'>
 						<SearchSection />
 						<LanguageSwitcher />
 					</div>
 
-					{/* Mobile Menu Button - Improved */}
+					{/* Mobile Menu Button */}
 					<button
 						className='lg:hidden relative p-3 rounded-xl hover:bg-blue-50 active:bg-blue-100 transition-all duration-300 group mt-1'
 						onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -206,17 +199,12 @@ const Header = () => {
 			>
 				<div className='bg-white border-t border-gray-200'>
 					<div className='container mx-auto px-4 py-4 space-y-2'>
-						{/* Mobile Search */}
 						<div className='pb-4 mb-4 border-b border-gray-100'>
 							<SearchSection />
 						</div>
-
-						{/* Mobile Language Switcher */}
 						<div className='pb-4 mb-4 border-b border-gray-100'>
 							<LanguageSwitcher />
 						</div>
-
-						{/* Mobile Nav Items */}
 						{navItems.map(item => (
 							<div key={item.label} className='space-y-2'>
 								<Link
@@ -228,7 +216,6 @@ const Header = () => {
 								>
 									{item.label}
 								</Link>
-
 								{item.dropdown && (
 									<div className='ml-4 space-y-1'>
 										{item.dropdown.map(dropdownItem => {

@@ -151,17 +151,124 @@ export async function getProperties(filter: PropertyFilter = {}) {
 
 		// Filter hidden properties
 		const visibleProperties = properties.filter(property => {
-			if (property.is_hidden === true) {
-				console.warn(`Filtered out hidden property: ${property.custom_id}`)
+			// Скрытые
+			if (property.is_hidden && !filter.show_hidden) return false
+
+			// Эксклюзивные
+			if (filter.is_exclusive === true && property.is_exclusive !== true)
+				return false
+
+			// Bedrooms
+			if (filter.bedrooms && property.attributes?.bedrooms !== filter.bedrooms)
+				return false
+
+			// Bathrooms
+			if (
+				filter.bathrooms &&
+				property.attributes?.bathrooms !== filter.bathrooms
+			)
+				return false
+
+			// Floors (house & commercial)
+			if (filter.floors) {
+				if (
+					(property.property_type === 'house' ||
+						property.property_type === 'commercial') &&
+					property.attributes?.floors !== filter.floors
+				) {
+					return false
+				}
+			}
+
+			// Floor (apartment)
+			if (
+				filter.floor &&
+				property.property_type === 'apartment' &&
+				property.attributes?.floor !== filter.floor
+			) {
 				return false
 			}
 
-			if (filter.is_exclusive === true && property.is_exclusive !== true) {
+			// Total floors (apartment)
+			if (
+				filter.total_floors &&
+				property.property_type === 'apartment' &&
+				property.attributes?.total_floors !== filter.total_floors
+			) {
 				return false
+			}
+
+			// Area (sqft)
+			if (
+				filter.min_area_sqft &&
+				property.attributes?.area_sqft < filter.min_area_sqft
+			)
+				return false
+			if (
+				filter.max_area_sqft &&
+				property.attributes?.area_sqft > filter.max_area_sqft
+			)
+				return false
+
+			// Lot size (house)
+			if (
+				filter.min_lot_size_sqft &&
+				property.property_type === 'house' &&
+				property.attributes?.lot_size_sqft &&
+				property.attributes.lot_size_sqft < filter.min_lot_size_sqft
+			)
+				return false
+			if (
+				filter.max_lot_size_sqft &&
+				property.property_type === 'house' &&
+				property.attributes?.lot_size_sqft &&
+				property.attributes.lot_size_sqft > filter.max_lot_size_sqft
+			)
+				return false
+
+			// Area acres (land)
+			if (
+				filter.min_area_acres &&
+				property.property_type === 'land' &&
+				property.attributes?.area_acres < filter.min_area_acres
+			)
+				return false
+			if (
+				filter.max_area_acres &&
+				property.property_type === 'land' &&
+				property.attributes?.area_acres > filter.max_area_acres
+			)
+				return false
+
+			// Ceiling height
+			if (
+				filter.ceiling_height &&
+				property.attributes?.ceiling_height !== filter.ceiling_height
+			)
+				return false
+
+			// Business type (commercial)
+			if (
+				filter.business_type &&
+				property.property_type === 'commercial' &&
+				property.attributes?.business_type !== filter.business_type
+			)
+				return false
+
+			// Features
+			if (filter.features && filter.features.length > 0 && property.features) {
+				const hasAllFeatures = filter.features.every(f =>
+					property.features?.some(pf => pf.id === f)
+				)
+				if (!hasAllFeatures) return false
 			}
 
 			return true
 		})
+
+
+	
+	return visibleProperties
 
 	} catch (error) {
 		console.error('Error fetching properties:', error)

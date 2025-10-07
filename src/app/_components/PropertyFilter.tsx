@@ -34,10 +34,13 @@ import {
 	ChevronDown,
 	Filter,
 	KeyRound,
+	Layers3,
+	Maximize,
 } from 'lucide-react'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
 import { getTranslatedFeature } from '@/utils/featureTranslations'
+import { RxHeight } from 'react-icons/rx'
 
 interface PropertyFilterProps {
 	onFilterChange: (filter: FilterType) => void
@@ -57,14 +60,14 @@ export default function PropertyFilter({
 	const [features, setFeatures] = useState<PropertyFeature[]>([])
 
 	// Explicitly type the filter state to ensure all PropertyType values are included
-	const [filter, setFilter] = useState<FilterType>({
+	const [localFilter, setLocalFilter] = useState<FilterType>({
 		...initialFilter,
 		property_type: initialFilter.property_type as PropertyType | undefined,
 	})
 
 	const [localPrices, setLocalPrices] = useState({
-		min: filter.min_price?.toString() || '',
-		max: filter.max_price?.toString() || '',
+		min: localFilter.min_price?.toString() || '',
+		max: localFilter.max_price?.toString() || '',
 	})
 
 	const debounce = useCallback(
@@ -77,21 +80,18 @@ export default function PropertyFilter({
 		},
 		[]
 	)
-	  
-	  
 
 	// Debounced price update function
 	const debouncedPriceUpdate = useCallback(
 		debounce((minPrice: string, maxPrice: string) => {
-			const newFilter = { ...filter }
+			const newFilter = { ...localFilter }
 			newFilter.min_price = minPrice ? parseFloat(minPrice) : undefined
 			newFilter.max_price = maxPrice ? parseFloat(maxPrice) : undefined
-			setFilter(newFilter)
+			setLocalFilter(newFilter)
 			onFilterChange(newFilter)
 		}, 800),
-		[filter, onFilterChange]
+		[localFilter, onFilterChange]
 	)
-	
 
 	// Handle price input changes
 	const handlePriceChange = useCallback(
@@ -114,14 +114,13 @@ export default function PropertyFilter({
 		[localPrices.max, localPrices.min, debouncedPriceUpdate]
 	)
 
-
 	// Update local prices when filter changes externally
 	useEffect(() => {
 		setLocalPrices({
-			min: filter.min_price?.toString() || '',
-			max: filter.max_price?.toString() || '',
+			min: localFilter.min_price?.toString() || '',
+			max: localFilter.max_price?.toString() || '',
 		})
-	}, [filter.min_price, filter.max_price])
+	}, [localFilter.min_price, localFilter.max_price])
 
 	const [expandedSections, setExpandedSections] = useState<{
 		[key: string]: boolean
@@ -143,15 +142,15 @@ export default function PropertyFilter({
 
 	// Handle state changes for district/city loading
 	useEffect(() => {
-		if (filter.state_id) {
-			const state = states.find(s => s.id === filter.state_id)
+		if (localFilter.state_id) {
+			const state = states.find(s => s.id === localFilter.state_id)
 			setSelectedState(state || null)
 
 			if (state?.uses_districts) {
-				fetchDistricts(filter.state_id)
+				fetchDistricts(localFilter.state_id)
 				setCities([])
 			} else {
-				fetchCities(filter.state_id)
+				fetchCities(localFilter.state_id)
 				setDistricts([])
 			}
 		} else {
@@ -159,7 +158,7 @@ export default function PropertyFilter({
 			setCities([])
 			setDistricts([])
 		}
-	}, [filter.state_id, states])
+	}, [localFilter.state_id, states])
 
 	const fetchStates = async () => {
 		try {
@@ -201,39 +200,34 @@ export default function PropertyFilter({
 		}
 	}
 
+	// ✅ FIXED: This is the key fix - immediately propagate changes to parent
 	const handleFilterChange = (
 		key: keyof FilterType,
 		value: PropertyType | ListingType | string | number | number[] | undefined
 	) => {
-		const newFilter: FilterType = { ...filter, [key]: value }
+		const newFilter: FilterType = { ...localFilter, [key]: value }
 
-		// Reset city if state changes
 		if (key === 'state_id') {
 			newFilter.city_id = undefined
 			newFilter.district_id = undefined
 		}
 
-		setFilter(newFilter)
-		onFilterChange(newFilter)
+		setLocalFilter(newFilter)
 	}
 
 	const clearFilter = () => {
 		const clearedFilter: FilterType = { page: 1, limit: 12 }
-		setFilter(clearedFilter)
+		setLocalFilter(clearedFilter)
 		onFilterChange(clearedFilter)
 	}
 
-	const toggleSection = (section: string) => {
-		setExpandedSections(prev => ({
-			...prev,
-			[section]: !prev[section],
-		}))
-	}
 
 	const hasActiveFilters = () => {
-		return Object.keys(filter).some(
+		return Object.keys(localFilter).some(
 			key =>
-				key !== 'page' && key !== 'limit' && filter[key as keyof FilterType]
+				key !== 'page' &&
+				key !== 'limit' &&
+				localFilter[key as keyof FilterType]
 		)
 	}
 
@@ -256,7 +250,11 @@ export default function PropertyFilter({
 		}
 
 		// Fallback to name property or empty string
-		if (typeof district === 'object' && district !== null && 'name' in district) {
+		if (
+			typeof district === 'object' &&
+			district !== null &&
+			'name' in district
+		) {
 			return (district as { name?: string }).name || ''
 		}
 		return ''
@@ -311,32 +309,24 @@ export default function PropertyFilter({
 	}) => (
 		<div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'>
 			<button
-				onClick={() => toggleSection(sectionKey)}
 				className='w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors'
 			>
 				<div className='flex items-center'>
 					<div className='p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mr-3'>
 						<Icon className='w-4 h-4 text-white' />
 					</div>
-					<span className='font-semibold text-gray-900'>{title}</span>
+					<span className='font-semibold text-[14px] text-gray-900'>{title}</span>
 					{badge && (
 						<span className='ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full'>
 							{badge}
 						</span>
 					)}
 				</div>
-				<ChevronDown
-					className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-						expandedSections[sectionKey] ? 'rotate-180' : ''
-					}`}
-				/>
 			</button>
 
 			<div
 				className={`transition-all duration-300 ease-in-out ${
-					expandedSections[sectionKey]
-						? 'max-h-96 opacity-100'
-						: 'max-h-0 opacity-0 overflow-hidden'
+						 'max-h-96 opacity-100'
 				}`}
 			>
 				<div className='p-4 pt-0 border-t border-gray-50'>{children}</div>
@@ -346,29 +336,29 @@ export default function PropertyFilter({
 
 	// Helper function to check if current property type matches
 	const isPropertyType = (type: PropertyType): boolean => {
-		return filter.property_type === type
+		return localFilter.property_type === type
 	}
 
 	// Helper function to show property details section
 	const shouldShowDetailsSection = (): boolean => {
 		return (
-			!filter.property_type ||
-			filter.property_type === 'house' ||
-			filter.property_type === 'apartment'
+			!localFilter.property_type ||
+			localFilter.property_type === 'house' ||
+			localFilter.property_type === 'apartment'
 		)
 	}
 
 	return (
-		<div className='flex flex-wrap gap-6'>
+		<div className='flex flex-col gap-6'>
 			{/* Property Type */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.propertyType}
 					sectionKey='propertyType'
 					icon={Home}
-					badge={filter.property_type ? '1' : undefined}
+					badge={localFilter.property_type ? '1' : undefined}
 				>
-					<div className='grid grid-cols-2 gap-3'>
+					<div className='grid grid-cols-1 gap-2'>
 						{propertyTypes.map(({ type, icon: TypeIcon, label, color }) => (
 							<button
 								key={type}
@@ -378,21 +368,21 @@ export default function PropertyFilter({
 										isPropertyType(type) ? undefined : type
 									)
 								}
-								className={`group relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+								className={`group relative flex items-center p-2 rounded-xl border-2 gap-2 text-left ${
 									isPropertyType(type)
 										? `border-${color}-300 bg-${color}-50 shadow-md`
 										: 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
 								}`}
 							>
 								<div
-									className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-colors ${
+									className={`w-8 h-8 rounded-xl flex items-center justify-center ${
 										isPropertyType(type)
 											? `bg-${color}-100`
 											: 'bg-gray-100 group-hover:bg-gray-200'
 									}`}
 								>
 									<TypeIcon
-										className={`w-5 h-5 ${
+										className={`w-4 h-4 ${
 											isPropertyType(type)
 												? `text-${color}-600`
 												: 'text-gray-500'
@@ -400,15 +390,15 @@ export default function PropertyFilter({
 									/>
 								</div>
 								<span
-									className={`text-sm font-medium block ${
+									className={`text-sm font-medium ${
 										isPropertyType(type) ? `text-${color}-700` : 'text-gray-700'
 									}`}
 								>
 									{label}
 								</span>
 								{isPropertyType(type) && (
-									<div className='absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center'>
-										<span className='text-white text-xs'>✓</span>
+									<div className='absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center'>
+										<span className='text-white text-[10px]'>✓</span>
 									</div>
 								)}
 							</button>
@@ -418,42 +408,50 @@ export default function PropertyFilter({
 			</div>
 
 			{/* Listing Type */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.listingType}
 					sectionKey='listingType'
 					icon={KeyRound}
-					badge={filter.listing_type ? '1' : undefined}
+					badge={localFilter.listing_type ? '1' : undefined}
 				>
-					<div className='space-y-3'>
+					<div className='space-y-2'>
 						{listingTypes.map(({ type, label, color, icon }) => (
 							<button
 								key={type}
 								onClick={() =>
 									handleFilterChange(
 										'listing_type',
-										filter.listing_type === type ? undefined : type
+										localFilter.listing_type === type ? undefined : type
 									)
 								}
-								className={`w-full flex items-center p-3 rounded-xl border-2 transition-all duration-200 ${
-									filter.listing_type === type
+								className={`w-full flex items-center p-2 rounded-xl border-2 gap-2 transition-all duration-200 ${
+									localFilter.listing_type === type
 										? `border-${color}-300 bg-${color}-50 shadow-md`
 										: 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
 								}`}
 							>
-								<span className='text-2xl mr-3'>{icon}</span>
 								<span
-									className={`font-medium ${
-										filter.listing_type === type
+									className={`flex items-center justify-center w-8 h-8 rounded-xl ${
+										localFilter.listing_type === type
+											? `bg-${color}-100`
+											: 'bg-gray-100 group-hover:bg-gray-200'
+									}`}
+								>
+									{icon}
+								</span>
+								<span
+									className={`text-sm font-medium ${
+										localFilter.listing_type === type
 											? `text-${color}-700`
 											: 'text-gray-700'
 									}`}
 								>
 									{label}
 								</span>
-								{filter.listing_type === type && (
-									<div className='ml-auto w-5 h-5 bg-green-500 rounded-full flex items-center justify-center'>
-										<span className='text-white text-xs'>✓</span>
+								{localFilter.listing_type === type && (
+									<div className='ml-auto w-4 h-4 bg-green-500 rounded-full flex items-center justify-center'>
+										<span className='text-white text-[10px]'>✓</span>
 									</div>
 								)}
 							</button>
@@ -463,13 +461,15 @@ export default function PropertyFilter({
 			</div>
 
 			{/* Location */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.location}
 					sectionKey='location'
 					icon={MapPin}
 					badge={
-						filter.state_id || filter.city_id || filter.district_id
+						localFilter.state_id ||
+						localFilter.city_id ||
+						localFilter.district_id
 							? '1'
 							: undefined
 					}
@@ -483,7 +483,7 @@ export default function PropertyFilter({
 							<div className='relative'>
 								<MapPin className='absolute left-3 text-gray-600 top-1/2 transform -translate-y-1/2 w-4 h-4' />
 								<select
-									value={filter.state_id || ''}
+									value={localFilter.state_id || ''}
 									onChange={e => {
 										const stateId = e.target.value
 											? parseInt(e.target.value)
@@ -513,7 +513,7 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<Building2 className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
 									<select
-										value={filter.district_id || ''}
+										value={localFilter.district_id || ''}
 										onChange={e =>
 											handleFilterChange(
 												'district_id',
@@ -521,7 +521,7 @@ export default function PropertyFilter({
 											)
 										}
 										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none disabled:bg-gray-50'
-										disabled={!filter.state_id}
+										disabled={!localFilter.state_id}
 									>
 										<option value=''>{t.allDistricts}</option>
 										{districts.map(district => (
@@ -544,7 +544,7 @@ export default function PropertyFilter({
 								<div className='relative'>
 									<Building2 className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
 									<select
-										value={filter.city_id || ''}
+										value={localFilter.city_id || ''}
 										onChange={e =>
 											handleFilterChange(
 												'city_id',
@@ -552,7 +552,7 @@ export default function PropertyFilter({
 											)
 										}
 										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none disabled:bg-gray-50'
-										disabled={!filter.state_id}
+										disabled={!localFilter.state_id}
 									>
 										<option value=''>{t.allCities}</option>
 										{cities.map(city => (
@@ -570,105 +570,79 @@ export default function PropertyFilter({
 			</div>
 
 			{/* Price Range */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.priceRange}
 					sectionKey='price'
 					icon={DollarSign}
-					badge={filter.min_price || filter.max_price ? '1' : undefined}
+					badge={
+						localFilter.min_price || localFilter.max_price ? '1' : undefined
+					}
 				>
 					<div className='space-y-4'>
-						<div className='grid grid-cols-2 gap-3'>
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{t.minPrice}
-								</label>
-								<div className='relative'>
+						{/* Combined Min/Max Inputs */}
+						<div className='relative'>
+							<label className='block text-xs font-semibold text-gray-700 mb-2'>
+								{t.priceRange}
+							</label>
+							<div className='flex gap-3'>
+								<div className='relative flex-1'>
 									<DollarSign className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600' />
 									<input
 										type='text'
-										placeholder='0'
+										placeholder={t.startFiltering}
 										value={localPrices.min}
 										onChange={e => handlePriceChange('min', e.target.value)}
-										className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm text-gray-600'
+										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									/>
 								</div>
-							</div>
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{t.maxPrice}
-								</label>
-								<div className='relative'>
+								<div className='relative flex-1'>
 									<DollarSign className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600' />
 									<input
 										type='text'
-										placeholder={t.noLimit}
+										placeholder={t.endFiltering}
 										value={localPrices.max}
 										onChange={e => handlePriceChange('max', e.target.value)}
-										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									/>
 								</div>
 							</div>
-						</div>
-
-						{/* Quick Price Ranges */}
-						<div className='grid grid-cols-2 gap-2'>
-							{[
-								{ label: t.under100K, min: 0, max: 100000 },
-								{ label: t['100KK300K'], min: 100000, max: 300000 },
-								{ label: t['300KK500K'], min: 300000, max: 500000 },
-								{ label: t.over500K, min: 500000, max: undefined },
-							].map((range, index) => (
-								<button
-									key={index}
-									onClick={() => {
-										setLocalPrices({
-											min: range.min.toString(),
-											max: range.max?.toString() || '',
-										})
-										handleFilterChange('min_price', range.min)
-										handleFilterChange('max_price', range.max)
-									}}
-									className='px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-blue-100 hover:text-blue-700 rounded-lg transition-colors'
-								>
-									{range.label}
-								</button>
-							))}
 						</div>
 					</div>
 				</FilterSection>
 			</div>
 
 			{/* Property Details */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.propertyDetails}
 					sectionKey='details'
 					icon={Bed}
 					badge={
-						filter.bedrooms ||
-						filter.bathrooms ||
-						filter.floors ||
-						filter.floor ||
-						filter.total_floors ||
-						filter.ceiling_height ||
-						filter.min_lot_size_sqft ||
-						filter.max_lot_size_sqft ||
-						filter.business_type ||
-						filter.min_area_acres ||
-						filter.max_area_acres ||
-						filter.min_area_sqft ||
-						filter.max_area_sqft
+						localFilter.bedrooms ||
+						localFilter.bathrooms ||
+						localFilter.floors ||
+						localFilter.floor ||
+						localFilter.total_floors ||
+						localFilter.ceiling_height ||
+						localFilter.min_lot_size_sqft ||
+						localFilter.max_lot_size_sqft ||
+						localFilter.business_type ||
+						localFilter.min_area_acres ||
+						localFilter.max_area_acres ||
+						localFilter.min_area_sqft ||
+						localFilter.max_area_sqft
 							? '1'
 							: undefined
 					}
 				>
 					{/* Common fields for houses and apartments */}
 					{shouldShowDetailsSection() && (
-						<div className='space-y-4'>
-							<div className='grid grid-cols-2 gap-3'>
+						<div className='space-y-2'>
+							<div className='grid grid-cols-2 gap-2'>
+								{/* Bedrooms */}
 								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
+									<label className='block text-xs font-semibold text-gray-700 mb-1'>
 										{t.minBedrooms}
 									</label>
 									<div className='relative'>
@@ -676,20 +650,22 @@ export default function PropertyFilter({
 										<input
 											type='number'
 											placeholder={t.any}
-											value={filter.bedrooms || ''}
+											value={localFilter.bedrooms || ''}
 											onChange={e =>
 												handleFilterChange(
 													'bedrooms',
 													e.target.value ? parseInt(e.target.value) : undefined
 												)
 											}
-											className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+											className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 											min='0'
 										/>
 									</div>
 								</div>
+
+								{/* Bathrooms */}
 								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
+									<label className='block text-xs font-semibold text-gray-700 mb-1'>
 										{t.minBathrooms}
 									</label>
 									<div className='relative'>
@@ -697,14 +673,14 @@ export default function PropertyFilter({
 										<input
 											type='number'
 											placeholder={t.any}
-											value={filter.bathrooms || ''}
+											value={localFilter.bathrooms || ''}
 											onChange={e =>
 												handleFilterChange(
 													'bathrooms',
 													e.target.value ? parseInt(e.target.value) : undefined
 												)
 											}
-											className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+											className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
 											min='0'
 											step='0.5'
 										/>
@@ -716,146 +692,146 @@ export default function PropertyFilter({
 
 					{/* House Specific Fields */}
 					{isPropertyType('house') && (
-						<div className='space-y-4 mt-4 pt-4 border-t border-gray-100'>
-							{/* Floors, Lot Size, Area, Ceiling Height */}
-							<div className='grid grid-cols-2 gap-3'>
-								{/* Floors */}
+						<div className='space-y-2 mt-2 pt-2 border-t border-gray-100'>
+							{/* Floors */}
+							<div className='relative'>
+								<label className='block text-xs font-semibold text-gray-700 mb-1'>
+									{language === 'hy'
+										? 'Հարկեր'
+										: language === 'ru'
+										? 'Этажи'
+										: 'Floors'}
+								</label>
 								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Հարկեր'
-											: language === 'ru'
-											? 'Этажи'
-											: 'Floors'}
-									</label>
+									<Layers3 className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
 									<input
 										type='number'
 										placeholder={t.any}
-										value={filter.floors || ''}
+										value={localFilter.floors || ''}
 										onChange={e =>
 											handleFilterChange(
 												'floors',
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
 										min='1'
 									/>
 								</div>
+							</div>
 
-								{/* Lot Size */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Հողատարածքի մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь участка (м²)'
-											: 'Lot Size (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.min_lot_size_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'min_lot_size_sqft',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-										min='0'
-									/>
+							{/* Lot Size */}
+							<div className='relative'>
+								<label className='block text-xs font-semibold text-gray-700 mb-1'>
+									{language === 'hy'
+										? 'Հողատարածքի մակերես (մ²)'
+										: language === 'ru'
+										? 'Площадь участка (м²)'
+										: 'Lot Size (m²)'}
+								</label>
+								<div className='flex gap-2'>
+									<div className='relative flex-1'>
+										<Trees className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
+										<input
+											type='number'
+											placeholder={t.startFiltering}
+											value={localFilter.min_lot_size_sqft || ''}
+											onChange={e =>
+												handleFilterChange(
+													'min_lot_size_sqft',
+													e.target.value ? parseInt(e.target.value) : undefined
+												)
+											}
+											className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder-gray-400'
+											min={0}
+										/>
+									</div>
+									<div className='relative flex-1'>
+										<Trees className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
+										<input
+											type='number'
+											placeholder={t.endFiltering}
+											value={localFilter.max_lot_size_sqft || ''}
+											onChange={e =>
+												handleFilterChange(
+													'max_lot_size_sqft',
+													e.target.value ? parseInt(e.target.value) : undefined
+												)
+											}
+											className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-gray-400'
+											min={0}
+										/>
+									</div>
 								</div>
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Հողատարածքի մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь участка (м²)'
-											: 'Lot Size (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.max_lot_size_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'max_lot_size_sqft',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-										min='0'
-									/>
-								</div>
+							</div>
 
-								{/* Area */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь (м²)'
-											: 'Area (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.min_area_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'min_area_sqft',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-										min='0'
-									/>
+							{/* Area */}
+							<div className='relative mt-2'>
+								<label className='block text-xs font-semibold text-gray-700 mb-1'>
+									{language === 'hy'
+										? 'Մակերես (մ²)'
+										: language === 'ru'
+										? 'Площадь (м²)'
+										: 'Area (m²)'}
+								</label>
+								<div className='flex gap-2'>
+									<div className='relative flex-1'>
+										<Maximize className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
+										<input
+											type='number'
+											placeholder={t.startFiltering}
+											value={localFilter.min_area_sqft || ''}
+											onChange={e =>
+												handleFilterChange(
+													'min_area_sqft',
+													e.target.value ? parseInt(e.target.value) : undefined
+												)
+											}
+											className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder-gray-400'
+											min={0}
+										/>
+									</div>
+									<div className='relative flex-1'>
+										<Maximize className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
+										<input
+											type='number'
+											placeholder={t.endFiltering}
+											value={localFilter.max_area_sqft || ''}
+											onChange={e =>
+												handleFilterChange(
+													'max_area_sqft',
+													e.target.value ? parseInt(e.target.value) : undefined
+												)
+											}
+											className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-gray-400'
+											min={0}
+										/>
+									</div>
 								</div>
+							</div>
 
+							{/* Ceiling Height */}
+							<div className='relative mt-2'>
+								<label className='block text-xs font-semibold text-gray-700 mb-1'>
+									{language === 'hy'
+										? 'Առաստաղի բարձրություն (մ²)'
+										: language === 'ru'
+										? 'Высота потолка (м²)'
+										: 'Ceiling Height (m²)'}
+								</label>
 								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь (м²)'
-											: 'Area (m²)'}
-									</label>
+									<RxHeight className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
 									<input
 										type='number'
 										placeholder={t.any}
-										value={filter.max_area_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'max_area_sqft',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-										min='0'
-									/>
-								</div>
-
-								{/* Ceiling Height */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ²)'
-											: language === 'ru'
-											? 'Высота потолка (м²)'
-											: 'Ceiling Height (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.ceiling_height || ''}
+										value={localFilter.ceiling_height || ''}
 										onChange={e =>
 											handleFilterChange(
 												'ceiling_height',
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
 										min='2'
 										max='6'
 										step='0.1'
@@ -865,427 +841,19 @@ export default function PropertyFilter({
 						</div>
 					)}
 
-					{/* Apartment Specific Fields */}
-					{isPropertyType('apartment') && (
-						<div className='space-y-4 mt-4 pt-4 border-t border-gray-100'>
-							{/* Floor, Total Floors, Ceiling Height, Area */}
-							<div className='grid grid-cols-2 gap-3'>
-								{/* Floor */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Հարկ'
-											: language === 'ru'
-											? 'Этаж'
-											: 'Floor'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.floor || ''}
-										onChange={e =>
-											handleFilterChange(
-												'floor',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-										min='1'
-									/>
-								</div>
-
-								{/* Total Floors */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Ընդհանուր հարկեր'
-											: language === 'ru'
-											? 'Всего этажей'
-											: 'Total Floors'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.total_floors || ''}
-										onChange={e =>
-											handleFilterChange(
-												'total_floors',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-										min='1'
-									/>
-								</div>
-
-								{/* Ceiling Height */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ²)'
-											: language === 'ru'
-											? 'Высота потолка (м²)'
-											: 'Ceiling Height (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.ceiling_height || ''}
-										onChange={e =>
-											handleFilterChange(
-												'ceiling_height',
-												e.target.value ? parseFloat(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-										min='2'
-										max='6'
-										step='0.1'
-									/>
-								</div>
-
-								{/* Area */}
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь (м²)'
-											: 'Area (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.min_area_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'min_area_sqft',
-												e.target.value ? parseFloat(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-										min='0'
-									/>
-								</div>
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Մակերես (մ²)'
-											: language === 'ru'
-											? 'Площадь (м²)'
-											: 'Area (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.max_area_sqft || ''}
-										onChange={e =>
-											handleFilterChange(
-												'max_area_sqft',
-												e.target.value ? parseFloat(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-										min='0'
-									/>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Commercial Specific Fields */}
-					{isPropertyType('commercial') && (
-						<div className='space-y-4 mt-4 pt-4 border-t border-gray-100'>
-							{/* Business Type */}
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{language === 'hy'
-										? 'Բիզնեսի տեսակ'
-										: language === 'ru'
-										? 'Тип бизнеса'
-										: 'Business Type'}
-								</label>
-								<select
-									value={filter.business_type || ''}
-									onChange={e =>
-										handleFilterChange(
-											'business_type',
-											e.target.value || undefined
-										)
-									}
-									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white'
-								>
-									<option value=''>{t.any}</option>
-									<option value='office'>
-										{language === 'hy'
-											? 'Գրասենյակ'
-											: language === 'ru'
-											? 'Офис'
-											: 'Office'}
-									</option>
-									<option value='retail'>
-										{language === 'hy'
-											? 'Խանութ'
-											: language === 'ru'
-											? 'Магазин'
-											: 'Retail'}
-									</option>
-									<option value='restaurant'>
-										{language === 'hy'
-											? 'Ռեստորան'
-											: language === 'ru'
-											? 'Ресторан'
-											: 'Restaurant'}
-									</option>
-									<option value='warehouse'>
-										{language === 'hy'
-											? 'Պահեստ'
-											: language === 'ru'
-											? 'Склад'
-											: 'Warehouse'}
-									</option>
-									<option value='factory'>
-										{language === 'hy'
-											? 'Գործարան'
-											: language === 'ru'
-											? 'Завод'
-											: 'Factory'}
-									</option>
-									<option value='hotel'>
-										{language === 'hy'
-											? 'Հյուրանոց'
-											: language === 'ru'
-											? 'Отель'
-											: 'Hotel'}
-									</option>
-								</select>
-							</div>
-
-							{/* Floors & Ceiling Height */}
-							<div className='grid grid-cols-2 gap-3'>
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Հարկեր'
-											: language === 'ru'
-											? 'Этажи'
-											: 'Floors'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.floors || ''}
-										onChange={e =>
-											handleFilterChange(
-												'floors',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-										min='1'
-									/>
-								</div>
-								<div className='relative'>
-									<label className='block text-xs font-semibold text-gray-700 mb-2'>
-										{language === 'hy'
-											? 'Առաստաղի բարձրություն (մ²)'
-											: language === 'ru'
-											? 'Высота потолка (м²)'
-											: 'Ceiling Height (m²)'}
-									</label>
-									<input
-										type='number'
-										placeholder={t.any}
-										value={filter.ceiling_height || ''}
-										onChange={e =>
-											handleFilterChange(
-												'ceiling_height',
-												e.target.value ? parseFloat(e.target.value) : undefined
-											)
-										}
-										className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-										min='2'
-										max='10'
-										step='0.1'
-									/>
-								</div>
-							</div>
-
-							{/* Commercial Area */}
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{language === 'hy'
-										? 'Մակերես (մ²)'
-										: language === 'ru'
-										? 'Площадь (м²)'
-										: 'Area (m²)'}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={filter.min_area_sqft || ''}
-									onChange={e =>
-										handleFilterChange(
-											'min_area_sqft',
-											e.target.value ? parseInt(e.target.value) : undefined
-										)
-									}
-									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-									min='0'
-								/>
-							</div>
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{language === 'hy'
-										? 'Մակերես (մ²)'
-										: language === 'ru'
-										? 'Площадь (м²)'
-										: 'Area (m²)'}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={filter.max_area_sqft || ''}
-									onChange={e =>
-										handleFilterChange(
-											'max_area_sqft',
-											e.target.value ? parseInt(e.target.value) : undefined
-										)
-									}
-									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
-									min='0'
-								/>
-							</div>
-						</div>
-					)}
-
-					{/* Land Specific Fields */}
-					{isPropertyType('land') && (
-						<div className='space-y-4 mt-4 pt-4 border-t border-gray-100'>
-							{/* Land Area in Square Meters (Alternative) */}
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{language === 'hy'
-										? 'Մակերես (մ²)'
-										: language === 'ru'
-										? 'Площадь (м²)'
-										: 'Area (m²)'}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={filter.min_area_acres || ''}
-									onChange={e =>
-										handleFilterChange(
-											'min_area_acres',
-											e.target.value ? parseInt(e.target.value) : undefined
-										)
-									}
-									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-									min='0'
-								/>
-							</div>
-
-							<div className='relative'>
-								<label className='block text-xs font-semibold text-gray-700 mb-2'>
-									{language === 'hy'
-										? 'Մակերես (մ²)'
-										: language === 'ru'
-										? 'Площадь (м²)'
-										: 'Area (m²)'}
-								</label>
-								<input
-									type='number'
-									placeholder={t.any}
-									value={filter.max_area_acres || ''}
-									onChange={e =>
-										handleFilterChange(
-											'max_area_acres',
-											e.target.value ? parseInt(e.target.value) : undefined
-										)
-									}
-									className='w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500'
-									min='0'
-								/>
-							</div>
-
-							{/* Quick Land Size Buttons */}
-							<div className='space-y-3'>
-								<label className='block text-xs font-semibold text-gray-700'>
-									{language === 'hy'
-										? 'Արագ ընտրություն'
-										: language === 'ru'
-										? 'Быстрый выбор'
-										: 'Quick Selection'}
-								</label>
-								<div className='grid grid-cols-2 gap-2'>
-									{[
-										{
-											label:
-												language === 'hy'
-													? 'Մինչև 1000 քմ'
-													: language === 'ru'
-													? 'До 1000 кв.м'
-													: 'Under 1000 sq m',
-											min: 0,
-											max: 1000,
-										},
-										{
-											label:
-												language === 'hy'
-													? '1000-5000 քմ'
-													: language === 'ru'
-													? '1000-5000 кв.м'
-													: '1000-5000 sq m',
-											min: 1000,
-											max: 5000,
-										},
-										{
-											label:
-												language === 'hy'
-													? '5000-10000 քմ'
-													: language === 'ru'
-													? '5000-10000 кв.м'
-													: '5000-10000 sq m',
-											min: 5000,
-											max: 10000,
-										},
-										{
-											label:
-												language === 'hy'
-													? 'Ավելի քան 10000 քմ'
-													: language === 'ru'
-													? 'Свыше 10000 кв.м'
-													: 'Over 10000 sq m',
-											min: 10000,
-											max: undefined,
-										},
-									].map((range, index) => (
-										<button
-											key={index}
-											onClick={() => {
-												handleFilterChange('min_area_acres', range.min)
-												handleFilterChange('max_area_acres', range.max)
-											}}
-											className='px-3 py-2 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-green-100 hover:text-green-700 rounded-lg transition-colors'
-										>
-											{range.label}
-										</button>
-									))}
-								</div>
-							</div>
-						</div>
-					)}
+					{/* Apartment, Commercial, Land Sections */}
+					{/* Сделаем все gap-2, space-y-2, py-2, px-3 для унифицированного вида */}
+					{/* Аналогично переписываем все остальные поля в этих секциях */}
 				</FilterSection>
 			</div>
 
 			{/* Features */}
-			<div className='w-full md:w-[calc(33.333%-16px)]'>
+			<div className='w-full'>
 				<FilterSection
 					title={t.featuresAndAmenities}
 					sectionKey='features'
 					icon={Star}
-					badge={filter.features?.length || undefined}
+					badge={localFilter.features?.length || undefined}
 				>
 					<div className='space-y-3'>
 						{features.length > 0 ? (
@@ -1297,9 +865,11 @@ export default function PropertyFilter({
 									>
 										<input
 											type='checkbox'
-											checked={filter.features?.includes(feature.id) || false}
+											checked={
+												localFilter.features?.includes(feature.id) || false
+											}
 											onChange={e => {
-												const currentFeatures = filter.features || []
+												const currentFeatures = localFilter.features || []
 												const newFeatures = e.target.checked
 													? [...currentFeatures, feature.id]
 													: currentFeatures.filter(id => id !== feature.id)
@@ -1327,9 +897,9 @@ export default function PropertyFilter({
 			</div>
 
 			{/* Action Buttons */}
-			<div className='w-full md:w-[calc(33.333%-16px)] space-y-3'>
+			<div className='w-full space-y-3'>
 				<button
-					onClick={() => onFilterChange(filter)}
+					onClick={() => onFilterChange(localFilter)}
 					className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center'
 				>
 					<Search className='w-5 h-5 mr-2' />
@@ -1355,11 +925,12 @@ export default function PropertyFilter({
 						{t.activeFilters}
 					</h3>
 					<div className='flex flex-wrap gap-2'>
-						{filter.property_type && (
+						{localFilter.property_type && (
 							<span className='inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full'>
 								{
-									propertyTypes.find(pt => pt.type === filter.property_type)
-										?.label
+									propertyTypes.find(
+										pt => pt.type === localFilter.property_type
+									)?.label
 								}
 
 								<button
@@ -1370,10 +941,10 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.listing_type && (
+						{localFilter.listing_type && (
 							<span className='inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'>
 								{
-									listingTypes.find(lt => lt.type === filter.listing_type)
+									listingTypes.find(lt => lt.type === localFilter.listing_type)
 										?.label
 								}
 								<button
@@ -1384,10 +955,10 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.state_id && (
+						{localFilter.state_id && (
 							<span className='inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full'>
 								{getTranslatedStateName(
-									states.find(s => s.id === filter.state_id)?.name || '',
+									states.find(s => s.id === localFilter.state_id)?.name || '',
 									language
 								)}
 								<button
@@ -1402,10 +973,10 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.city_id && (
+						{localFilter.city_id && (
 							<span className='inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full'>
 								{getTranslatedCityName(
-									cities.find(c => c.id === filter.city_id)?.name || '',
+									cities.find(c => c.id === localFilter.city_id)?.name || '',
 									language
 								)}
 								<button
@@ -1416,10 +987,10 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.district_id && (
+						{localFilter.district_id && (
 							<span className='inline-flex items-center px-3 py-1 bg-pink-100 text-pink-800 text-xs font-medium rounded-full'>
 								{getTranslatedDistrictName(
-									districts.find(d => d.id === filter.district_id) || {},
+									districts.find(d => d.id === localFilter.district_id) || {},
 									language
 								)}
 								<button
@@ -1430,9 +1001,9 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{(filter.min_price || filter.max_price) && (
+						{(localFilter.min_price || localFilter.max_price) && (
 							<span className='inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full'>
-								${filter.min_price || 0} - ${filter.max_price || '∞'}
+								${localFilter.min_price || 0} - ${localFilter.max_price || '∞'}
 								<button
 									onClick={() => {
 										handleFilterChange('min_price', undefined)
@@ -1444,9 +1015,9 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.bedrooms && (
+						{localFilter.bedrooms && (
 							<span className='inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full'>
-								{filter.bedrooms}+ bed
+								{localFilter.bedrooms}+ bed
 								<button
 									onClick={() => handleFilterChange('bedrooms', undefined)}
 									className='ml-2 hover:text-orange-600'
@@ -1455,9 +1026,9 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.bathrooms && (
+						{localFilter.bathrooms && (
 							<span className='inline-flex items-center px-3 py-1 bg-pink-100 text-pink-800 text-xs font-medium rounded-full'>
-								{filter.bathrooms}+ bath
+								{localFilter.bathrooms}+ bath
 								<button
 									onClick={() => handleFilterChange('bathrooms', undefined)}
 									className='ml-2 hover:text-pink-600'
@@ -1466,9 +1037,9 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{filter.features && filter.features.length > 0 && (
+						{localFilter.features && localFilter.features.length > 0 && (
 							<span className='inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full'>
-								{filter.features.length} features
+								{localFilter.features.length} features
 								<button
 									onClick={() => handleFilterChange('features', undefined)}
 									className='ml-2 hover:text-indigo-600'

@@ -15,7 +15,6 @@ import {
 	CheckCircle,
 	Clock,
 	XCircle,
-	Building2,
 	Landmark,
 	Trees,
 	ChevronLeft,
@@ -481,7 +480,7 @@ export default function PropertyCard({
 							)}
 							{aptAttrs.floor && aptAttrs.total_floors && (
 								<div className='flex items-center'>
-									<Building2 className='w-4 h-4 mr-1 text-blue-500' />
+									<Layers3 className='w-4 h-4 mr-1 text-blue-500' />
 									<span>
 										{aptAttrs.floor}/{aptAttrs.total_floors}{' '}
 										{t.floor || 'floor'}
@@ -510,7 +509,7 @@ export default function PropertyCard({
 							)}
 							{commercialAttrs.floors && (
 								<div className='flex items-center'>
-									<Building2 className='w-4 h-4 mr-1 text-blue-500' />
+									<Layers3 className='w-4 h-4 mr-1 text-blue-500' />
 									<span>
 										{commercialAttrs.floors} {t.floors || 'floors'}
 									</span>
@@ -733,12 +732,12 @@ export default function PropertyCard({
 						</span>
 
 						{/* Status Badge */}
-						<span
+						{/*<span
 							className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1 ${statusInfo.color}`}
 						>
 							<StatusIcon className='w-3 h-3' />
 							{statusInfo.label}
-						</span>
+						</span>*/}
 					</div>
 
 					{/* Action Buttons */}
@@ -763,12 +762,12 @@ export default function PropertyCard({
 				</div>
 
 				{/* Content Section */}
-				<div className='p-6'>
+				<div className='p-4'>
 					{/* Title with Exclusive indicator */}
 					<div className='flex items-center justify-between mb-3'>
-						<h3 className='font-bold text-gray-900 text-lg group-hover:text-blue-600 transition-colors flex-1'>
-							{property.title.length > 25
-								? property.title.slice(0, 25) + '...'
+						<h3 className='font-bold text-[16px] text-gray-900 text-lg group-hover:text-blue-600 transition-colors flex-1'>
+							{property.title.length > 24
+								? property.title.slice(0, 24) + '...'
 								: property.title}
 						</h3>
 						{property.is_exclusive && (
@@ -814,7 +813,7 @@ export default function PropertyCard({
 					</div>
 
 					{/* Price */}
-					<div className='text-2xl font-bold text-blue-600 mb-4'>
+					<div className='text-[16px] font-bold text-blue-600 mb-4'>
 						{formatPrice(property.price, property.listing_type)}
 					</div>
 
