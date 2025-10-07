@@ -156,64 +156,64 @@ export default function PropertyCard({
 	}
 
 	// Get status info with icons and colors
-	const getStatusInfo = (status: PropertyStatus) => {
-		const statusStr =
-			typeof status === 'object' ? status?.name || 'active' : String(status)
+	// const getStatusInfo = (status: PropertyStatus) => {
+	// 	const statusStr =
+	// 		typeof status === 'object' ? status?.name || 'active' : String(status)
 
-		const statuses = {
-			active: {
-				icon: CheckCircle,
-				label:
-					language === 'hy'
-						? 'Ակտիվ'
-						: language === 'ru'
-						? 'Активный'
-						: 'Active',
-				color: 'bg-green-100 text-green-800 border-green-200',
-			},
-			pending: {
-				icon: Clock,
-				label:
-					language === 'hy'
-						? 'Սպասող'
-						: language === 'ru'
-						? 'В ожидании'
-						: 'Pending',
-				color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-			},
-			sold: {
-				icon: XCircle,
-				label:
-					language === 'hy'
-						? 'Վաճառված'
-						: language === 'ru'
-						? 'Продано'
-						: 'Sold',
-				color: 'bg-red-100 text-red-800 border-red-200',
-			},
-			rented: {
-				icon: Pause,
-				label:
-					language === 'hy'
-						? 'Վարձակալված'
-						: language === 'ru'
-						? 'Арендовано'
-						: 'Rented',
-				color: 'bg-purple-100 text-purple-800 border-purple-200',
-			},
-			inactive: {
-				icon: AlertCircle,
-				label:
-					language === 'hy'
-						? 'Ոչ ակտիվ'
-						: language === 'ru'
-						? 'Неактивный'
-						: 'Inactive',
-				color: 'bg-gray-100 text-gray-800 border-gray-200',
-			},
-		}
-		return statuses[statusStr as keyof typeof statuses] || statuses.active
-	}
+	// 	const statuses = {
+	// 		active: {
+	// 			icon: CheckCircle,
+	// 			label:
+	// 				language === 'hy'
+	// 					? 'Ակտիվ'
+	// 					: language === 'ru'
+	// 					? 'Активный'
+	// 					: 'Active',
+	// 			color: 'bg-green-100 text-green-800 border-green-200',
+	// 		},
+	// 		pending: {
+	// 			icon: Clock,
+	// 			label:
+	// 				language === 'hy'
+	// 					? 'Սպասող'
+	// 					: language === 'ru'
+	// 					? 'В ожидании'
+	// 					: 'Pending',
+	// 			color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+	// 		},
+	// 		sold: {
+	// 			icon: XCircle,
+	// 			label:
+	// 				language === 'hy'
+	// 					? 'Վաճառված'
+	// 					: language === 'ru'
+	// 					? 'Продано'
+	// 					: 'Sold',
+	// 			color: 'bg-red-100 text-red-800 border-red-200',
+	// 		},
+	// 		rented: {
+	// 			icon: Pause,
+	// 			label:
+	// 				language === 'hy'
+	// 					? 'Վարձակալված'
+	// 					: language === 'ru'
+	// 					? 'Арендовано'
+	// 					: 'Rented',
+	// 			color: 'bg-purple-100 text-purple-800 border-purple-200',
+	// 		},
+	// 		inactive: {
+	// 			icon: AlertCircle,
+	// 			label:
+	// 				language === 'hy'
+	// 					? 'Ոչ ակտիվ'
+	// 					: language === 'ru'
+	// 					? 'Неактивный'
+	// 					: 'Inactive',
+	// 			color: 'bg-gray-100 text-gray-800 border-gray-200',
+	// 		},
+	// 	}
+	// 	return statuses[statusStr as keyof typeof statuses] || statuses.active
+	// }
 
 	// Mouse events
 	const handleMouseDown = (e: React.MouseEvent) => {
