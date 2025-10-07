@@ -7,6 +7,7 @@ import {
 	generateOrganizationSchema,
 	generateWebsiteSchema,
 } from '@/utils/structuredData'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -164,7 +165,10 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<ClientLayout>{children}</ClientLayout>
+				<ClientLayout>
+					{children}
+					<SpeedInsights />
+				</ClientLayout>
 			</body>
 		</html>
 	)

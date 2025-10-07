@@ -122,17 +122,6 @@ export default function PropertyFilter({
 		})
 	}, [localFilter.min_price, localFilter.max_price])
 
-	const [expandedSections, setExpandedSections] = useState<{
-		[key: string]: boolean
-	}>({
-		propertyType: true,
-		listingType: true,
-		location: true,
-		price: true,
-		details: false,
-		features: false,
-		status: false,
-	})
 
 	useEffect(() => {
 		// Fetch initial data
@@ -296,13 +285,11 @@ export default function PropertyFilter({
 
 	const FilterSection = ({
 		title,
-		sectionKey,
 		icon: Icon,
 		children,
 		badge,
 	}: {
 		title: string
-		sectionKey: string
 		icon: React.ComponentType<{ className?: string }>
 		children: React.ReactNode
 		badge?: number | string
@@ -354,7 +341,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.propertyType}
-					sectionKey='propertyType'
 					icon={Home}
 					badge={localFilter.property_type ? '1' : undefined}
 				>
@@ -411,7 +397,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.listingType}
-					sectionKey='listingType'
 					icon={KeyRound}
 					badge={localFilter.listing_type ? '1' : undefined}
 				>
@@ -464,7 +449,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.location}
-					sectionKey='location'
 					icon={MapPin}
 					badge={
 						localFilter.state_id ||
@@ -573,7 +557,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.priceRange}
-					sectionKey='price'
 					icon={DollarSign}
 					badge={
 						localFilter.min_price || localFilter.max_price ? '1' : undefined
@@ -616,7 +599,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.propertyDetails}
-					sectionKey='details'
 					icon={Bed}
 					badge={
 						localFilter.bedrooms ||
@@ -851,7 +833,6 @@ export default function PropertyFilter({
 			<div className='w-full'>
 				<FilterSection
 					title={t.featuresAndAmenities}
-					sectionKey='features'
 					icon={Star}
 					badge={localFilter.features?.length || undefined}
 				>

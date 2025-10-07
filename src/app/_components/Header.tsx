@@ -119,7 +119,6 @@ const Header = () => {
 		<header className='sticky top-0 z-50 bg-white shadow-md border-b border-gray-200'>
 			<div className='container mx-auto px-4 sm:px-6'>
 				<div className='flex items-center justify-between h-16 sm:h-20'>
-					{/* Logo с небольшим сдвигом вправо на десктопе */}
 					<Link
 						href={`/${currentLang}`}
 						className='flex items-center group flex-shrink-0 lg:ml-24'
@@ -130,7 +129,7 @@ const Header = () => {
 								alt='Chance Realty Logo'
 								width={280}
 								height={160}
-								className='h-45 w-45 transition-all duration-500 group-hover:scale-105'
+								className='h-45 w-45'
 								priority
 							/>
 						</div>

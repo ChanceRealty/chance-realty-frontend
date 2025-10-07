@@ -1,4 +1,4 @@
-// PropertiesContent.tsx - Updated to filter hidden properties
+// PropertiesContent.tsx - Updated with fixed sortBy function
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
@@ -19,20 +19,12 @@ import {
 	Grid3X3,
 	List,
 	SlidersHorizontal,
-	Search,
 	MapPin,
-	Home,
-	RefreshCw,
 	ChevronDown,
-	X,
-	Eye,
-	Calendar,
-	Crown, // Add Crown for exclusive filter
+	Crown,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { t } from '@/translations/translations'
-import Image from 'next/image'
 
 type PropertyCardProps = {
 	property?: Property
@@ -56,7 +48,8 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		'created_at'
 	)
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-	const [showExclusiveOnly, setShowExclusiveOnly] = useState(false) // Add exclusive filter
+	const [showExclusiveOnly, setShowExclusiveOnly] = useState(false)
+	const [showSortMenu, setShowSortMenu] = useState(false)
 
 	// Initialize filter from URL params
 	const [filter, setFilter] = useState<FilterType>(() => {
@@ -75,7 +68,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		const max_price = searchParams.get('max_price')
 		const exclusive = searchParams.get('exclusive')
 
-		// ✅ FIXED: Parse property attribute parameters
 		const bedrooms = searchParams.get('bedrooms')
 		const bathrooms = searchParams.get('bathrooms')
 		const floors = searchParams.get('floors')
@@ -90,8 +82,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		const min_area_sqft = searchParams.get('min_area_sqft')
 		const max_area_sqft = searchParams.get('max_area_sqft')
 
-
-		// Basic filters
 		if (property_type)
 			initialFilter.property_type = property_type as PropertyType
 		if (listing_type) initialFilter.listing_type = listing_type as ListingType
@@ -102,22 +92,24 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		if (max_price) initialFilter.max_price = parseFloat(max_price)
 		if (exclusive === 'true') setShowExclusiveOnly(true)
 
-		// ✅ FIXED: Apply ALL property attributes
 		if (bedrooms) initialFilter.bedrooms = parseInt(bedrooms)
 		if (bathrooms) initialFilter.bathrooms = parseFloat(bathrooms)
-
 		if (floors) initialFilter.floors = parseInt(floors)
 		if (floor) initialFilter.floor = parseInt(floor)
 		if (total_floors) initialFilter.total_floors = parseInt(total_floors)
 		if (ceiling_height)
 			initialFilter.ceiling_height = parseFloat(ceiling_height)
-		if (min_lot_size_sqft) initialFilter.min_lot_size_sqft = parseInt(min_lot_size_sqft)
-		if (max_lot_size_sqft) initialFilter.max_lot_size_sqft = parseInt(max_lot_size_sqft)
+		if (min_lot_size_sqft)
+			initialFilter.min_lot_size_sqft = parseInt(min_lot_size_sqft)
+		if (max_lot_size_sqft)
+			initialFilter.max_lot_size_sqft = parseInt(max_lot_size_sqft)
 		if (business_type) initialFilter.business_type = business_type
 		if (min_area_sqft) initialFilter.min_area_sqft = parseInt(min_area_sqft)
 		if (max_area_sqft) initialFilter.max_area_sqft = parseInt(max_area_sqft)
-		if (min_area_acres) initialFilter.min_area_acres = parseFloat(min_area_acres)
-		if (max_area_acres) initialFilter.max_area_acres = parseFloat(max_area_acres)
+		if (min_area_acres)
+			initialFilter.min_area_acres = parseFloat(min_area_acres)
+		if (max_area_acres)
+			initialFilter.max_area_acres = parseFloat(max_area_acres)
 		return initialFilter
 	})
 
@@ -158,27 +150,25 @@ export default function PropertiesContent({}: PropertyCardProps) {
 				page: currentPage,
 				sort_by: sortBy,
 				sort_order: sortOrder,
-				is_exclusive: showExclusiveOnly ? true : undefined, // Add exclusive filter
-				show_hidden: false, // Explicitly hide hidden properties
+				is_exclusive: showExclusiveOnly ? true : undefined,
+				show_hidden: false,
 			})
 
-				const data = await getProperties({
-					...filter, // This now includes ALL parameters
-					page: currentPage,
-					sort_by: sortBy,
-					sort_order: sortOrder,
-					limit: 50,
-					is_exclusive: showExclusiveOnly ? true : undefined,
-					show_hidden: false,
-				})
+			const data = await getProperties({
+				...filter,
+				page: currentPage,
+				sort_by: sortBy,
+				sort_order: sortOrder,
+				limit: 50,
+				is_exclusive: showExclusiveOnly ? true : undefined,
+				show_hidden: false,
+			})
 
 			console.log('Received properties data:', data)
 
 			if (data && Array.isArray(data) && data.length > 0) {
-				// Additional client-side filtering to ensure no hidden properties slip through
 				const visibleProperties = data.filter(property => !property.is_hidden)
 
-				// Apply exclusive filter if needed
 				const filteredProperties = showExclusiveOnly
 					? visibleProperties.filter(property => property.is_exclusive)
 					: visibleProperties
@@ -209,15 +199,27 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		fetchProperties()
 	}, [fetchProperties])
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement
+			if (showSortMenu && !target.closest('.sort-dropdown-container')) {
+				setShowSortMenu(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => document.removeEventListener('mousedown', handleClickOutside)
+	}, [showSortMenu])
+
 	const handleFilterChange = (newFilter: FilterType) => {
 		setFilter(newFilter)
 		setCurrentPage(1)
 	}
 
-	const handlePageChange = (page: number) => {
-		setCurrentPage(page)
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}
+	// const handlePageChange = (page: number) => {
+	// 	setCurrentPage(page)
+	// 	window.scrollTo({ top: 0, behavior: 'smooth' })
+	// }
 
 	const handleSortChange = (
 		newSortBy: 'price' | 'created_at' | 'views',
@@ -226,6 +228,27 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setSortBy(newSortBy)
 		setSortOrder(newSortOrder)
 		setCurrentPage(1)
+	}
+
+	const getSortLabel = (sortType: 'price' | 'created_at' | 'views') => {
+		const labels = {
+			price: {
+				hy: 'Գին',
+				en: 'Price',
+				ru: 'Цена',
+			},
+			created_at: {
+				hy: 'Ամսաթիվ',
+				en: 'Date',
+				ru: 'Дата',
+			},
+			views: {
+				hy: 'Դիտումներ',
+				en: 'Views',
+				ru: 'Просмотры',
+			},
+		}
+		return labels[sortType][language]
 	}
 
 	const handleExclusiveToggle = () => {
@@ -258,80 +281,80 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		return summary.join(', ') || 'All properties'
 	}
 
-	const formatPrice = (price: number, listingType: string) => {
-		const formatted = new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD',
-			maximumFractionDigits: 0,
-		}).format(price)
+	// const formatPrice = (price: number, listingType: string) => {
+	// 	const formatted = new Intl.NumberFormat('en-US', {
+	// 		style: 'currency',
+	// 		currency: 'USD',
+	// 		maximumFractionDigits: 0,
+	// 	}).format(price)
 
-		switch (listingType) {
-			case 'rent':
-				return `${formatted}/month`
-			case 'daily_rent':
-				return `${formatted}/day`
-			default:
-				return formatted
-		}
-	}
+	// 	switch (listingType) {
+	// 		case 'rent':
+	// 			return `${formatted}/month`
+	// 		case 'daily_rent':
+	// 			return `${formatted}/day`
+	// 		default:
+	// 			return formatted
+	// 	}
+	// }
 
-	const formatLocalizedDate = (
-		date: string | Date,
-		language: 'hy' | 'en' | 'ru'
-	) => {
-		const dateObj = new Date(date)
+	// const formatLocalizedDate = (
+	// 	date: string | Date,
+	// 	language: 'hy' | 'en' | 'ru'
+	// ) => {
+	// 	const dateObj = new Date(date)
 
-		const monthNames = {
-			hy: [
-				'Հունվար',
-				'Փետրվար',
-				'Մարտ',
-				'Ապրիլ',
-				'Մայիս',
-				'Հունիս',
-				'Հուլիս',
-				'Օգոստոս',
-				'Սեպտեմբեր',
-				'Հոկտեմբեր',
-				'Նոյեմբեր',
-				'Դեկտեմբեր',
-			],
-			en: [
-				'January',
-				'February',
-				'March',
-				'April',
-				'May',
-				'June',
-				'July',
-				'August',
-				'September',
-				'October',
-				'November',
-				'December',
-			],
-			ru: [
-				'Январь',
-				'Февраль',
-				'Март',
-				'Апрель',
-				'Май',
-				'Июнь',
-				'Июль',
-				'Август',
-				'Сентябрь',
-				'Октябрь',
-				'Ноябрь',
-				'Декабрь',
-			],
-		}
+	// 	const monthNames = {
+	// 		hy: [
+	// 			'Հունվար',
+	// 			'Փետրվար',
+	// 			'Մարտ',
+	// 			'Ապրիլ',
+	// 			'Մայիս',
+	// 			'Հունիս',
+	// 			'Հուլիս',
+	// 			'Օգոստոս',
+	// 			'Սեպտեմբեր',
+	// 			'Հոկտեմբեր',
+	// 			'Նոյեմբեր',
+	// 			'Դեկտեմբեր',
+	// 		],
+	// 		en: [
+	// 			'January',
+	// 			'February',
+	// 			'March',
+	// 			'April',
+	// 			'May',
+	// 			'June',
+	// 			'July',
+	// 			'August',
+	// 			'September',
+	// 			'October',
+	// 			'November',
+	// 			'December',
+	// 		],
+	// 		ru: [
+	// 			'Январь',
+	// 			'Февраль',
+	// 			'Март',
+	// 			'Апрель',
+	// 			'Май',
+	// 			'Июнь',
+	// 			'Июль',
+	// 			'Август',
+	// 			'Сентябрь',
+	// 			'Октябрь',
+	// 			'Ноябрь',
+	// 			'Декабрь',
+	// 		],
+	// 	}
 
-		const day = dateObj.getDate()
-		const month = monthNames[language][dateObj.getMonth()]
-		const year = dateObj.getFullYear()
+	// 	const day = dateObj.getDate()
+	// 	const month = monthNames[language][dateObj.getMonth()]
+	// 	const year = dateObj.getFullYear()
 
-		return `${day} ${month} ${year}`
-	}
+	// 	return `${day} ${month} ${year}`
+	// }
 
 	return (
 		<div className='min-h-screen bg-white'>
@@ -459,19 +482,218 @@ export default function PropertiesContent({}: PropertyCardProps) {
 								{/* Controls: Sort + View Mode */}
 								<div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto'>
 									{/* Sort Dropdown */}
-									<div className='relative group w-full sm:w-auto'>
-										<button className='flex items-center justify-between px-4 py-2 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 w-full sm:w-auto min-w-[160px]'>
-											<span className='text-sm font-medium mr-2'>
-												{t('sortBy')}:{' '}
-												{sortBy === 'created_at'
-													? t('date')
-													: sortBy === 'price'
-													? t('price')
-													: t('views')}
-											</span>
-											<ChevronDown className='w-4 h-4' />
+									<div className='relative w-full sm:w-auto sort-dropdown-container'>
+										<button
+											onClick={() => setShowSortMenu(!showSortMenu)}
+											className='flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-200 border border-gray-200 w-full sm:w-auto min-w-[180px] shadow-sm hover:shadow-md group'
+										>
+											<div className='flex items-center gap-2'>
+												<SlidersHorizontal className='w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors' />
+												<span className='text-sm font-medium'>
+													{getSortLabel(sortBy)}
+													{sortOrder === 'asc' ? ' ↑' : ' ↓'}
+												</span>
+											</div>
+											<ChevronDown
+												className={`w-4 h-4 transition-transform duration-200 ${
+													showSortMenu ? 'rotate-180' : ''
+												}`}
+											/>
 										</button>
-										{/* Sort Options (can add your sort options here) */}
+
+										{/* Sort Options Dropdown */}
+										{showSortMenu && (
+											<div className='absolute top-full mt-2 w-full sm:w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 overflow-hidden animate-fade-in'>
+												<div className='p-2'>
+													{/* Price Sort */}
+													<div className='mb-1'>
+														<div className='px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide'>
+															{language === 'hy'
+																? 'Գին'
+																: language === 'ru'
+																? 'Цена'
+																: 'Price'}
+														</div>
+														<button
+															onClick={() => {
+																handleSortChange('price', 'asc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'price' && sortOrder === 'asc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Ցածրից բարձր'
+																	: language === 'ru'
+																	? 'От низкой к высокой'
+																	: 'Low to High'}
+															</span>
+															{sortBy === 'price' && sortOrder === 'asc' && (
+																<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																	<span className='text-white text-xs'>✓</span>
+																</div>
+															)}
+														</button>
+														<button
+															onClick={() => {
+																handleSortChange('price', 'desc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'price' && sortOrder === 'desc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Բարձրից ցածր'
+																	: language === 'ru'
+																	? 'От высокой к низкой'
+																	: 'High to Low'}
+															</span>
+															{sortBy === 'price' && sortOrder === 'desc' && (
+																<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																	<span className='text-white text-xs'>✓</span>
+																</div>
+															)}
+														</button>
+													</div>
+
+													<div className='my-2 border-t border-gray-100'></div>
+
+													{/* Date Sort */}
+													<div className='mb-1'>
+														<div className='px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide'>
+															{language === 'hy'
+																? 'Ամսաթիվ'
+																: language === 'ru'
+																? 'Дата'
+																: 'Date'}
+														</div>
+														<button
+															onClick={() => {
+																handleSortChange('created_at', 'desc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'created_at' && sortOrder === 'desc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Նորից հին'
+																	: language === 'ru'
+																	? 'Новые первые'
+																	: 'Newest First'}
+															</span>
+															{sortBy === 'created_at' &&
+																sortOrder === 'desc' && (
+																	<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																		<span className='text-white text-xs'>
+																			✓
+																		</span>
+																	</div>
+																)}
+														</button>
+														<button
+															onClick={() => {
+																handleSortChange('created_at', 'asc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'created_at' && sortOrder === 'asc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Հնից նոր'
+																	: language === 'ru'
+																	? 'Старые первые'
+																	: 'Oldest First'}
+															</span>
+															{sortBy === 'created_at' &&
+																sortOrder === 'asc' && (
+																	<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																		<span className='text-white text-xs'>
+																			✓
+																		</span>
+																	</div>
+																)}
+														</button>
+													</div>
+
+													<div className='my-2 border-t border-gray-100'></div>
+
+													{/* Views Sort */}
+													<div>
+														<div className='px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide'>
+															{language === 'hy'
+																? 'Դիտումներ'
+																: language === 'ru'
+																? 'Просмотры'
+																: 'Views'}
+														</div>
+														<button
+															onClick={() => {
+																handleSortChange('views', 'desc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'views' && sortOrder === 'desc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Ամենաշատ դիտվածներ'
+																	: language === 'ru'
+																	? 'Самые просматриваемые'
+																	: 'Most Viewed'}
+															</span>
+															{sortBy === 'views' && sortOrder === 'desc' && (
+																<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																	<span className='text-white text-xs'>✓</span>
+																</div>
+															)}
+														</button>
+														<button
+															onClick={() => {
+																handleSortChange('views', 'asc')
+																setShowSortMenu(false)
+															}}
+															className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+																sortBy === 'views' && sortOrder === 'asc'
+																	? 'bg-blue-50 text-blue-700 font-medium shadow-sm'
+																	: 'text-gray-700 hover:bg-gray-50'
+															}`}
+														>
+															<span>
+																{language === 'hy'
+																	? 'Ամենաքիչ դիտվածներ'
+																	: language === 'ru'
+																	? 'Наименее просматриваемые'
+																	: 'Least Viewed'}
+															</span>
+															{sortBy === 'views' && sortOrder === 'asc' && (
+																<div className='w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center'>
+																	<span className='text-white text-xs'>✓</span>
+																</div>
+															)}
+														</button>
+													</div>
+												</div>
+											</div>
+										)}
 									</div>
 
 									{/* View Mode Toggle */}
@@ -499,7 +721,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 									</div>
 								</div>
 							</div>
-
 							{/* Properties Grid / Loading / Error */}
 							<div className='relative min-h-[300px]'>
 								{loading ? (
@@ -578,5 +799,4 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			`}</style>
 		</div>
 	)
-
 }

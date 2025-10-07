@@ -357,7 +357,7 @@ export default function PropertyCard({
 
 	// Get property type and status info
 	const statusInfo = getStatusInfo(property.status)
-	const StatusIcon = statusInfo.icon
+	// const StatusIcon = statusInfo.icon
 
 	// Function to format price based on listing type
 	const formatPrice = (price: number, listingType: string) => {
