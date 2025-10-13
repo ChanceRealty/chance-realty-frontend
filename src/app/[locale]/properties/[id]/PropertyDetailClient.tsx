@@ -36,9 +36,7 @@ import {
 	FileText,
 	Play,
 	RefreshCw,
-	Globe,
 	TrendingUp,
-	Navigation,
 	MapIcon,
 	Maximize2,
 	Layers3,
@@ -68,7 +66,6 @@ const YandexMap = ({
 	address,
 	title,
 	isPopup = false,
-	onClose,
 }: {
 	latitude: number
 	longitude: number
@@ -164,11 +161,7 @@ const YandexMap = ({
 
 		return () => {
 			if (mapRef.current) {
-				try {
-					mapRef.current.destroy()
-				} catch (e) {
-					// Ignore
-				}
+				mapRef.current.destroy()
 				mapRef.current = null
 			}
 		}
