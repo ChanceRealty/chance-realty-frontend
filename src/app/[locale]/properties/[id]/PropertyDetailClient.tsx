@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { getTranslatedFeature } from '@/utils/featureTranslations'
@@ -79,208 +79,170 @@ const YandexMap = ({
 }) => {
 	const [mapLoaded, setMapLoaded] = useState(false)
 	const [mapError, setMapError] = useState(false)
-	const [mapInstance, setMapInstance] = useState<ymaps.Map | null>(null)
+	const mapRef = useRef<ymaps.Map | null>(null)
 
 	const mapId = isPopup ? 'yandex-map-popup' : 'yandex-map'
 	const mapHeight = isPopup ? 'h-[500px]' : 'h-64'
 
-	// Replace the useEffect in YandexMap component (around line 60-170) with this fixed version:
+	const lat = Number(latitude)
+	const lng = Number(longitude)
+
+	// Validate coordinates
+	const isValid =
+		!isNaN(lat) &&
+		!isNaN(lng) &&
+		lat !== 0 &&
+		lng !== 0 &&
+		Math.abs(lat) <= 90 &&
+		Math.abs(lng) <= 180
 
 	useEffect(() => {
-		const loadYandexMaps = () => {
-			if (window.ymaps) {
-				initMap()
-				return
-			}
+		if (!isValid || mapRef.current) return
 
-			const existingScript = document.querySelector(
-				'script[src*="api-maps.yandex.ru"]'
-			)
-			if (existingScript) {
-				existingScript.addEventListener('load', () => {
-					if (window.ymaps) {
-						window.ymaps.ready(initMap)
-					}
-				})
-				return
-			}
-
-			const script = document.createElement('script')
-			script.src = `https://api-maps.yandex.ru/2.1/?apikey=${
-				process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY || ''
-			}&lang=en_US`
-			script.onload = () => {
-				window.ymaps.ready(initMap)
-			}
-			script.onerror = () => {
-				console.error('Failed to load Yandex Maps API')
-				setMapError(true)
-			}
-			document.head.appendChild(script)
-		}
-
-		const initMap = () => {
+		const initMap = async () => {
 			try {
-				// Clean up existing map instance
-				if (mapInstance) {
-					mapInstance.destroy()
-					setMapInstance(null)
-				}
+				// Wait for container to exist
+				const container = document.getElementById(mapId)
+				if (!container) return
 
-				const mapElement = document.getElementById(mapId)
-				if (!mapElement) {
-					console.error(`Map container ${mapId} not found`)
-					return
-				}
+				// Wait for ymaps to be ready
+				await window.ymaps.ready()
 
 				const zoom = isPopup ? 17 : 16
-				const controls = isPopup
-					? [
-							'zoomControl',
-							'fullscreenControl',
-							'typeSelector',
-							'geolocationControl',
-							'routeButtonControl',
-					  ]
-					: ['zoomControl', 'fullscreenControl', 'typeSelector']
 
-				const map = new window.ymaps.Map(
-					mapId,
-					{
-						center: [latitude, longitude],
-						zoom: zoom,
-						controls: controls,
-					},
-					{
-						suppressMapOpenBlock: true,
-						yandexMapDisablePoiInteractivity: false,
-					}
-				)
+				// Create map
+				const map = new window.ymaps.Map(mapId, {
+					center: [lat, lng],
+					zoom: zoom,
+					controls: ['zoomControl', 'typeSelector'],
+				})
 
+				// Add marker
 				const placemark = new window.ymaps.Placemark(
-					[latitude, longitude],
+					[lat, lng],
 					{
-						balloonContent: `
-						<div style="padding: 12px; max-width: 300px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-							<h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600; color: #1f2937;">${title}</h3>
-							<p style="margin: 0 0 12px 0; color: #6b7280; font-size: 14px; line-height: 1.4;">${address}</p>
-							<div style="display: flex; gap: 8px; flex-wrap: wrap;">
-								<a href="https://yandex.com/maps/?pt=${longitude},${latitude}&z=16&l=map" 
-								   target="_blank" 
-								   rel="noopener noreferrer"
-								   style="display: inline-flex; align-items: center; gap: 4px; color: #2563eb; text-decoration: none; font-size: 13px; font-weight: 500; padding: 4px 8px; background: #eff6ff; border-radius: 4px; transition: background-color 0.2s;">
-									🗺️ Open in Yandex Maps
-								</a>
-								<a href="https://maps.google.com/?q=${latitude},${longitude}" 
-								   target="_blank" 
-								   rel="noopener noreferrer"
-								   style="display: inline-flex; align-items: center; gap: 4px; color: #059669; text-decoration: none; font-size: 13px; font-weight: 500; padding: 4px 8px; background: #ecfdf5; border-radius: 4px; transition: background-color 0.2s;">
-									🌍 Open in Google Maps
-								</a>
-							</div>
-						</div>
-					`,
+						balloonContent: `<b>${title}</b><br/>${address}`,
 						hintContent: title,
-						iconCaption: title,
 					},
 					{
-						preset: 'islands#redDotIconWithCaption',
-						iconColor: '#dc2626',
-						iconCaptionMaxWidth: 200,
-						balloonCloseButton: true,
-						balloonMaxWidth: 350,
-						balloonOffset: [3, -40],
-						balloonShadow: true,
-						hideIconOnBalloonOpen: false,
-						openBalloonOnClick: true,
+						preset: 'islands#redIcon',
 					}
 				)
 
 				map.geoObjects.add(placemark)
 
 				if (isPopup) {
-					setTimeout(() => {
-						placemark.balloon.open()
-					}, 500)
+					placemark.balloon.open()
 				}
 
-				if (isPopup) {
-					const trafficControl = new window.ymaps.control.TrafficControl({
-						providerKey: 'traffic#actual',
-						trafficShown: false,
-					})
-					map.controls.add(trafficControl)
-				}
-
-				setMapInstance(map as unknown as ymaps.Map)
+				mapRef.current = map as unknown as ymaps.Map
 				setMapLoaded(true)
 			} catch (error) {
-				console.error('Error initializing Yandex Map:', error)
+				console.error('Map init error:', error)
 				setMapError(true)
 			}
 		}
 
-		loadYandexMaps()
+		// Load Yandex Maps script
+		if (!window.ymaps) {
+			const existingScript = document.querySelector(
+				'script[src*="api-maps.yandex.ru"]'
+			)
+
+			if (!existingScript) {
+				const script = document.createElement('script')
+				script.src = `https://api-maps.yandex.ru/2.1/?apikey=${process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY}&lang=en_US`
+				script.onload = () => initMap()
+				script.onerror = () => setMapError(true)
+				document.head.appendChild(script)
+			} else {
+				existingScript.addEventListener('load', () => initMap())
+			}
+		} else {
+			initMap()
+		}
 
 		return () => {
-			if (mapInstance) {
+			if (mapRef.current) {
 				try {
-					mapInstance.destroy()
-				} catch (error) {
-					console.error('Error destroying map:', error)
+					mapRef.current.destroy()
+				} catch (e) {
+					// Ignore
 				}
+				mapRef.current = null
 			}
 		}
-	}, [latitude, longitude, address, title, isPopup, mapId]) // REMOVED mapInstance from dependencies
+	}, [lat, lng, isValid, mapId, title, address, isPopup])
 
-	// Also, you might want to create a separate useEffect for cleanup only:
 	useEffect(() => {
-		return () => {
-			if (mapInstance) {
+		if (!mapRef.current || !mapLoaded) return
+
+		const resizeMap = () => {
+			if (mapRef.current) {
 				try {
-					mapInstance.destroy()
-				} catch (error) {
-					console.error('Error destroying map:', error)
+					mapRef.current.container.fitToViewport()
+					const center = mapRef.current.getCenter()
+					const zoom = mapRef.current.getZoom()
+					mapRef.current.setCenter(center, zoom)
+				} catch (e) {
+					console.warn('Map resize failed', e)
 				}
 			}
 		}
-	}, []) 
+		const timeouts = [
+			setTimeout(resizeMap, 100),
+			setTimeout(resizeMap, 300),
+			setTimeout(resizeMap, 600),
+		]
 
-	const handleGetDirections = () => {
-		const yandexUrl = `https://yandex.com/maps/?rtext=~${latitude},${longitude}&rtt=auto`
-		window.open(yandexUrl, '_blank', 'noopener,noreferrer')
-	}
+		// Наблюдаем за видимостью контейнера
+		const observer = new IntersectionObserver(
+			entries => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) resizeMap()
+				})
+			},
+			{ threshold: 0.1 }
+		)
 
-	const handleViewLarger = () => {
-		const yandexUrl = `https://yandex.com/maps/?pt=${longitude},${latitude}&z=16&l=map`
-		window.open(yandexUrl, '_blank', 'noopener,noreferrer')
-	}
+		const container = document.getElementById(mapId)
+		if (container) observer.observe(container)
 
-	if (mapError) {
+		window.addEventListener('resize', resizeMap)
+
+		return () => {
+			timeouts.forEach(clearTimeout)
+			observer.disconnect()
+			window.removeEventListener('resize', resizeMap)
+		}
+	}, [mapLoaded, mapId])
+
+
+	if (!isValid || mapError) {
 		return (
 			<div
 				className={`w-full ${mapHeight} bg-gray-100 rounded-xl flex items-center justify-center`}
 			>
 				<div className='text-center p-6'>
 					<MapIcon className='w-12 h-12 text-gray-400 mx-auto mb-3' />
-					<p className='text-gray-500 text-sm mb-3'>Map could not be loaded</p>
-					<div className='flex flex-col sm:flex-row gap-2 justify-center'>
+					<p className='text-gray-500 text-sm mb-3'>
+						{!isValid ? 'Invalid coordinates' : 'Map unavailable'}
+					</p>
+					<div className='flex gap-2 justify-center'>
 						<a
-							href={`https://yandex.com/maps/?pt=${longitude},${latitude}&z=16&l=map`}
+							href={`https://yandex.com/maps/?pt=${lng},${lat}&z=16`}
 							target='_blank'
 							rel='noopener noreferrer'
-							className='inline-flex items-center px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors'
+							className='px-3 py-2 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700'
 						>
-							<Globe className='w-3 h-3 mr-1' />
 							Yandex Maps
 						</a>
 						<a
-							href={`https://maps.google.com/?q=${latitude},${longitude}`}
+							href={`https://maps.google.com/?q=${lat},${lng}`}
 							target='_blank'
 							rel='noopener noreferrer'
-							className='inline-flex items-center px-3 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors'
+							className='px-3 py-2 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700'
 						>
-							<Globe className='w-3 h-3 mr-1' />
 							Google Maps
 						</a>
 					</div>
@@ -290,83 +252,27 @@ const YandexMap = ({
 	}
 
 	return (
-		<div className='relative'>
+		<div
+			className='relative w-full'
+			style={{ minHeight: isPopup ? '500px' : '256px' }}
+		>
 			<div
 				id={mapId}
-				className={`w-full ${mapHeight} rounded-xl overflow-hidden ${
-					!mapLoaded ? 'hidden' : 'block'
-				}`}
+				className={`w-full ${mapHeight} rounded-xl overflow-hidden bg-gray-200`}
+				style={{ width: '100%', height: isPopup ? '500px' : '256px' }}
 			/>
-
 			{!mapLoaded && (
-				<div
-					className={`w-full ${mapHeight} bg-gray-100 rounded-xl flex items-center justify-center`}
-				>
+				<div className='absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl'>
 					<div className='text-center'>
 						<Loader2 className='w-8 h-8 text-blue-600 animate-spin mx-auto mb-2' />
 						<p className='text-gray-500 text-sm'>Loading map...</p>
 					</div>
 				</div>
 			)}
-
-			{mapLoaded && !isPopup && (
-				<div className='absolute bottom-3 right-3 flex gap-2'>
-					<button
-						onClick={handleGetDirections}
-						className='bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg hover:bg-white transition-colors text-xs font-medium border border-gray-200'
-						title='Get directions'
-					>
-						<Navigation className='w-4 h-4 mr-1 inline' />
-						Directions
-					</button>
-					<button
-						onClick={handleViewLarger}
-						className='bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg hover:bg-white transition-colors text-xs font-medium border border-gray-200'
-						title='View larger map'
-					>
-						<Maximize2 className='w-4 h-4 mr-1 inline' />
-						Expand
-					</button>
-				</div>
-			)}
-
-			{isPopup && onClose && (
-				<button
-					onClick={onClose}
-					className='absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors border border-gray-200'
-					title='Close map'
-				>
-					<X className='w-4 h-4 text-gray-600' />
-				</button>
-			)}
-
-			{isPopup && mapLoaded && (
-				<div className='absolute bottom-3 left-3 right-3 flex justify-between items-end'>
-					<div className='bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg border border-gray-200'>
-						<p className='text-xs font-medium text-gray-800 mb-1'>{title}</p>
-						<p className='text-xs text-gray-600'>{address}</p>
-					</div>
-					<div className='flex gap-2'>
-						<button
-							onClick={handleGetDirections}
-							className='bg-blue-600 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition-colors text-xs font-medium'
-						>
-							<Navigation className='w-4 h-4 mr-1 inline' />
-							Directions
-						</button>
-						<button
-							onClick={handleViewLarger}
-							className='bg-green-600 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-green-700 transition-colors text-xs font-medium'
-						>
-							<Globe className='w-4 h-4 mr-1 inline' />
-							Yandex Maps
-						</button>
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }
+
 
 const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
 
@@ -1302,8 +1208,15 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 
 			{/* Map Popup Modal */}
 			{showMapPopup && hasValidCoordinates && (
-				<div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4'>
-					<div className='bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden'>
+				<div
+					className='fixed inset-0 z-50 flex items-center justify-center p-4'
+					style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} // прозрачный черный фон
+					onClick={() => setShowMapPopup(false)} // клик по фону закрывает
+				>
+					<div
+						className='bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden'
+						onClick={e => e.stopPropagation()} // клик внутри окна не закрывает
+					>
 						<div className='p-4 border-b border-gray-200 flex items-center justify-between'>
 							<div>
 								<h3 className='text-lg font-semibold text-gray-900'>
@@ -1727,6 +1640,30 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 								</div>
 							</div>
 
+							{/* Features Section */}
+							{property.features && property.features.length > 0 && (
+								<div className='bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6'>
+									<h2 className='text-xl font-semibold mb-4 text-gray-900'>
+										{t.featuresAndAmenities}
+									</h2>
+									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+										{property.features.map(feature => (
+											<div
+												key={feature.id}
+												className='flex items-center bg-gray-50 p-4 rounded-lg'
+											>
+												<div className='w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0'>
+													<Check className='w-5 h-5 text-blue-600' />
+												</div>
+												<span className='text-gray-700'>
+													{getTranslatedFeature(feature.name, language)}
+												</span>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+
 							{/* Mobile Map Section */}
 							<div className='block md:hidden bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6'>
 								<h3 className='text-lg font-semibold mb-4 text-gray-900 flex items-center'>
@@ -1774,30 +1711,6 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 									</>
 								)}
 							</div>
-
-							{/* Features Section */}
-							{property.features && property.features.length > 0 && (
-								<div className='bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6'>
-									<h2 className='text-xl font-semibold mb-4 text-gray-900'>
-										{t.featuresAndAmenities}
-									</h2>
-									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-										{property.features.map(feature => (
-											<div
-												key={feature.id}
-												className='flex items-center bg-gray-50 p-4 rounded-lg'
-											>
-												<div className='w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3 flex-shrink-0'>
-													<Check className='w-5 h-5 text-green-600' />
-												</div>
-												<span className='text-gray-700'>
-													{getTranslatedFeature(feature.name, language)}
-												</span>
-											</div>
-										))}
-									</div>
-								</div>
-							)}
 						</div>
 
 						{/* Right Column (Desktop Only) */}

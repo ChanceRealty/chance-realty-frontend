@@ -770,11 +770,6 @@ export default function PropertyCard({
 								? property.title.slice(0, 24) + '...'
 								: property.title}
 						</h3>
-						{property.is_exclusive && (
-							<div className='ml-2 flex-shrink-0'>
-								<Crown className='w-5 h-5 text-red-600' />
-							</div>
-						)}
 					</div>
 
 					{/* Location */}
