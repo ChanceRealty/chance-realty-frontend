@@ -16,12 +16,6 @@ const PromoVideoSection = () => {
       description: 'Experience our premium properties in 20 seconds',
       gradient: 'from-blue-600 via-purple-600 to-pink-600',
     },
-    {
-      url: 'promo2.mp4',
-      title: 'Full Experience',
-      description: 'Deep dive into what makes us special',
-      gradient: 'from-emerald-600 via-teal-600 to-cyan-600',
-    },
   ]
 
   useEffect(() => {
@@ -87,23 +81,25 @@ const PromoVideoSection = () => {
   }
 
   return (
-		<section className='py-12 md:py-20 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden'>
+		<section className='py-12 md:py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 relative overflow-hidden'>
 			{/* Animated Background */}
-			<div className='absolute inset-0 opacity-30'>
-				<div className='absolute top-0 left-0 w-64 h-64 md:w-96 md:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob'></div>
-				<div className='absolute top-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000'></div>
-				<div className='absolute bottom-0 left-1/2 w-64 h-64 md:w-96 md:h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000'></div>
+			<div className='absolute inset-0'>
+				<div className='absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 to-purple-600/20'></div>
+				<div className='absolute top-10 left-10 w-32 h-32 border border-white/10 rounded-full animate-pulse'></div>
+				<div className='absolute top-32 right-20 w-48 h-48 border border-white/5 rounded-full animate-pulse animation-delay-1000'></div>
+				<div className='absolute bottom-20 left-32 w-24 h-24 border border-white/15 rounded-full animate-pulse animation-delay-2000'></div>
+				<div className='absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-purple-600/10 to-pink-600/10 rounded-full'></div>
 			</div>
 
 			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
 				{/* Header */}
 				<div className='text-center mb-10 md:mb-16'>
-					<div className='inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mb-4 md:mb-6 shadow-2xl animate-pulse'>
+					<div className='inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mb-4 md:mb-6 shadow-2xl animate-pulse'>
 						<Play className='w-8 h-8 md:w-10 md:h-10 text-white ml-1' />
 					</div>
 					<h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 px-4'>
 						Experience the
-						<span className='block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mt-2'>
+						<span className='block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mt-2'>
 							Chance Realty Difference
 						</span>
 					</h2>
@@ -235,18 +231,6 @@ const PromoVideoSection = () => {
 							</div>
 						</div>
 					))}
-				</div>
-
-				{/* Call to Action */}
-				<div className='mt-12 md:mt-16 text-center px-4'>
-					<div className='inline-flex flex-col sm:flex-row items-center gap-3 bg-white/10 backdrop-blur-md rounded-2xl md:rounded-full px-6 md:px-8 py-4 border border-white/20'>
-						<span className='text-white font-semibold text-sm md:text-base text-center sm:text-left'>
-							Ready to find your dream home?
-						</span>
-						<button className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full font-bold hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg text-sm md:text-base'>
-							Get Started
-						</button>
-					</div>
 				</div>
 			</div>
 

@@ -86,6 +86,7 @@ export default function HomePage() {
 						</div>
 					</div>
 				</div>
+				<PromoVideoSection />
 				{/* Recent Properties */}
 				<section className='py-20 bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 relative overflow-hidden'>
 					<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
@@ -133,7 +134,6 @@ export default function HomePage() {
 						</div>
 					</div>
 				</section>
-				<PromoVideoSection />
 				{/* Property Types */}
 				<section className='py-20 bg-white relative overflow-hidden'>
 					<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
