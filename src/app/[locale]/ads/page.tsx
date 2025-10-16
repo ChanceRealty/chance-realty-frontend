@@ -8,6 +8,8 @@ import {
 	VolumeX,
 	RotateCcw,
 } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
+import { useTranslations } from '@/translations/translations'
 
 const adVideos = [
 	{
@@ -44,7 +46,9 @@ export default function AdsPage() {
 	const [showControls, setShowControls] = useState(adVideos.map(() => false))
 	const videoRefs = useRef([])
 	const progressIntervals = useRef(adVideos.map(() => null))
-
+  const t = useTranslations()
+  const { language } = useLanguage()
+  
 	useEffect(() => {
 		videoRefs.current = adVideos.map(
 			(_, i) => videoRefs.current[i] || React.createRef()
@@ -121,10 +125,10 @@ export default function AdsPage() {
 			{/* Header */}
 			<header className='bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 py-16 text-center'>
 				<h1 className='text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg'>
-					Գովազդային Տեսահոլովակներ
+					{t.adsTitle}
 				</h1>
 				<p className='text-lg md:text-2xl opacity-90 drop-shadow-md'>
-					Տեսեք մեր լավագույն գովազդները:
+					{t.adsSubtitle}
 				</p>
 			</header>
 

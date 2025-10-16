@@ -56,10 +56,13 @@ export default function HomePage() {
 						/> */}
 						<video
 							src='/vv2.mp4'
-							className='w-full h-full object-cover'
 							autoPlay
 							muted
-						></video>
+							loop
+							playsInline
+							className='w-full md:max-w-full h-full object-cover'
+						/>
+
 						{/* <Image
 								src='/cclogo.png'
 								alt='Hero background'
@@ -221,7 +224,7 @@ export default function HomePage() {
 									<span className='mr-3'>
 										<Clapperboard />
 									</span>
-									Տեսնել բոլոր տեսահոլովակները
+									{t.watchAllAds}
 									<ArrowRight className='ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300' />
 								</span>
 							</Link>

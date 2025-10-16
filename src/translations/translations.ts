@@ -1,5 +1,7 @@
 // src/translations/translations.ts
 
+import { a } from "framer-motion/client"
+
 export const translations = {
 	hy: {
 		// Navigation
@@ -86,6 +88,13 @@ export const translations = {
 		customerSupport: 'Հաճախորդական աջակցություն',
 		verifiedListings: 'Ստուգված ցուցակներ',
 		hiddenFees: 'Թաքնված վճարներ',
+		experienceThe: 'Փորձեք',
+		ChanceRealtyDifference: 'Շանս Ռիելթի տարբերությունը',
+		watchAllAds: "Տեսնել բոլոր տեսահոլովակները",
+
+		// Ads page
+		adsTitle: 'Գովազդային Տեսահոլովակներ',
+		adsSubtitle: 'Տեսեք մեր լավագույն գովազդները:',
 
 		// Properties page
 		propertiesTitle: 'Գույքեր',
@@ -456,6 +465,13 @@ export const translations = {
 		customerSupport: 'Customer Support',
 		verifiedListings: 'Verified Listings',
 		hiddenFees: 'Hidden Fees',
+		experienceThe: 'Experience the',
+		ChanceRealtyDifference: 'Chance Realty Difference',
+		watchAllAds: "Watch All Ads",
+
+		// Ads page
+		adsTitle: 'Video Ads',
+		adsSubtitle: 'Watch our best ads',
 
 		// Properties page
 		propertiesTitle: 'Properties',
@@ -809,6 +825,12 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		customerSupport: 'Поддержка клиентов',
 		verifiedListings: 'Проверенные объявления',
 		hiddenFees: 'Скрытых комиссий',
+		experienceThe: 'Ощутите',
+		ChanceRealtyDifference: 'разницу с Chance Realty',
+		watchAllAds: 'Смотреть все видеоролики',
+		// Ads page
+		adsTitle: 'Рекламные видео',
+		adsSubtitle: 'Смотрите наши лучшие рекламные ролики',
 
 		// Properties page
 		propertiesTitle: 'Недвижимость',
