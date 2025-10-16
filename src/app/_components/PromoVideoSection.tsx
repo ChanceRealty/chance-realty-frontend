@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Play, Pause, Volume2, VolumeX, Maximize2, RotateCcw } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, RotateCcw } from 'lucide-react'
 
 const PromoVideoSection = () => {
-  const [activeVideo, setActiveVideo] = useState(0)
   const [isPlaying, setIsPlaying] = useState([false, false])
   const [isMuted, setIsMuted] = useState([true, true])
   const [progress, setProgress] = useState([0, 0])
@@ -85,14 +84,6 @@ const PromoVideoSection = () => {
       return newPlaying
     })
     if (progressIntervals.current[index]) clearInterval(progressIntervals.current[index])
-  }
-
-  const goFullscreen = index => {
-    const video = videoRefs[index].current
-    if (!video) return
-    if (video.requestFullscreen) video.requestFullscreen()
-    else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen()
-    else if (video.msRequestFullscreen) video.msRequestFullscreen()
   }
 
   return (
