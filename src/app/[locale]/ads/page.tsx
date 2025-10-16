@@ -1,22 +1,55 @@
+"use client"
+
 import React, { useState, useRef, useEffect } from 'react'
-import { Play, Pause, Volume2, VolumeX, RotateCcw } from 'lucide-react'
+import {
+	Play,
+	Pause,
+	Volume2,
+	VolumeX,
+	RotateCcw,
+} from 'lucide-react'
 
-const PromoVideoSection = () => {
-	const [isPlaying, setIsPlaying] = useState([false])
-	const [isMuted, setIsMuted] = useState([true])
-	const [progress, setProgress] = useState([0])
-	const [showControls, setShowControls] = useState([false])
-	const videoRefs = [useRef(null)]
-	const progressIntervals = useRef([null])
+const adVideos = [
+	{
+		src: '/promo.mp4',
+		title: 'Ad Video 1',
+		gradient: 'from-blue-600 via-purple-600 to-pink-600',
+	},
+	{
+		src: '/promo2.mp4',
+		title: 'Ad Video 2',
+		gradient: 'from-purple-600 via-pink-600 to-red-600',
+	},
+	{
+		src: '/ads/ad3.mp4',
+		title: 'Ad Video 3',
+		gradient: 'from-green-600 via-teal-600 to-blue-600',
+	},
+	{
+		src: '/ads/ad4.mp4',
+		title: 'Ad Video 4',
+		gradient: 'from-orange-600 via-red-600 to-pink-600',
+	},
+	{
+		src: '/ads/ad5.mp4',
+		title: 'Ad Video 5',
+		gradient: 'from-indigo-600 via-purple-600 to-pink-600',
+	},
+]
 
-	const videos = [
-		{
-			url: 'promo.mp4',
-			title: 'Quick Tour',
-			description: 'Experience our premium properties in 20 seconds',
-			gradient: 'from-blue-600 via-purple-600 to-pink-600',
-		},
-	]
+export default function AdsPage() {
+	const [isPlaying, setIsPlaying] = useState(adVideos.map(() => false))
+	const [isMuted, setIsMuted] = useState(adVideos.map(() => true))
+	const [progress, setProgress] = useState(adVideos.map(() => 0))
+	const [showControls, setShowControls] = useState(adVideos.map(() => false))
+	const videoRefs = useRef([])
+	const progressIntervals = useRef(adVideos.map(() => null))
+
+	useEffect(() => {
+		videoRefs.current = adVideos.map(
+			(_, i) => videoRefs.current[i] || React.createRef()
+		)
+	}, [])
 
 	useEffect(() => {
 		return () => {
@@ -27,7 +60,7 @@ const PromoVideoSection = () => {
 	}, [])
 
 	const togglePlay = index => {
-		const video = videoRefs[index].current
+		const video = videoRefs.current[index]?.current
 		if (!video) return
 
 		if (isPlaying[index]) {
@@ -52,7 +85,7 @@ const PromoVideoSection = () => {
 	}
 
 	const toggleMute = index => {
-		const video = videoRefs[index].current
+		const video = videoRefs.current[index]?.current
 		if (!video) return
 		video.muted = !video.muted
 		setIsMuted(prev => {
@@ -63,7 +96,7 @@ const PromoVideoSection = () => {
 	}
 
 	const restartVideo = index => {
-		const video = videoRefs[index].current
+		const video = videoRefs.current[index]?.current
 		if (!video) return
 		video.currentTime = 0
 		setProgress(prev => {
@@ -84,36 +117,24 @@ const PromoVideoSection = () => {
 	}
 
 	return (
-		<section className='py-12 md:py-20 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 relative overflow-hidden'>
-			{/* Animated Background */}
-			<div className='absolute inset-0'>
-				<div className='absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 to-purple-600/20'></div>
-				<div className='absolute top-10 left-10 w-32 h-32 border border-white/10 rounded-full animate-pulse'></div>
-				<div className='absolute top-32 right-20 w-48 h-48 border border-white/5 rounded-full animate-pulse animation-delay-1000'></div>
-				<div className='absolute bottom-20 left-32 w-24 h-24 border border-white/15 rounded-full animate-pulse animation-delay-2000'></div>
-				<div className='absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-purple-600/10 to-pink-600/10 rounded-full'></div>
-			</div>
+		<div className='min-h-screen bg-white text-white'>
+			{/* Header */}
+			<header className='bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 py-16 text-center'>
+				<h1 className='text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg'>
+					Գովազդային Տեսահոլովակներ
+				</h1>
+				<p className='text-lg md:text-2xl opacity-90 drop-shadow-md'>
+					Տեսեք մեր լավագույն գովազդները:
+				</p>
+			</header>
 
-			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
-				{/* Header */}
-				<div className='text-center mb-10 md:mb-16'>
-					<div className='inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mb-4 md:mb-6 shadow-2xl animate-pulse'>
-						<Play className='w-8 h-8 md:w-10 md:h-10 text-white ml-1' />
-					</div>
-					<h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 px-4'>
-						Experience the
-						<span className='block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mt-2'>
-							Chance Realty Difference
-						</span>
-					</h2>
-				</div>
-
-				{/* Centered Video */}
-				<div className='flex justify-center items-center'>
-					{videos.map((video, index) => (
+			{/* Ads Grid */}
+			<main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20'>
+				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10'>
+					{adVideos.map((video, index) => (
 						<div
 							key={index}
-							className='relative w-full max-w-[500px] md:max-w-[700px] lg:max-w-[500px] rounded-3xl overflow-hidden shadow-2xl'
+							className='relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-300'
 							onMouseEnter={() =>
 								setShowControls(prev => {
 									const n = [...prev]
@@ -131,15 +152,14 @@ const PromoVideoSection = () => {
 						>
 							{/* Video */}
 							<video
-								ref={videoRefs[index]}
-								className='w-full h-full object-cover cursor-pointer'
+								ref={videoRefs.current[index]}
+								className='w-full h-[500px] md:h-[600px] object-cover cursor-pointer'
 								muted={isMuted[index]}
 								playsInline
 								onClick={() => togglePlay(index)}
 								onEnded={() => handleVideoEnd(index)}
-								poster={`/poster-${index + 1}.jpg`}
 							>
-								<source src={video.url} type='video/mp4' />
+								<source src={video.src} type='video/mp4' />
 							</video>
 
 							{/* Gradient Overlay */}
@@ -200,36 +220,7 @@ const PromoVideoSection = () => {
 						</div>
 					))}
 				</div>
-			</div>
-
-			<style jsx>{`
-				@keyframes blob {
-					0%,
-					100% {
-						transform: translate(0, 0) scale(1);
-					}
-					25% {
-						transform: translate(20px, -50px) scale(1.1);
-					}
-					50% {
-						transform: translate(-20px, 20px) scale(0.9);
-					}
-					75% {
-						transform: translate(50px, 50px) scale(1.05);
-					}
-				}
-				.animate-blob {
-					animation: blob 7s infinite;
-				}
-				.animation-delay-2000 {
-					animation-delay: 2s;
-				}
-				.animation-delay-4000 {
-					animation-delay: 4s;
-				}
-			`}</style>
-		</section>
+			</main>
+		</div>
 	)
 }
-
-export default PromoVideoSection

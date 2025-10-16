@@ -12,6 +12,7 @@ import {
 	Landmark,
 	Trees,
 	ArrowRight,
+	Clapperboard,
 } from 'lucide-react'
 import Image from 'next/image'
 import PromoVideoSection from '../_components/PromoVideoSection'
@@ -210,6 +211,20 @@ export default function HomePage() {
 									</div>
 								</Link>
 							))}
+						</div>
+						<div className='mt-16 text-center'>
+							<Link
+								href={`/${language}/ads`}
+								className='group inline-flex items-center px-10 py-5 bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-lg relative overflow-hidden'
+							>
+								<span className='relative z-10 flex items-center'>
+									<span className='mr-3'>
+										<Clapperboard />
+									</span>
+									Տեսնել բոլոր տեսահոլովակները
+									<ArrowRight className='ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300' />
+								</span>
+							</Link>
 						</div>
 					</div>
 				</section>
