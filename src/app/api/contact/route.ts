@@ -263,8 +263,6 @@ export async function POST(request: NextRequest) {
 			html: userEmailContent,
 		})
 
-		console.log(`✅ Կապի ձև ուղարկված: ${email} - ${subject}`)
-
 		return setCorsHeaders(
 			NextResponse.json({
 				success: true,

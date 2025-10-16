@@ -1,4 +1,3 @@
-// services/propertyService.ts - Updated with hidden/exclusive filtering
 import { PropertyFilter } from '../types/property'
 
 const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
@@ -98,10 +97,6 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		if (!filter.limit) params.append('limit', '50')
 
 		const apiUrl = `${API_BASE_URL}/api/public/properties?${params.toString()}`
-		
-		// ✅ ADD THIS: Log the full URL to see what's being sent
-		console.log('🔍 FULL API URL:', apiUrl)
-		console.log('🔍 FILTER OBJECT:', filter)
 
 		const response = await fetch(apiUrl, {
 			method: 'GET',
@@ -121,7 +116,6 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		}
 
 		const data = await response.json()
-		console.log('📦 Raw API Response:', data)
 
 		let properties = []
 
@@ -279,9 +273,6 @@ export async function getProperties(filter: PropertyFilter = {}) {
 export async function getPropertyByCustomId(customId: string) {
 	try {
 		const language = getCurrentLanguage()
-		console.log(
-			`✅ Fetching property from PUBLIC endpoint: ${API_BASE_URL}/api/public/properties/${customId}`
-		)
 
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties/${customId}?lang=${language}`
@@ -298,8 +289,6 @@ export async function getPropertyByCustomId(customId: string) {
 
 		const property = await response.json()
 
-		// ✅ NEW: Additional check for hidden properties
-		// The server should handle this, but double-check for safety
 		if (property.is_hidden === true) {
 			console.warn(`Property ${customId} is hidden, returning null`)
 			return null
@@ -315,7 +304,6 @@ export async function getPropertyByCustomId(customId: string) {
 export async function getStates() {
 	try {
 		const language = getCurrentLanguage()
-		console.log('Fetching states...')
 
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties/states?lang=${language}`,
@@ -336,7 +324,6 @@ export async function getStates() {
 		}
 
 		const states = await response.json()
-		console.log('States fetched:', states)
 		return Array.isArray(states) ? states : []
 	} catch (error) {
 		console.error('Error fetching states:', error)
@@ -347,7 +334,6 @@ export async function getStates() {
 export async function getCitiesByState(stateId: number) {
 	try {
 		const language = getCurrentLanguage()
-		console.log(`Fetching cities for state ${stateId}...`)
 
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties/cities/${stateId}?lang=${language}`,
@@ -368,7 +354,6 @@ export async function getCitiesByState(stateId: number) {
 		}
 
 		const cities = await response.json()
-		console.log('Cities fetched:', cities)
 		return Array.isArray(cities) ? cities : []
 	} catch (error) {
 		console.error('Error fetching cities:', error)
@@ -379,7 +364,6 @@ export async function getCitiesByState(stateId: number) {
 export async function getDistrictsByState(stateId: number) {
 	try {
 		const language = getCurrentLanguage()
-		console.log(`Fetching districts for state ${stateId}...`)
 
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties/districts/${stateId}?lang=${language}`,
@@ -400,7 +384,6 @@ export async function getDistrictsByState(stateId: number) {
 		}
 
 		const districts = await response.json()
-		console.log('Districts fetched:', districts)
 		return Array.isArray(districts) ? districts : []
 	} catch (error) {
 		console.error('Error fetching districts:', error)
@@ -434,7 +417,6 @@ export async function getFeaturedProperties() {
 	try {
 		const language = getCurrentLanguage()
 
-		console.log('Fetching featured properties...')
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties?featured=true&limit=20&lang=${language}`,
 			{
@@ -446,8 +428,6 @@ export async function getFeaturedProperties() {
 			}
 		)
 
-		console.log(`Featured properties response status: ${response.status}`)
-
 		if (!response.ok) {
 			console.error(
 				'Failed to fetch featured properties:',
@@ -458,7 +438,6 @@ export async function getFeaturedProperties() {
 		}
 
 		const data = await response.json()
-		console.log('Featured properties raw response:', data)
 
 		let properties = []
 		if (Array.isArray(data)) {
@@ -479,12 +458,8 @@ export async function getFeaturedProperties() {
 			}
 		}
 
-		// ✅ NEW: Filter out hidden properties from featured
 		const visibleProperties = properties.filter(property => !property.is_hidden)
 
-		console.log(
-			`✅ Received ${visibleProperties.length} visible featured properties`
-		)
 		return visibleProperties
 	} catch (error) {
 		console.error('Error fetching featured properties:', error)
@@ -496,7 +471,6 @@ export async function getRecentProperties(limit: number = 12) {
 	try {
 		const language = getCurrentLanguage()
 
-		console.log('Fetching recent properties...')
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties?sort_by=created_at&sort_order=desc&limit=${limit}&lang=${language}`,
 			{
@@ -508,7 +482,6 @@ export async function getRecentProperties(limit: number = 12) {
 			}
 		)
 
-		console.log(`Recent properties response status: ${response.status}`)
 
 		if (!response.ok) {
 			console.error(
@@ -520,7 +493,6 @@ export async function getRecentProperties(limit: number = 12) {
 		}
 
 		const data = await response.json()
-		console.log('Recent properties raw response:', data)
 
 		let properties = []
 		if (Array.isArray(data)) {
@@ -541,12 +513,8 @@ export async function getRecentProperties(limit: number = 12) {
 			}
 		}
 
-		// ✅ NEW: Filter out hidden properties from recent
 		const visibleProperties = properties.filter(property => !property.is_hidden)
 
-		console.log(
-			`✅ Received ${visibleProperties.length} visible recent properties`
-		)
 		return visibleProperties
 	} catch (error) {
 		console.error('Error fetching recent properties:', error)
@@ -559,7 +527,6 @@ export async function getExclusiveProperties(limit: number = 12) {
 	try {
 		const language = getCurrentLanguage()
 
-		console.log('Fetching exclusive properties...')
 		const response = await fetch(
 			`${API_BASE_URL}/api/public/properties?exclusive=true&limit=${limit}&lang=${language}`,
 			{
@@ -571,7 +538,6 @@ export async function getExclusiveProperties(limit: number = 12) {
 			}
 		)
 
-		console.log(`Exclusive properties response status: ${response.status}`)
 
 		if (!response.ok) {
 			console.error(
@@ -583,7 +549,6 @@ export async function getExclusiveProperties(limit: number = 12) {
 		}
 
 		const data = await response.json()
-		console.log('Exclusive properties raw response:', data)
 
 		let properties = []
 		if (Array.isArray(data)) {
@@ -604,14 +569,10 @@ export async function getExclusiveProperties(limit: number = 12) {
 			}
 		}
 
-		// ✅ Filter out hidden properties and ensure they're exclusive
 		const visibleExclusiveProperties = properties.filter(
 			property => !property.is_hidden && property.is_exclusive === true
 		)
 
-		console.log(
-			`✅ Received ${visibleExclusiveProperties.length} visible exclusive properties`
-		)
 		return visibleExclusiveProperties
 	} catch (error) {
 		console.error('Error fetching exclusive properties:', error)
@@ -641,7 +602,6 @@ export async function getPropertyStatuses() {
 	}
 }
 
-// Keep existing translation helper functions
 export function getTranslatedCityName(
 	cityName: string,
 	language: 'hy' | 'en' | 'ru'

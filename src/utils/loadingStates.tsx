@@ -59,14 +59,12 @@ export const performanceMetrics = {
 		const start = performance.now()
 		fn()
 		const end = performance.now()
-		console.log(`${name} took ${end - start} milliseconds`)
 	},
 
 	measureAsync: async (name: string, fn: () => Promise<unknown>) => {
 		const start = performance.now()
 		const result = await fn()
 		const end = performance.now()
-		console.log(`${name} took ${end - start} milliseconds`)
 		return result
 	},
 
@@ -75,7 +73,6 @@ export const performanceMetrics = {
 			// Track Largest Contentful Paint
 			new PerformanceObserver(list => {
 				for (const entry of list.getEntries()) {
-					console.log('LCP:', entry.startTime)
 				}
 			}).observe({ entryTypes: ['largest-contentful-paint'] })
 
@@ -83,7 +80,6 @@ export const performanceMetrics = {
 			new PerformanceObserver(list => {
 				for (const entry of list.getEntries()) {
 					const timing = entry as PerformanceEventTiming
-					console.log('FID:', timing.processingStart - timing.startTime)
 				}
 			}).observe({ entryTypes: ['first-input'] })
 		}

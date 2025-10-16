@@ -145,15 +145,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setError(null)
 
 		try {
-			console.log('Fetching properties with filter:', {
-				...filter,
-				page: currentPage,
-				sort_by: sortBy,
-				sort_order: sortOrder,
-				is_exclusive: showExclusiveOnly ? true : undefined,
-				show_hidden: false,
-			})
-
 			const data = await getProperties({
 				...filter,
 				page: currentPage,
@@ -164,7 +155,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 				show_hidden: false,
 			})
 
-			console.log('Received properties data:', data)
 
 			if (data && Array.isArray(data) && data.length > 0) {
 				const visibleProperties = data.filter(property => !property.is_hidden)
@@ -181,7 +171,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 				)
 				setTotalPages(calculatedPages)
 			} else {
-				console.log('No properties returned from API')
 				setProperties([])
 				setTotalPages(1)
 			}

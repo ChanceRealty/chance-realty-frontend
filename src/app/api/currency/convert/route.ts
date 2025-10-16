@@ -29,10 +29,6 @@ export async function GET(request: Request) {
 			)
 		}
 
-		console.log(
-			`💱 Converting ${amount} ${fromCurrency} to [${toCurrencies.join(', ')}]`
-		)
-
 		// Get exchange rates
 		const rates = await getExchangeRates(fromCurrency, toCurrencies)
 
@@ -80,7 +76,6 @@ async function getExchangeRates(
 
 	// Return cached rates if still valid
 	if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-		console.log('✅ Using cached rates')
 		const rates: Record<string, number> = {}
 		targetCurrencies.forEach(currency => {
 			const currencyCache = rateCache.get(`${baseCurrency}-${currency}`)
@@ -93,14 +88,12 @@ async function getExchangeRates(
 		}
 	}
 
-	console.log('🌐 Fetching fresh rates from APIs...')
 
 	try {
 		// Primary: Fawaz API (best accuracy and reliability)
 		let rates = await fetchFromFawazAPI(baseCurrency, targetCurrencies)
 
 		if (!rates || Object.keys(rates).length === 0) {
-			console.log('⚠️ Fawaz API failed, trying backup...')
 			rates = await fetchFromExchangeRateAPI(baseCurrency, targetCurrencies)
 		}
 
@@ -114,11 +107,9 @@ async function getExchangeRates(
 			rateCache.set(`${baseCurrency}-${currency}`, { rate, timestamp })
 		})
 
-		console.log('✅ Successfully fetched live rates:', rates)
 		return rates
 	} catch (error) {
 		console.error('💥 All APIs failed:', error)
-		console.log('⚠️ Using fallback rates')
 		return getCurrentFallbackRates(targetCurrencies)
 	}
 }
@@ -161,7 +152,6 @@ async function fetchFromFawazAPI(
 			}
 		})
 
-		console.log('✅ Fawaz API (PRIMARY) rates:', filteredRates)
 		return filteredRates
 	} catch (error) {
 		console.error('❌ Fawaz API failed:', error)
@@ -203,7 +193,6 @@ async function fetchFromExchangeRateAPI(
 			}
 		})
 
-		console.log('✅ ExchangeRate-API (BACKUP) rates:', filteredRates)
 		return filteredRates
 	} catch (error) {
 		console.error('❌ ExchangeRate-API failed:', error)
@@ -215,7 +204,6 @@ async function fetchFromExchangeRateAPI(
 function getCurrentFallbackRates(
 	targetCurrencies: string[]
 ): Record<string, number> {
-	console.log('⚠️ FALLBACK: APIs are down, using emergency rates')
 
 	// Use average of both APIs from your test for maximum accuracy
 	const fallbackRates: Record<string, number> = {
@@ -229,7 +217,6 @@ function getCurrentFallbackRates(
 	targetCurrencies.forEach(currency => {
 		if (fallbackRates[currency]) {
 			result[currency] = fallbackRates[currency]
-			console.log(`📌 FALLBACK rate ${currency}: ${fallbackRates[currency]}`)
 		}
 	})
 
