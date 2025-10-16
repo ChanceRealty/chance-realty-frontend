@@ -169,9 +169,9 @@ export async function GET(request: NextRequest) {
 				height: 630,
 			}
 		)
-	}
-	catch (error: Error | unknown) {
-		console.error('Error generating OG image:', error)
+	} catch {
+		console.error('Error generating OG image')
 		return new Response(`Failed to generate the image`, { status: 500 })
 	}
+
 }
