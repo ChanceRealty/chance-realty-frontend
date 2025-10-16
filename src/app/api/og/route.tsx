@@ -1,3 +1,4 @@
+import Error from 'next/error'
 import Image from 'next/image'
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
@@ -168,9 +169,9 @@ export async function GET(request: NextRequest) {
 				height: 630,
 			}
 		)
-	} catch (e: unknown) {
-		return new Response(`Failed to generate the image`, {
-			status: 500,
-		})
+	}
+	catch (error: Error | unknown) {
+		console.error('Error generating OG image:', error)
+		return new Response(`Failed to generate the image`, { status: 500 })
 	}
 }

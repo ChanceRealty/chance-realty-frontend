@@ -56,15 +56,15 @@ export function createLoadingComponent(language: 'hy' | 'en' | 'ru') {
 // Performance monitoring
 export const performanceMetrics = {
 	measureTiming: (name: string, fn: () => void) => {
-		const start = performance.now()
+		// const start = performance.now()
 		fn()
-		const end = performance.now()
+		// const end = performance.now()
 	},
 
 	measureAsync: async (name: string, fn: () => Promise<unknown>) => {
-		const start = performance.now()
+		// const start = performance.now()
 		const result = await fn()
-		const end = performance.now()
+		// const end = performance.now()
 		return result
 	},
 
@@ -72,14 +72,14 @@ export const performanceMetrics = {
 		if (typeof window !== 'undefined') {
 			// Track Largest Contentful Paint
 			new PerformanceObserver(list => {
-				for (const entry of list.getEntries()) {
-				}
+				// for (const entry of list.getEntries()) {
+				// }
 			}).observe({ entryTypes: ['largest-contentful-paint'] })
 
 			// Track First Input Delay
 			new PerformanceObserver(list => {
 				for (const entry of list.getEntries()) {
-					const timing = entry as PerformanceEventTiming
+					// const timing = entry as PerformanceEventTiming
 				}
 			}).observe({ entryTypes: ['first-input'] })
 		}
