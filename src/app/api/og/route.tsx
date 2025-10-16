@@ -1,4 +1,3 @@
-import Error from 'next/error'
 import Image from 'next/image'
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
