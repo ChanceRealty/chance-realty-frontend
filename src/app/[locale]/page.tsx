@@ -14,6 +14,7 @@ import {
 	ArrowRight,
 } from 'lucide-react'
 import Image from 'next/image'
+import PromoVideoSection from '../_components/PromoVideoSection'
 
 export default function HomePage() {
 	const t = useTranslations()
@@ -132,6 +133,7 @@ export default function HomePage() {
 						</div>
 					</div>
 				</section>
+				<PromoVideoSection />
 				{/* Property Types */}
 				<section className='py-20 bg-white relative overflow-hidden'>
 					<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
