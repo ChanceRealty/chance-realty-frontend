@@ -269,6 +269,8 @@ const YandexMap = ({
 
 const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
 
+// Updated CurrencyDisplay component for PropertyDetailClient.tsx
+
 function CurrencyDisplay({
 	amount,
 	originalCurrency,
@@ -280,13 +282,29 @@ function CurrencyDisplay({
 	listingType: string
 	language?: string
 }) {
+	// ✅ FIX: Determine target currencies based on original currency
+	const getTargetCurrencies = (baseCurrency: string): string[] => {
+		switch (baseCurrency) {
+			case 'USD':
+				return ['AMD', 'RUB'] // USD -> AMD, RUB
+			case 'AMD':
+				return ['USD', 'RUB'] // AMD -> USD, RUB
+			case 'RUB':
+				return ['USD', 'AMD'] // RUB -> USD, AMD
+			default:
+				return ['AMD', 'RUB'] // Default fallback
+		}
+	}
+
+	const targetCurrencies = getTargetCurrencies(originalCurrency)
+
 	const conversionOptions = useMemo(
 		() => ({
 			autoFetch: true,
 			refreshInterval: 30 * 60 * 1000,
-			targetCurrencies: ['RUB', 'AMD'],
+			targetCurrencies, // ✅ Use dynamic target currencies
 		}),
-		[]
+		[targetCurrencies]
 	)
 
 	const getRentalPeriodSuffix = useCallback(

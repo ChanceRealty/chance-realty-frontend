@@ -359,26 +359,52 @@ export default function PropertyCard({
 	// const statusInfo = getStatusInfo(property.status)
 	// const StatusIcon = statusInfo.icon
 
-	// Function to format price based on listing type
-	const formatPrice = (price: number, listingType: string) => {
-		const formatted = new Intl.NumberFormat(
+const formatPrice = (price: number, listingType: string) => {
+	// 🔹 Округляем цену до целого
+	const roundedPrice = Math.round(price)
+
+	const getCurrencySymbol = (currency: string) => {
+		switch (currency) {
+			case 'AMD':
+				return '֏'
+			case 'USD':
+				return '$'
+			case 'RUB':
+				return '₽'
+			default:
+				return '$'
+		}
+	}
+
+	const symbol = getCurrencySymbol(property.currency || 'USD')
+
+	let formatted: string
+
+	if (property.currency === 'AMD') {
+		formatted = `${roundedPrice.toLocaleString()} ֏`
+	} else {
+		formatted = new Intl.NumberFormat(
 			language === 'ru' ? 'ru-RU' : language === 'en' ? 'en-US' : 'hy-AM',
 			{
 				style: 'currency',
 				currency: property.currency || 'USD',
 				maximumFractionDigits: 0,
 			}
-		).format(price)
-
-		switch (listingType) {
-			case 'rent':
-				return `${formatted}${t.month}`
-			case 'daily_rent':
-				return `${formatted}${t.day}`
-			default:
-				return formatted
-		}
+		).format(roundedPrice)
 	}
+
+	const fallbackFormatted = `${symbol}${roundedPrice.toLocaleString()}`
+
+	switch (listingType) {
+		case 'rent':
+			return `${formatted || fallbackFormatted}${t.month}`
+		case 'daily_rent':
+			return `${formatted || fallbackFormatted}${t.day}`
+		default:
+			return formatted || fallbackFormatted
+	}
+}
+
 
 	// Get listing type label
 	const getListingTypeLabel = (type: string) => {
@@ -753,6 +779,7 @@ export default function PropertyCard({
 								aria-label='Add to favorites'
 								type='button'
 							>
+								formatPrice
 								<Heart
 									className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`}
 								/>
