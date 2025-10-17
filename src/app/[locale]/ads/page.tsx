@@ -47,7 +47,6 @@ export default function AdsPage() {
 	const videoRefs = useRef([])
 	const progressIntervals = useRef(adVideos.map(() => null))
   const t = useTranslations()
-  const { language } = useLanguage()
   
 	useEffect(() => {
 		videoRefs.current = adVideos.map(
