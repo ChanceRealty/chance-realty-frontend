@@ -8,7 +8,6 @@ import {
 	VolumeX,
 	RotateCcw,
 } from 'lucide-react'
-import { useLanguage } from '@/context/LanguageContext'
 import { useTranslations } from '@/translations/translations'
 
 const adVideos = [
