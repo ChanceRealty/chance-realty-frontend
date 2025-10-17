@@ -1,6 +1,4 @@
-// src/translations/translations.ts
 
-import { a } from "framer-motion/client"
 
 export const translations = {
 	hy: {
