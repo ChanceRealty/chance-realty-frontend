@@ -310,15 +310,6 @@ export default function PropertyCard({
 							>
 								<source src={getImageUrl(media.url)} type='video/mp4' />
 							</video>
-
-							<div className='absolute inset-0 bg-gray-200 flex items-center justify-center'>
-								<div className='text-center'>
-									<div className='w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2'>
-										<Play className='w-8 h-8 text-gray-500' />
-									</div>
-									<div className='text-gray-500 text-sm'>Video Preview</div>
-								</div>
-							</div>
 						</>
 					)}
 
@@ -326,18 +317,6 @@ export default function PropertyCard({
 						<div className='bg-black/70 rounded-full p-4 backdrop-blur-sm hover:scale-110 transition-transform'>
 							<Play className='w-8 h-8 text-white ml-1' />
 						</div>
-					</div>
-
-					<div className='absolute top-2 left-2 flex gap-2'>
-						{media.thumbnail_url && !thumbnailError ? (
-							<span className='bg-green-500 text-white px-2 py-1 rounded text-xs font-medium'>
-								HD Preview
-							</span>
-						) : (
-							<span className='bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium'>
-								Video
-							</span>
-						)}
 					</div>
 				</div>
 			)
@@ -794,7 +773,7 @@ const formatPrice = (price: number, listingType: string) => {
 					<div className='flex items-center justify-between mb-3'>
 						<h3 className='font-bold text-[16px] text-gray-900 text-lg group-hover:text-blue-600 transition-colors flex-1'>
 							{property.title.length > 24
-								? property.title.slice(0, 24) + '...'
+								? property.title.slice(0, 22) + '...'
 								: property.title}
 						</h3>
 					</div>

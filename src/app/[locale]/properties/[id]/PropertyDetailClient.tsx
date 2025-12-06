@@ -659,9 +659,9 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 				en: 'Business Type',
 			},
 			area_acres: {
-				hy: 'Մակերես (ակր)',
-				ru: 'Площадь (акры)',
-				en: 'Area (acres)',
+				hy: 'Մակերես',
+				ru: 'Площадь',
+				en: 'Area',
 			},
 		}
 		return labels[key]?.[language] || key
@@ -808,7 +808,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('ceiling_height')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.ceiling_height}
+												{property.attributes.ceiling_height} մ
 											</p>
 										</div>
 									</div>
@@ -865,7 +865,8 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('area_sqft')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.area_sqft.toLocaleString()} {t.sqft}
+												{property.attributes.area_sqft.toLocaleString()}{' '}
+												{t.sqft}
 											</p>
 										</div>
 									</div>
@@ -899,7 +900,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('ceiling_height')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.ceiling_height}
+												{property.attributes.ceiling_height} մ
 											</p>
 										</div>
 									</div>
@@ -924,7 +925,8 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('area_sqft')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.area_sqft.toLocaleString()} {t.sqft}
+												{property.attributes.area_sqft.toLocaleString()}{' '}
+												{t.sqft}
 											</p>
 										</div>
 									</div>
@@ -972,7 +974,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('ceiling_height')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.ceiling_height}
+												{property.attributes.ceiling_height} մ
 											</p>
 										</div>
 									</div>
@@ -997,7 +999,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 											{getAttributeLabel('area_acres')}
 										</p>
 										<p className='font-medium text-gray-700'>
-											{property.attributes.area_acres.toLocaleString()} acres
+											{property.attributes.area_acres.toLocaleString()} {t.sqft}
 										</p>
 									</div>
 								</div>
@@ -1267,6 +1269,19 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 								<div className='relative h-[50vh] md:h-[60vh]'>
 									{property.images && property.images.length > 0 ? (
 										<>
+										{/* 3D View Button */}
+										{property['url_3d'] && (
+											<a
+												href={property['url_3d']}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='absolute top-4 left-4 z-30 bg-white/90 hover:bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg transition-all flex items-center gap-2 text-sm font-medium backdrop-blur-sm'
+											>
+												<Maximize2 className='w-4 h-4' />
+												<span>3D</span>
+											</a>
+										)}
+
 											{property.images[selectedImage].type === 'image' ? (
 												<div
 													className='relative w-full h-full cursor-pointer group'

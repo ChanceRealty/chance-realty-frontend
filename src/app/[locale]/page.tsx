@@ -28,7 +28,7 @@ export default function HomePage() {
 		const fetchProperties = async () => {
 			try {
 				const [ recent] = await Promise.all([
-					getRecentProperties(8),
+					getRecentProperties(9),
 				])
 				setRecentProperties(recent || [])
 			} catch (error) {

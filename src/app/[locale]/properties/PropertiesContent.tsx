@@ -1,7 +1,7 @@
-// PropertiesContent.tsx - Updated with fixed sortBy function
+// PropertiesContent.tsx - Updated with lazy pagination only
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PropertyCard from '@/app/_components/PropertyCard'
 import PropertyFilter from '@/app/_components/PropertyFilter'
@@ -33,15 +33,18 @@ type PropertyCardProps = {
 	variant?: 'default' | 'featured'
 }
 
+const PROPERTIES_PER_PAGE = 30
+
 export default function PropertiesContent({}: PropertyCardProps) {
 	const { language } = useLanguage()
 
 	const searchParams = useSearchParams()
-	const [properties, setProperties] = useState<Property[]>([])
+	const [allProperties, setAllProperties] = useState<Property[]>([])
+	const [displayedProperties, setDisplayedProperties] = useState<Property[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [currentPage, setCurrentPage] = useState(1)
-	const [totalPages, setTotalPages] = useState(1)
+	const [hasMore, setHasMore] = useState(true)
 	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 	const [showFilters, setShowFilters] = useState(false)
 	const [sortBy, setSortBy] = useState<'price' | 'created_at' | 'views'>(
@@ -115,6 +118,8 @@ export default function PropertiesContent({}: PropertyCardProps) {
 
 	useEffect(() => {
 		setCurrentPage(1)
+		setDisplayedProperties([])
+		setAllProperties([])
 		fetchProperties()
 	}, [
 		filter.property_type,
@@ -138,6 +143,8 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		filter.max_area_acres,
 		filter.business_type,
 		showExclusiveOnly,
+		sortBy,
+		sortOrder,
 	])
 
 	const fetchProperties = useCallback(async () => {
@@ -147,14 +154,12 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		try {
 			const data = await getProperties({
 				...filter,
-				page: currentPage,
 				sort_by: sortBy,
 				sort_order: sortOrder,
-				limit: 50,
+				limit: 100,
 				is_exclusive: showExclusiveOnly ? true : undefined,
 				show_hidden: false,
 			})
-
 
 			if (data && Array.isArray(data) && data.length > 0) {
 				const visibleProperties = data.filter(property => !property.is_hidden)
@@ -163,30 +168,64 @@ export default function PropertiesContent({}: PropertyCardProps) {
 					? visibleProperties.filter(property => property.is_exclusive)
 					: visibleProperties
 
-				setProperties(filteredProperties)
-
-				const calculatedPages = Math.max(
-					1,
-					Math.ceil(filteredProperties.length / (filter.limit || 12))
-				)
-				setTotalPages(calculatedPages)
+				setAllProperties(filteredProperties)
+				setDisplayedProperties(filteredProperties.slice(0, PROPERTIES_PER_PAGE))
+				setHasMore(filteredProperties.length > PROPERTIES_PER_PAGE)
 			} else {
-				setProperties([])
-				setTotalPages(1)
+				setAllProperties([])
+				setDisplayedProperties([])
+				setHasMore(false)
 			}
 		} catch (err) {
 			console.error('Error in fetchProperties:', err)
 			setError('Failed to load properties. Please try again.')
-			setProperties([])
-			setTotalPages(1)
+			setAllProperties([])
+			setDisplayedProperties([])
+			setHasMore(false)
 		} finally {
 			setLoading(false)
 		}
-	}, [currentPage, filter, sortBy, sortOrder, showExclusiveOnly])
+	}, [filter, sortBy, sortOrder, showExclusiveOnly])
 
-	useEffect(() => {
-		fetchProperties()
-	}, [fetchProperties])
+	const propertyListRef = useRef<HTMLDivElement>(null)
+
+	const scrollToTop = () => {
+		setTimeout(() => {
+			window.scrollTo({ top: 0, behavior: 'smooth' })
+			const mainContent =
+				document.querySelector('main') || document.querySelector('.max-w-7xl')
+			if (mainContent) {
+				mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' })
+			}
+		}, 100)
+	}
+
+
+	const goToNextPage = () => {
+		if (currentPage * PROPERTIES_PER_PAGE < allProperties.length) {
+			const nextPage = currentPage + 1
+			const startIndex = (nextPage - 1) * PROPERTIES_PER_PAGE
+			const endIndex = startIndex + PROPERTIES_PER_PAGE
+			setDisplayedProperties(allProperties.slice(startIndex, endIndex))
+			setCurrentPage(nextPage)
+			setHasMore(endIndex < allProperties.length)
+			scrollToTop()
+		}
+	}
+
+	const goToPreviousPage = () => {
+		if (currentPage > 1) {
+			const prevPage = currentPage - 1
+			const startIndex = (prevPage - 1) * PROPERTIES_PER_PAGE
+			const endIndex = startIndex + PROPERTIES_PER_PAGE
+			setDisplayedProperties(allProperties.slice(startIndex, endIndex))
+			setCurrentPage(prevPage)
+			setHasMore(endIndex < allProperties.length)
+			scrollToTop()
+		}
+	}
+
+	const totalPages = Math.ceil(allProperties.length / PROPERTIES_PER_PAGE)
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -204,11 +243,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setFilter(newFilter)
 		setCurrentPage(1)
 	}
-
-	// const handlePageChange = (page: number) => {
-	// 	setCurrentPage(page)
-	// 	window.scrollTo({ top: 0, behavior: 'smooth' })
-	// }
 
 	const handleSortChange = (
 		newSortBy: 'price' | 'created_at' | 'views',
@@ -245,9 +279,9 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setCurrentPage(1)
 	}
 
-	useEffect(() => {
-		fetchProperties()
-	}, [currentPage, sortBy, sortOrder])
+	// useEffect(() => {
+	// 	fetchProperties()
+	// }, [currentPage, sortBy, sortOrder])
 
 	const hasActiveFilters = () => {
 		return (
@@ -269,81 +303,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		if (showExclusiveOnly) summary.push('Exclusive Only')
 		return summary.join(', ') || 'All properties'
 	}
-
-	// const formatPrice = (price: number, listingType: string) => {
-	// 	const formatted = new Intl.NumberFormat('en-US', {
-	// 		style: 'currency',
-	// 		currency: 'USD',
-	// 		maximumFractionDigits: 0,
-	// 	}).format(price)
-
-	// 	switch (listingType) {
-	// 		case 'rent':
-	// 			return `${formatted}/month`
-	// 		case 'daily_rent':
-	// 			return `${formatted}/day`
-	// 		default:
-	// 			return formatted
-	// 	}
-	// }
-
-	// const formatLocalizedDate = (
-	// 	date: string | Date,
-	// 	language: 'hy' | 'en' | 'ru'
-	// ) => {
-	// 	const dateObj = new Date(date)
-
-	// 	const monthNames = {
-	// 		hy: [
-	// 			'Հունվար',
-	// 			'Փետրվար',
-	// 			'Մարտ',
-	// 			'Ապրիլ',
-	// 			'Մայիս',
-	// 			'Հունիս',
-	// 			'Հուլիս',
-	// 			'Օգոստոս',
-	// 			'Սեպտեմբեր',
-	// 			'Հոկտեմբեր',
-	// 			'Նոյեմբեր',
-	// 			'Դեկտեմբեր',
-	// 		],
-	// 		en: [
-	// 			'January',
-	// 			'February',
-	// 			'March',
-	// 			'April',
-	// 			'May',
-	// 			'June',
-	// 			'July',
-	// 			'August',
-	// 			'September',
-	// 			'October',
-	// 			'November',
-	// 			'December',
-	// 		],
-	// 		ru: [
-	// 			'Январь',
-	// 			'Февраль',
-	// 			'Март',
-	// 			'Апрель',
-	// 			'Май',
-	// 			'Июнь',
-	// 			'Июль',
-	// 			'Август',
-	// 			'Сентябрь',
-	// 			'Октябрь',
-	// 			'Ноябрь',
-	// 			'Декабрь',
-	// 		],
-	// 	}
-
-	// 	const day = dateObj.getDate()
-	// 	const month = monthNames[language][dateObj.getMonth()]
-	// 	const year = dateObj.getFullYear()
-
-	// 	return `${day} ${month} ${year}`
-	// }
 
 	return (
 		<div className='min-h-screen bg-white'>
@@ -428,7 +387,12 @@ export default function PropertiesContent({}: PropertyCardProps) {
 							</div>
 
 							{/* Filters Container */}
-							<div className='bg-white rounded-2xl'>
+							{/* Filters Container */}
+							<div
+								className={`bg-white rounded-2xl lg:block ${
+									showFilters ? 'block' : 'hidden'
+								}`}
+							>
 								<PropertyFilter
 									onFilterChange={handleFilterChange}
 									initialFilter={filter}
@@ -445,7 +409,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 									<div className='flex items-center text-sm text-gray-600'>
 										<MapPin className='w-4 h-4 mr-2 text-blue-500' />
 										<span className='font-medium'>
-											{properties.length} {t('propertiesFound')}
+											{allProperties.length} {t('propertiesFound')}
 										</span>
 									</div>
 									{hasActiveFilters() && (
@@ -733,19 +697,21 @@ export default function PropertiesContent({}: PropertyCardProps) {
 												: 'Retry'}
 										</button>
 									</div>
-								) : properties.length === 0 ? (
+								) : displayedProperties.length === 0 ? (
 									<div className='flex justify-center items-center h-64 text-gray-500'>
 										<p>{t('noPropertiesFound')}</p>
 									</div>
 								) : viewMode === 'grid' ? (
 									<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-										{properties.map(property => (
-											<PropertyCard key={property.id} property={property} />
+										{displayedProperties.map(property => (
+											<div key={property.id}>
+												<PropertyCard property={property} />
+											</div>
 										))}
 									</div>
 								) : (
-									<div className='grid grid-cols-1 gap-6'>
-										{properties.map(property => (
+									<div ref={propertyListRef} className='grid grid-cols-1 gap-6'>
+										{displayedProperties.map(property => (
 											<div
 												key={property.id}
 												className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300'
@@ -755,14 +721,59 @@ export default function PropertiesContent({}: PropertyCardProps) {
 										))}
 									</div>
 								)}
-							</div>
 
-							{/* Pagination */}
-							{totalPages > 1 && (
-								<div className='mt-12 flex justify-center'>
-									{/* Pagination buttons */}
-								</div>
-							)}
+								{/* Pagination Controls */}
+								{!loading &&
+									!error &&
+									displayedProperties.length > 0 &&
+									totalPages > 1 && (
+										<div className='mt-12 flex flex-col items-center gap-4'>
+											{/* Page info */}
+											<div className='text-sm text-gray-600'>
+												{language === 'hy'
+													? `Էջ ${currentPage} / ${totalPages}`
+													: language === 'ru'
+													? `Страница ${currentPage} из ${totalPages}`
+													: `Page ${currentPage} of ${totalPages}`}
+											</div>
+
+											{/* Pagination buttons */}
+											<div className='flex items-center gap-3'>
+												<button
+													onClick={goToPreviousPage}
+													disabled={currentPage === 1}
+													className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+														currentPage === 1
+															? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+															: 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+													}`}
+												>
+													{language === 'hy'
+														? '← Նախորդ'
+														: language === 'ru'
+														? '← Предыдущая'
+														: '← Previous'}
+												</button>
+
+												<button
+													onClick={goToNextPage}
+													disabled={currentPage >= totalPages}
+													className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+														currentPage >= totalPages
+															? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+															: 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
+													}`}
+												>
+													{language === 'hy'
+														? 'Հաջորդ →'
+														: language === 'ru'
+														? 'Следующая →'
+														: 'Next →'}
+												</button>
+											</div>
+										</div>
+									)}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -781,8 +792,24 @@ export default function PropertiesContent({}: PropertyCardProps) {
 					}
 				}
 
+				@keyframes slideInUp {
+					from {
+						opacity: 0;
+						transform: translateY(30px) scale(0.95);
+					}
+					to {
+						opacity: 1;
+						transform: translateY(0) scale(1);
+					}
+				}
+
 				.animate-fade-in {
 					animation: fade-in 0.6s ease-out forwards;
+					opacity: 0;
+				}
+
+				.property-card-animate {
+					animation: slideInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 					opacity: 0;
 				}
 			`}</style>
