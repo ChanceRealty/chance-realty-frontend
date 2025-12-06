@@ -44,7 +44,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [currentPage, setCurrentPage] = useState(1)
-	const [hasMore, setHasMore] = useState(true)
 	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 	const [showFilters, setShowFilters] = useState(false)
 	const [sortBy, setSortBy] = useState<'price' | 'created_at' | 'views'>(
@@ -170,18 +169,15 @@ export default function PropertiesContent({}: PropertyCardProps) {
 
 				setAllProperties(filteredProperties)
 				setDisplayedProperties(filteredProperties.slice(0, PROPERTIES_PER_PAGE))
-				setHasMore(filteredProperties.length > PROPERTIES_PER_PAGE)
 			} else {
 				setAllProperties([])
 				setDisplayedProperties([])
-				setHasMore(false)
 			}
 		} catch (err) {
 			console.error('Error in fetchProperties:', err)
 			setError('Failed to load properties. Please try again.')
 			setAllProperties([])
 			setDisplayedProperties([])
-			setHasMore(false)
 		} finally {
 			setLoading(false)
 		}
@@ -208,7 +204,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			const endIndex = startIndex + PROPERTIES_PER_PAGE
 			setDisplayedProperties(allProperties.slice(startIndex, endIndex))
 			setCurrentPage(nextPage)
-			setHasMore(endIndex < allProperties.length)
 			scrollToTop()
 		}
 	}
@@ -220,7 +215,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			const endIndex = startIndex + PROPERTIES_PER_PAGE
 			setDisplayedProperties(allProperties.slice(startIndex, endIndex))
 			setCurrentPage(prevPage)
-			setHasMore(endIndex < allProperties.length)
 			scrollToTop()
 		}
 	}
