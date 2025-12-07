@@ -45,6 +45,8 @@ import {
 	Clock,
 	XCircle,
 	Phone,
+	Boxes,
+	Glasses,
 } from 'lucide-react'
 
 import { RxHeight } from 'react-icons/rx'
@@ -55,6 +57,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import React from 'react'
 import ymaps from 'yandex-maps'
 import ContactPopup from '@/app/_components/ContactPopup'
+import { FaVrCardboard } from 'react-icons/fa'
 
 interface PropertyDetailClientProps {
 	property: Property
@@ -1596,15 +1599,15 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												rel='noopener noreferrer'
 												className='
           w-full flex items-center justify-center
-          text-gray-800
+          text-blue-600
           px-2 py-1
           rounded-full
-          gap-2 text-xs font-medium
+          gap-2 text-[18px] font-bold
           backdrop-blur-sm
           transition-all duration-200
         '
 											>
-												<Maximize2 className='w-3 h-3' />
+												<FaVrCardboard className='w-6 h-6' />
 												<span>
 													{
 														{
@@ -1823,15 +1826,15 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 										rel='noopener noreferrer'
 										className='
           w-full flex items-center justify-center
-          text-gray-800
+          text-blue-600
           px-2 py-1
           rounded-full
-          gap-2 text-[14px] font-bold
+          gap-2 text-[18px] font-bold
           backdrop-blur-sm
           transition-all duration-200
         '
 									>
-										<Maximize2 className='w-4 h-4=' />
+										<FaVrCardboard className='w-6 h-6' />
 										<span>
 											{
 												{
