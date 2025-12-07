@@ -1269,19 +1269,6 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 								<div className='relative h-[50vh] md:h-[60vh]'>
 									{property.images && property.images.length > 0 ? (
 										<>
-										{/* 3D View Button */}
-										{property['url_3d'] && (
-											<a
-												href={property['url_3d']}
-												target='_blank'
-												rel='noopener noreferrer'
-												className='absolute top-4 left-4 z-30 bg-white/90 hover:bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg transition-all flex items-center gap-2 text-sm font-medium backdrop-blur-sm'
-											>
-												<Maximize2 className='w-4 h-4' />
-												<span>3D</span>
-											</a>
-										)}
-
 											{property.images[selectedImage].type === 'image' ? (
 												<div
 													className='relative w-full h-full cursor-pointer group'
@@ -1601,6 +1588,36 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 									{/* Mobile Property Attributes */}
 									{getPropertyAttributes()}
 
+									{property.url_3d && property.url_3d.trim() !== '' && (
+										<div className='bg-white rounded-xl shadow-sm p-2 border border-gray-100 mb-6'>
+											<a
+												href={property.url_3d}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='
+          w-full flex items-center justify-center
+          text-gray-800
+          px-2 py-1
+          rounded-full
+          gap-2 text-xs font-medium
+          backdrop-blur-sm
+          transition-all duration-200
+        '
+											>
+												<Maximize2 className='w-3 h-3' />
+												<span>
+													{
+														{
+															hy: 'Դիտել 3D տարբերակով',
+															en: 'View in 3D',
+															ru: 'Смотреть в 3D',
+														}[language]
+													}
+												</span>{' '}
+											</a>
+										</div>
+									)}
+
 									{/* Price for Mobile */}
 									<div className='mt-4'>
 										<CurrencyDisplay
@@ -1798,6 +1815,35 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 									</div>
 								</div>
 							</div>
+							{property.url_3d && property.url_3d.trim() !== '' && (
+								<div className='bg-white rounded-xl shadow-sm p-2 border border-gray-100 mb-6'>
+									<a
+										href={property.url_3d}
+										target='_blank'
+										rel='noopener noreferrer'
+										className='
+          w-full flex items-center justify-center
+          text-gray-800
+          px-2 py-1
+          rounded-full
+          gap-2 text-[14px] font-bold
+          backdrop-blur-sm
+          transition-all duration-200
+        '
+									>
+										<Maximize2 className='w-4 h-4=' />
+										<span>
+											{
+												{
+													hy: 'Դիտել 3D տարբերակով',
+													en: 'View in 3D',
+													ru: 'Смотреть в 3D',
+												}[language]
+											}
+										</span>{' '}
+									</a>
+								</div>
+							)}
 
 							{/* Price Card with Currency Conversion (Desktop Only) */}
 							<div className='bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6'>

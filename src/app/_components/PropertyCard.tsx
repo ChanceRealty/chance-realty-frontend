@@ -23,6 +23,7 @@ import {
 	// Pause,
 	Crown,
 	Layers3,
+	Maximize2,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -610,231 +611,263 @@ const formatPrice = (price: number, listingType: string) => {
 		}
 	}
 
+
+
 	return (
-		<Link
-			href={`/${language}/properties/${property.custom_id}`}
-			target='_blank'
-			onClick={handleLinkClick}
-		>
-			<div className='group bg-white rounded-xl shadow-lg hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-500 transform hover:-translate-y-2'>
-				{/* Image Section with Touch/Drag Slider */}
-				<div
-					ref={sliderRef}
-					className='relative h-64 overflow-hidden select-none'
-					onMouseEnter={() => setIsHovering(true)}
-					onMouseLeave={() => setIsHovering(false)}
-					onMouseDown={handleMouseDown}
-					onTouchStart={handleTouchStart}
-					onTouchMove={handleTouchMove}
-					onTouchEnd={handleTouchEnd}
-					style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-				>
-					{property.images && property.images.length > 0 ? (
-						<>
-							<div
-								className={`relative w-full h-full transition-all duration-500 group-hover:scale-110 ${
-									isDragging ? '' : 'transition-transform'
-								}`}
-								style={{
-									transform: isDragging
-										? `translateX(${translateX}px)`
-										: 'none',
-								}}
-							>
-								{renderMediaItem(
-									property.images[currentImageIndex],
-									currentImageIndex
-								)}
-							</div>
+		<div className='relative group'>
+			<Link
+				href={`/${language}/properties/${property.custom_id}`}
+				target='_blank'
+				onClick={handleLinkClick}
+			>
+				<div className=' bg-white rounded-xl shadow-lg hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-500 transform hover:-translate-y-2'>
+					{/* Image Section with Touch/Drag Slider */}
+					<div
+						ref={sliderRef}
+						className='relative h-64 overflow-hidden select-none'
+						onMouseEnter={() => setIsHovering(true)}
+						onMouseLeave={() => setIsHovering(false)}
+						onMouseDown={handleMouseDown}
+						onTouchStart={handleTouchStart}
+						onTouchMove={handleTouchMove}
+						onTouchEnd={handleTouchEnd}
+						style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+					>
+						{property.images && property.images.length > 0 ? (
+							<>
+								<div
+									className={`relative w-full h-full transition-all duration-500 group-hover:scale-110 ${
+										isDragging ? '' : 'transition-transform'
+									}`}
+									style={{
+										transform: isDragging
+											? `translateX(${translateX}px)`
+											: 'none',
+									}}
+								>
+									{renderMediaItem(
+										property.images[currentImageIndex],
+										currentImageIndex
+									)}
+								</div>
 
-							{/* Desktop Navigation Controls - FIXED */}
-							{property.images.length > 1 && isHovering && !isDragging && (
-								<>
-									<button
-										onMouseDown={handlePrevClick}
-										className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
-										aria-label='Previous image'
-										type='button'
-									>
-										<ChevronLeft className='w-5 h-5' />
-									</button>
-									<button
-										onMouseDown={handleNextClick}
-										className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
-										aria-label='Next image'
-										type='button'
-									>
-										<ChevronRight className='w-5 h-5' />
-									</button>
-								</>
-							)}
-
-							{/* Image Indicators */}
-							{property.images.length > 1 && (
-								<div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[90]'>
-									{property.images.map((_, index) => (
+								{/* Desktop Navigation Controls - FIXED */}
+								{property.images.length > 1 && isHovering && !isDragging && (
+									<>
 										<button
-											key={index}
-											onMouseDown={e => handleIndicatorClick(e, index)}
-											className={`w-2 h-2 rounded-full transition-all duration-300 ${
-												index === currentImageIndex
-													? 'bg-white scale-125'
-													: 'bg-white/50 hover:bg-white/80'
-											}`}
-											aria-label={`Go to image ${index + 1}`}
+											onMouseDown={handlePrevClick}
+											className='absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
+											aria-label='Previous image'
 											type='button'
-										/>
-									))}
-								</div>
-							)}
+										>
+											<ChevronLeft className='w-5 h-5' />
+										</button>
+										<button
+											onMouseDown={handleNextClick}
+											className='absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 z-[100]'
+											aria-label='Next image'
+											type='button'
+										>
+											<ChevronRight className='w-5 h-5' />
+										</button>
+									</>
+								)}
 
-							{/* Media Count Badge */}
-							{property.images.length > 1 && (
-								<div className='absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm z-10'>
-									{currentImageIndex + 1}/{property.images.length}
-								</div>
-							)}
-
-							{/* Drag Indicator for Mobile */}
-							{property.images.length > 1 && (
-								<div className='absolute bottom-10 left-1/2 transform -translate-x-1/2 md:hidden z-10'>
-									<div className='bg-black/50 text-white px-2 py-1 rounded text-xs'>
-										← Swipe →
+								{/* Image Indicators */}
+								{property.images.length > 1 && (
+									<div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[90]'>
+										{property.images.map((_, index) => (
+											<button
+												key={index}
+												onMouseDown={e => handleIndicatorClick(e, index)}
+												className={`w-2 h-2 rounded-full transition-all duration-300 ${
+													index === currentImageIndex
+														? 'bg-white scale-125'
+														: 'bg-white/50 hover:bg-white/80'
+												}`}
+												aria-label={`Go to image ${index + 1}`}
+												type='button'
+											/>
+										))}
 									</div>
-								</div>
-							)}
-						</>
-					) : (
-						<div className='w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center'>
-							<div className='text-center'>
-								<Home className='w-12 h-12 text-gray-400 mx-auto mb-2' />
-								<span className='text-gray-500 text-sm'>{t.noImage}</span>
-							</div>
-						</div>
-					)}
+								)}
 
-					{/* Enhanced Badges */}
-					<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
-						{/* Exclusive Badge */}
-						{property.is_exclusive && (
-							<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
-								<Crown className='w-3 h-3' />
-								{getExclusiveLabel()}
-							</span>
+								{/* Media Count Badge */}
+								{property.images.length > 1 && (
+									<div className='absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm z-20'>
+										{currentImageIndex + 1}/{property.images.length}
+									</div>
+								)}
+
+								{/* 3D Button — под Media Count Badge */}
+								{property.url_3d && property.url_3d.trim() !== '' && (
+									<a
+										href={property.url_3d}
+										target='_blank'
+										rel='noopener noreferrer'
+										onClick={e => e.stopPropagation()}
+										className='
+    absolute top-[2.5rem] right-3
+    z-30
+    bg-white/95 hover:bg-white
+    text-gray-800
+    px-2 py-1
+    rounded-full
+    shadow-lg
+    flex items-center gap-1 text-xs font-medium
+    backdrop-blur-sm
+    transition-all duration-200
+  '
+									>
+										<Maximize2 className='w-3 h-3' />
+										<span>3D</span>
+									</a>
+								)}
+
+								{/* Drag Indicator for Mobile */}
+								{property.images.length > 1 && (
+									<div className='absolute bottom-10 left-1/2 transform -translate-x-1/2 md:hidden z-10'>
+										<div className='bg-black/50 text-white px-2 py-1 rounded text-xs'>
+											← Swipe →
+										</div>
+									</div>
+								)}
+							</>
+						) : (
+							<div className='w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center'>
+								<div className='text-center'>
+									<Home className='w-12 h-12 text-gray-400 mx-auto mb-2' />
+									<span className='text-gray-500 text-sm'>{t.noImage}</span>
+								</div>
+							</div>
 						)}
 
-						{/* Listing Type Badge */}
-						<span
-							className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
-								property.listing_type === 'sale'
-									? 'bg-gradient-to-r from-green-500 to-emerald-600'
-									: property.listing_type === 'rent'
-									? 'bg-gradient-to-r from-blue-500 to-blue-600'
-									: 'bg-gradient-to-r from-purple-500 to-purple-600'
-							}`}
-						>
-							{getListingTypeLabel(property.listing_type)}
-						</span>
+						{/* Enhanced Badges */}
+						<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
+							{/* Exclusive Badge */}
+							{property.is_exclusive && (
+								<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
+									<Crown className='w-3 h-3' />
+									{getExclusiveLabel()}
+								</span>
+							)}
 
-						{/* Status Badge */}
-						{/*<span
+							{/* Listing Type Badge */}
+							<span
+								className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
+									property.listing_type === 'sale'
+										? 'bg-gradient-to-r from-green-500 to-emerald-600'
+										: property.listing_type === 'rent'
+										? 'bg-gradient-to-r from-blue-500 to-blue-600'
+										: 'bg-gradient-to-r from-purple-500 to-purple-600'
+								}`}
+							>
+								{getListingTypeLabel(property.listing_type)}
+							</span>
+
+							{/* Status Badge */}
+							{/*<span
 							className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1 ${statusInfo.color}`}
 						>
 							<StatusIcon className='w-3 h-3' />
 							{statusInfo.label}
 						</span>*/}
+						</div>
+
+						{/* Action Buttons */}
+						<div className='absolute top-3 right-3 z-10'>
+							{onFavoriteClick && (
+								<button
+									onClick={handleFavoriteClick}
+									className={`p-2 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 transform hover:scale-110 ${
+										isFavorited
+											? 'bg-red-500 text-white'
+											: 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
+									}`}
+									aria-label='Add to favorites'
+									type='button'
+								>
+									formatPrice
+									<Heart
+										className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`}
+									/>
+								</button>
+							)}
+						</div>
 					</div>
 
-					{/* Action Buttons */}
-					<div className='absolute top-3 right-3 z-10'>
-						{onFavoriteClick && (
-							<button
-								onClick={handleFavoriteClick}
-								className={`p-2 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 transform hover:scale-110 ${
-									isFavorited
-										? 'bg-red-500 text-white'
-										: 'bg-white/90 text-gray-700 hover:bg-red-50 hover:text-red-500'
-								}`}
-								aria-label='Add to favorites'
-								type='button'
-							>
-								formatPrice
-								<Heart
-									className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`}
-								/>
-							</button>
-						)}
-					</div>
-				</div>
+					{/* Content Section */}
+					<div className='p-4'>
+						{/* Title with Exclusive indicator */}
+						<div className='flex items-center justify-between mb-3'>
+							<h3 className='font-bold text-[16px] text-gray-900 text-lg group-hover:text-blue-600 transition-colors flex-1'>
+								{property.title.length > 24
+									? property.title.slice(0, 22) + '...'
+									: property.title}
+							</h3>
+						</div>
 
-				{/* Content Section */}
-				<div className='p-4'>
-					{/* Title with Exclusive indicator */}
-					<div className='flex items-center justify-between mb-3'>
-						<h3 className='font-bold text-[16px] text-gray-900 text-lg group-hover:text-blue-600 transition-colors flex-1'>
-							{property.title.length > 24
-								? property.title.slice(0, 22) + '...'
-								: property.title}
-						</h3>
-					</div>
-
-					{/* Location */}
-					<div className='flex items-center text-gray-600 mb-4'>
-						<MapPin className='w-4 h-4 mr-2 text-blue-500 flex-shrink-0' />
-						<div className='text-sm truncate'>
-							{(() => {
-								if (property.state) {
-									if (property.district) {
-										const districtName = getTranslatedDistrictName(
-											property.district,
-											language
-										)
-										const stateName = getTranslatedStateName(
-											property.state.name,
-											language
-										)
-										return `${districtName}, ${stateName}`
-									} else if (property.city) {
-										const cityName = getTranslatedCityName(
-											property.city.name,
-											language
-										)
-										const stateName = getTranslatedStateName(
-											property.state.name,
-											language
-										)
-										return `${cityName}, ${stateName}`
-									} else {
-										return getTranslatedStateName(property.state.name, language)
+						{/* Location */}
+						<div className='flex items-center text-gray-600 mb-4'>
+							<MapPin className='w-4 h-4 mr-2 text-blue-500 flex-shrink-0' />
+							<div className='text-sm truncate'>
+								{(() => {
+									if (property.state) {
+										if (property.district) {
+											const districtName = getTranslatedDistrictName(
+												property.district,
+												language
+											)
+											const stateName = getTranslatedStateName(
+												property.state.name,
+												language
+											)
+											return `${districtName}, ${stateName}`
+										} else if (property.city) {
+											const cityName = getTranslatedCityName(
+												property.city.name,
+												language
+											)
+											const stateName = getTranslatedStateName(
+												property.state.name,
+												language
+											)
+											return `${cityName}, ${stateName}`
+										} else {
+											return getTranslatedStateName(
+												property.state.name,
+												language
+											)
+										}
 									}
-								}
-								return ''
-							})()}
+									return ''
+								})()}
+							</div>
 						</div>
-					</div>
 
-					{/* Price */}
-					<div className='text-[16px] font-bold text-blue-600 mb-4'>
-						{formatPrice(property.price, property.listing_type)}
-					</div>
+						{/* Price */}
+						<div className='text-[16px] font-bold text-blue-600 mb-4'>
+							{formatPrice(property.price, property.listing_type)}
+						</div>
 
-					{/* Property Attributes */}
-					<div className='mb-4'>{renderPropertyAttributes()}</div>
+						{/* Property Attributes */}
+						<div className='mb-4'>{renderPropertyAttributes()}</div>
 
-					{/* Property ID and Stats */}
-					<div className='flex justify-between items-center pt-4 border-t border-gray-100'>
-						<span className='text-sm text-gray-900 font-bold'>
-							ID: {property.custom_id}
-						</span>
-						<div className='flex items-center space-x-4 text-xs text-gray-500'>
-							<span>👁 {property.views}</span>
-							<span>
-								📅 {new Date(property.created_at).toLocaleDateString()}
+						{/* Property ID and Stats */}
+						<div className='flex justify-between items-center pt-4 border-t border-gray-100'>
+							<span className='text-sm text-gray-900 font-bold'>
+								ID: {property.custom_id}
 							</span>
+							<div className='flex items-center space-x-4 text-xs text-gray-500'>
+								<span>👁 {property.views}</span>
+								<span>
+									📅 {new Date(property.created_at).toLocaleDateString()}
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</Link>
+			</Link>
+		</div>
 	)
 }

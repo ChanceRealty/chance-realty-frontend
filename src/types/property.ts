@@ -61,7 +61,7 @@ export interface BaseProperty {
 	longitude?: number
 	status: PropertyStatus
 	views: number
-	url_3d?: string
+	url_3d?: string | null
 	created_at: Date
 	updated_at: Date
 
