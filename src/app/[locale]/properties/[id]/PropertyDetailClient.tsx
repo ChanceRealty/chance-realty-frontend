@@ -45,8 +45,6 @@ import {
 	Clock,
 	XCircle,
 	Phone,
-	Boxes,
-	Glasses,
 } from 'lucide-react'
 
 import { RxHeight } from 'react-icons/rx'

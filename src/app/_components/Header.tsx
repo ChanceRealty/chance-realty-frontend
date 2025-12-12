@@ -37,6 +37,7 @@ const Header = () => {
 			commercial: 'Կոմերցիոն',
 			land: 'Հողատարածքներ',
 			dailyRent: 'Օրավարձ',
+			dTour: '3D Տուր'
 		},
 		en: {
 			buy: 'Buy',
@@ -48,6 +49,7 @@ const Header = () => {
 			commercial: 'Commercial',
 			land: 'Land',
 			dailyRent: 'Daily Rent',
+			dTour: '3D Tour'
 		},
 		ru: {
 			buy: 'Купить',
@@ -59,6 +61,7 @@ const Header = () => {
 			commercial: 'Коммерческая',
 			land: 'Земельные участки',
 			dailyRent: 'Посуточная аренда',
+			dTour: '3D Тур'
 		},
 	}
 	const t = navTranslations[currentLang]
@@ -106,6 +109,7 @@ const Header = () => {
 		},
 		{ label: t.contact, href: `/${currentLang}/contact` },
 		{ label: t.about, href: `/${currentLang}/about` },
+		{ label: t.dTour, href: `/${currentLang}/properties?3d=true` },
 	]
 
 	const getNavItemClass = (href: string) => {

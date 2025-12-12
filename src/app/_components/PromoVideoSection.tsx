@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import  { useState, useRef, useEffect } from 'react'
 import { Play, Pause, Volume2, VolumeX, RotateCcw } from 'lucide-react'
 import { useTranslations } from '@/translations/translations'
 
@@ -97,25 +97,12 @@ const PromoVideoSection = () => {
 			</div>
 
 			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10'>
-				{/* Header */}
-				<div className='text-center mb-10 md:mb-16'>
-					<div className='inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mb-4 md:mb-6 shadow-2xl animate-pulse'>
-						<Play className='w-8 h-8 md:w-10 md:h-10 text-white ml-1' />
-					</div>
-					<h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 px-4'>
-						{t.experienceThe}{' '}
-						<span className='block bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mt-2'>
-							{t.ChanceRealtyDifference}
-						</span>
-					</h2>
-				</div>
-
 				{/* Centered Video */}
 				<div className='flex justify-center items-center'>
 					{videos.map((video, index) => (
 						<div
 							key={index}
-							className='relative w-full max-w-[500px] md:max-w-[700px] lg:max-w-[500px] rounded-3xl overflow-hidden shadow-2xl'
+							className='relative w-full max-w-[300px] md:max-w-[500px] lg:max-w-[300px] rounded-3xl overflow-hidden shadow-2xl'
 							onMouseEnter={() =>
 								setShowControls(prev => {
 									const n = [...prev]

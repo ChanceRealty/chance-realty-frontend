@@ -23,7 +23,6 @@ import {
 	// Pause,
 	Crown,
 	Layers3,
-	Maximize2,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -41,6 +40,7 @@ import {
 	getTranslatedField,
 	getTranslatedStateName,
 } from '@/services/propertyService'
+import { FaVrCardboard } from 'react-icons/fa'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
@@ -701,11 +701,16 @@ const formatPrice = (price: number, listingType: string) => {
 
 								{/* 3D Button — под Media Count Badge */}
 								{property.url_3d && property.url_3d.trim() !== '' && (
-									<a
-										href={property.url_3d}
-										target='_blank'
-										rel='noopener noreferrer'
-										onClick={e => e.stopPropagation()}
+									<button
+										type='button'
+										onClick={e => {
+											e.stopPropagation()
+											window.open(
+												property.url_3d,
+												'_blank',
+												'noopener,noreferrer'
+											)
+										}}
 										className='
     absolute top-[2.5rem] right-3
     z-30
@@ -719,9 +724,9 @@ const formatPrice = (price: number, listingType: string) => {
     transition-all duration-200
   '
 									>
-										<Maximize2 className='w-3 h-3' />
+										<FaVrCardboard className='w-3 h-3' />
 										<span>3D</span>
-									</a>
+									</button>
 								)}
 
 								{/* Drag Indicator for Mobile */}

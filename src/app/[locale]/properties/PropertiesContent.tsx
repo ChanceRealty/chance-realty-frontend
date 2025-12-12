@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { t } from '@/translations/translations'
+import { FaVrCardboard } from 'react-icons/fa'
 
 type PropertyCardProps = {
 	property?: Property
@@ -52,6 +53,14 @@ export default function PropertiesContent({}: PropertyCardProps) {
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 	const [showExclusiveOnly, setShowExclusiveOnly] = useState(false)
 	const [showSortMenu, setShowSortMenu] = useState(false)
+
+	const [show3DOnly, setShow3DOnly] = useState(false)
+
+	useEffect(() => {
+		const has3d = searchParams.get('3d') === 'true'
+		setShow3DOnly(has3d)
+	}, [searchParams])
+
 
 	// Initialize filter from URL params
 	const [filter, setFilter] = useState<FilterType>(() => {
@@ -142,6 +151,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		filter.max_area_acres,
 		filter.business_type,
 		showExclusiveOnly,
+		show3DOnly,
 		sortBy,
 		sortOrder,
 	])
@@ -163,12 +173,34 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			if (data && Array.isArray(data) && data.length > 0) {
 				const visibleProperties = data.filter(property => !property.is_hidden)
 
-				const filteredProperties = showExclusiveOnly
+				let filteredProperties = showExclusiveOnly
 					? visibleProperties.filter(property => property.is_exclusive)
 					: visibleProperties
+				
+				if (show3DOnly) {
+					filteredProperties = filteredProperties.filter(
+						property => property.url_3d && property.url_3d.trim() !== ''
+					)
+				}
 
-				setAllProperties(filteredProperties)
-				setDisplayedProperties(filteredProperties.slice(0, PROPERTIES_PER_PAGE))
+				const sortedProperties = filteredProperties.sort((a, b) => {
+					if (a.is_exclusive && !b.is_exclusive) return -1
+					if (!a.is_exclusive && b.is_exclusive) return 1
+
+					if (sortBy === 'price') {
+						return sortOrder === 'asc' ? a.price - b.price : b.price - a.price
+					} else if (sortBy === 'views') {
+						return sortOrder === 'asc' ? a.views - b.views : b.views - a.views
+					} else {
+						// created_at
+						const aTime = new Date(a.created_at).getTime()
+						const bTime = new Date(b.created_at).getTime()
+						return sortOrder === 'asc' ? aTime - bTime : bTime - aTime
+					}
+				})
+
+				setAllProperties(sortedProperties)
+				setDisplayedProperties(sortedProperties.slice(0, PROPERTIES_PER_PAGE))
 			} else {
 				setAllProperties([])
 				setDisplayedProperties([])
@@ -181,7 +213,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		} finally {
 			setLoading(false)
 		}
-	}, [filter, sortBy, sortOrder, showExclusiveOnly])
+	}, [filter, sortBy, sortOrder, showExclusiveOnly, show3DOnly])
 
 	const propertyListRef = useRef<HTMLDivElement>(null)
 
@@ -273,6 +305,11 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setCurrentPage(1)
 	}
 
+	const handle3DToggle = () => {
+		setShow3DOnly(!show3DOnly)
+		setCurrentPage(1)
+	}
+
 	// useEffect(() => {
 	// 	fetchProperties()
 	// }, [currentPage, sortBy, sortOrder])
@@ -282,7 +319,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			Object.keys(filter).some(
 				key =>
 					key !== 'page' && key !== 'limit' && filter[key as keyof FilterType]
-			) || showExclusiveOnly
+			) || showExclusiveOnly || show3DOnly
 		)
 	}
 
@@ -311,14 +348,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 								</h1>
 							</div>
 						</div>
-						{hasActiveFilters() && (
-							<div className='mt-2 flex items-center text-sm text-gray-500'>
-								<Filter className='w-4 h-4 mr-2' />
-								<span>
-									{t('filteredBy')}: {getFilterSummary()}
-								</span>
-							</div>
-						)}
 					</div>
 				</div>
 			</div>
@@ -346,6 +375,29 @@ export default function PropertiesContent({}: PropertyCardProps) {
 								</span>
 								{showExclusiveOnly && (
 									<div className='w-4 h-4 bg-red-500 rounded-full flex items-center justify-center'>
+										<span className='text-white text-xs'>✓</span>
+									</div>
+								)}
+							</button>
+							{/* Add 3D Filter Button */}
+							<button
+								onClick={handle3DToggle}
+								className={`px-4 py-2 rounded-xl border-2 font-medium transition-all duration-200 flex items-center gap-2 ${
+									show3DOnly
+										? 'border-blue-300 bg-blue-50 text-blue-700 shadow-md'
+										: 'border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-sm'
+								}`}
+							>
+								<FaVrCardboard className='w-4 h-4' />
+								<span className='text-sm'>
+									{language === 'hy'
+										? 'Միայն 3D'
+										: language === 'ru'
+										? 'Только 3D'
+										: '3D Only'}
+								</span>
+								{show3DOnly && (
+									<div className='w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center'>
 										<span className='text-white text-xs'>✓</span>
 									</div>
 								)}
@@ -421,6 +473,18 @@ export default function PropertiesContent({}: PropertyCardProps) {
 													: language === 'ru'
 													? 'Только Эксклюзив'
 													: 'Exclusive Only'}
+											</span>
+										</div>
+									)}
+									{show3DOnly && (
+										<div className='flex items-center text-sm text-blue-600'>
+											<FaVrCardboard className='w-4 h-4 mr-1' />
+											<span>
+												{language === 'hy'
+													? 'Միայն 3D'
+													: language === 'ru'
+													? 'Только 3D'
+													: '3D Only'}
 											</span>
 										</div>
 									)}

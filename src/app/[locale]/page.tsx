@@ -27,10 +27,20 @@ export default function HomePage() {
 	useEffect(() => {
 		const fetchProperties = async () => {
 			try {
-				const [ recent] = await Promise.all([
-					getRecentProperties(9),
-				])
-				setRecentProperties(recent || [])
+				const recent = await getRecentProperties(20)
+
+				const sortedProperties = (recent || []).sort((a, b) => {
+					if (a.is_exclusive && !b.is_exclusive) return -1
+					if (!a.is_exclusive && b.is_exclusive) return 1
+
+					// Second priority: creation date (newest first)
+					return (
+						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+					)
+				})
+
+				// Take only first 9 for display
+				setRecentProperties(sortedProperties.slice(0, 9))
 			} catch (error) {
 				console.error('Error fetching properties:', error)
 				setRecentProperties([])
