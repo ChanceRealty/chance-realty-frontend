@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import SearchSection from './SearchSection'
+import { FaVrCardboard } from 'react-icons/fa'
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -202,9 +203,20 @@ const Header = () => {
 			>
 				<div className='bg-white border-t border-gray-200'>
 					<div className='container mx-auto px-4 py-4 space-y-2'>
-						<div className='pb-4 mb-4 border-b border-gray-100'>
-							<SearchSection />
+						<div className='pb-4 mb-4 border-b border-gray-100 flex items-center'>
+							<div className='flex-1 flex items-center gap-1'>
+								<SearchSection />
+								<Link
+									href={`/${currentLang}/properties?3d=true`}
+									className='flex items-center gap-1 text-gray-700 font-medium'
+									onClick={() => setIsMenuOpen(false)}
+								>
+									<FaVrCardboard className='w-4 h-4' />
+									<span>{t.dTour}</span>
+								</Link>
+							</div>
 						</div>
+
 						<div className='pb-4 mb-4 border-b border-gray-100'>
 							<LanguageSwitcher />
 						</div>
