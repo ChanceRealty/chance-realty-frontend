@@ -22,17 +22,17 @@ const adVideos = [
 		gradient: 'from-purple-600 via-pink-600 to-red-600',
 	},
 	{
-		src: '/ads/ad3.mp4',
+		src: '/promo3.mp4',
 		title: 'Ad Video 3',
 		gradient: 'from-green-600 via-teal-600 to-blue-600',
 	},
 	{
-		src: '/ads/ad4.mp4',
+		src: '/promo4.mp4',
 		title: 'Ad Video 4',
 		gradient: 'from-orange-600 via-red-600 to-pink-600',
 	},
 	{
-		src: '/ads/ad5.mp4',
+		src: '/ad5.mp4',
 		title: 'Ad Video 5',
 		gradient: 'from-indigo-600 via-purple-600 to-pink-600',
 	},

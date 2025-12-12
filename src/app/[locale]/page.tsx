@@ -27,20 +27,35 @@ export default function HomePage() {
 	useEffect(() => {
 		const fetchProperties = async () => {
 			try {
-				const recent = await getRecentProperties(20)
+				const recent = await getRecentProperties(100) 
 
-				const sortedProperties = (recent || []).sort((a, b) => {
-					if (a.is_exclusive && !b.is_exclusive) return -1
-					if (!a.is_exclusive && b.is_exclusive) return 1
+				if (!recent || recent.length === 0) {
+					setRecentProperties([])
+					return
+				}
 
-					// Second priority: creation date (newest first)
-					return (
+				const exclusive = recent.filter(p => p.is_exclusive)
+				const nonExclusive = recent.filter(p => !p.is_exclusive)
+
+				exclusive.sort(
+					(a, b) =>
 						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-					)
-				})
+				)
+				nonExclusive.sort(
+					(a, b) =>
+						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+				)
 
-				// Take only first 9 for display
-				setRecentProperties(sortedProperties.slice(0, 9))
+				const MAX_PROPERTIES = 9
+				const finalProperties = [
+					...exclusive,
+					...nonExclusive.slice(
+						0,
+						Math.max(0, MAX_PROPERTIES - exclusive.length)
+					),
+				]
+
+				setRecentProperties(finalProperties.slice(0, MAX_PROPERTIES))
 			} catch (error) {
 				console.error('Error fetching properties:', error)
 				setRecentProperties([])
@@ -48,8 +63,12 @@ export default function HomePage() {
 				setLoading(false)
 			}
 		}
+
 		fetchProperties()
 	}, [])
+
+
+
 
 		return (
 			<div className='min-h-screen'>
