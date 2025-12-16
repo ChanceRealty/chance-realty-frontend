@@ -56,7 +56,7 @@ export const translations = {
 		acres: 'մ²',
 		month: '/ամիս',
 		day: '/օր',
-
+		rooms: 'սենյակ',
 		// Home page
 		heroTitle: 'Ձեր բնակարանը մեր առաջադրանքն է',
 		heroSubtitle: 'Մի կորցրեք ձեր շանսը',
@@ -433,7 +433,7 @@ export const translations = {
 		acres: 'm²',
 		month: '/month',
 		day: '/day',
-
+		rooms: 'rooms',
 		// Home page
 		heroTitle: 'Find Your Dream Property',
 		heroSubtitle: 'Discover the perfect home from our extensive collection',
@@ -793,6 +793,7 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		acres: 'м²',
 		month: '/месяц',
 		day: '/день',
+		rooms: 'комн',
 
 		// Home page
 		heroTitle: 'Найдите недвижимость вашей мечты',

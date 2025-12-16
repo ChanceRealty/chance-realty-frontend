@@ -23,6 +23,7 @@ import {
 	// Pause,
 	Crown,
 	Layers3,
+	DoorClosed,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -60,7 +61,6 @@ export default function PropertyCard({
 	const t = useTranslations()
 	const { language } = useLanguage()
 
-	// ALL HOOKS MUST BE DECLARED FIRST
 	const [currentImageIndex, setCurrentImageIndex] = useState(0)
 	const [isHovering, setIsHovering] = useState(false)
 	const [isDragging, setIsDragging] = useState(false)
@@ -340,7 +340,6 @@ export default function PropertyCard({
 	// const StatusIcon = statusInfo.icon
 
 const formatPrice = (price: number, listingType: string) => {
-	// 🔹 Округляем цену до целого
 	const roundedPrice = Math.round(price)
 
 	const getCurrencySymbol = (currency: string) => {
@@ -521,10 +520,12 @@ const formatPrice = (price: number, listingType: string) => {
 									</span>
 								</div>
 							)}
-							{commercialAttrs.business_type && (
+							{commercialAttrs.rooms && (
 								<div className='flex items-center'>
-									<Landmark className='w-4 h-4 mr-1 text-blue-500' />
-									<span>{commercialAttrs.business_type}</span>
+									<DoorClosed className='w-4 h-4 mr-1 text-blue-500' />
+									<span>
+										{commercialAttrs.rooms} {t.rooms || 'rooms'}
+									</span>
 								</div>
 							)}
 						</div>

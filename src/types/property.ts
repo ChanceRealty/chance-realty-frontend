@@ -32,7 +32,7 @@ export interface City {
 	id: number
 	state_id: number
 	name: string
-	district_id?: number // Optional reference to district
+	district_id?: number 
 	state?: State
 	district?: District
 }
@@ -103,6 +103,7 @@ export interface CommercialAttributes {
 	area_sqft: number
 	floors?: number
 	ceiling_height?: number
+	rooms?: number
 }
 
 export interface LandAttributes {
@@ -110,7 +111,6 @@ export interface LandAttributes {
 	area_acres: number
 }
 
-// Renamed from PropertyImage to PropertyMedia to handle both images and videos
 export interface PropertyMedia {
 	id: number
 	property_id: number
@@ -138,8 +138,9 @@ export interface PropertyFilter {
 	max_price?: number
 	bedrooms?: number
 	bathrooms?: number
+	rooms?: number
 	features?: number[]
-	status?: string // Added status filter
+	status?: string 
 	sort_by?: 'price' | 'created_at' | 'views'
 	sort_order?: 'asc' | 'desc'
 	page?: number
@@ -160,7 +161,6 @@ export interface PropertyFilter {
 	show_hidden?: boolean
 }
 
-// Extended property types with attributes
 export interface HouseProperty extends BaseProperty {
 	property_type: 'house'
 	attributes: HouseAttributes

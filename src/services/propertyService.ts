@@ -75,6 +75,8 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		// Commercial-specific
 		if (filter.business_type)
 			params.append('business_type', filter.business_type)
+		if(filter.rooms)
+			params.append('rooms', filter.rooms.toString())
 
 		// Features
 		if (filter.features && filter.features.length > 0) {
@@ -241,11 +243,17 @@ export async function getProperties(filter: PropertyFilter = {}) {
 			)
 				return false
 
-			// Business type (commercial)
+			// Business type, rooms (commercial)
 			if (
 				filter.business_type &&
 				property.property_type === 'commercial' &&
 				property.attributes?.business_type !== filter.business_type
+			)
+				return false
+			if (
+				filter.rooms &&
+				property.property_type === 'commercial' &&
+				property.attributes?.rooms !== filter.rooms
 			)
 				return false
 
@@ -522,7 +530,6 @@ export async function getRecentProperties(limit: number = 12) {
 	}
 }
 
-// ✅ NEW: Get exclusive properties
 export async function getExclusiveProperties(limit: number = 12) {
 	try {
 		const language = getCurrentLanguage()

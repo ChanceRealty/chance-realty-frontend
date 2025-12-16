@@ -45,6 +45,7 @@ import {
 	Clock,
 	XCircle,
 	Phone,
+	DoorClosed,
 } from 'lucide-react'
 
 import { RxHeight } from 'react-icons/rx'
@@ -270,7 +271,6 @@ const YandexMap = ({
 
 const API_BASE_URL = 'https://chance-realty-admin.vercel.app'
 
-// Updated CurrencyDisplay component for PropertyDetailClient.tsx
 
 function CurrencyDisplay({
 	amount,
@@ -283,7 +283,6 @@ function CurrencyDisplay({
 	listingType: string
 	language?: string
 }) {
-	// ✅ FIX: Determine target currencies based on original currency
 	const getTargetCurrencies = (baseCurrency: string): string[] => {
 		switch (baseCurrency) {
 			case 'USD':
@@ -303,7 +302,7 @@ function CurrencyDisplay({
 		() => ({
 			autoFetch: true,
 			refreshInterval: 30 * 60 * 1000,
-			targetCurrencies, // ✅ Use dynamic target currencies
+			targetCurrencies, 
 		}),
 		[targetCurrencies]
 	)
@@ -659,6 +658,11 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 				ru: 'Тип бизнеса',
 				en: 'Business Type',
 			},
+			rooms: {
+				hy: 'Սենյակներ',
+				ru: 'Комнаты',
+				en: 'Rooms',
+			},
 			area_acres: {
 				hy: 'Մակերես',
 				ru: 'Площадь',
@@ -976,6 +980,21 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 											</p>
 											<p className='font-medium text-gray-700'>
 												{property.attributes.ceiling_height} մ
+											</p>
+										</div>
+									</div>
+								)}
+								{property.attributes.rooms != null && (
+									<div className='flex items-center'>
+										<div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-2'>
+											<DoorClosed className='w-6 h-6 text-blue-600' />
+										</div>
+										<div>
+											<p className='text-xs text-gray-500'>
+												{getAttributeLabel('rooms')}
+											</p>
+											<p className='font-medium text-gray-700'>
+												{property.attributes.rooms}
 											</p>
 										</div>
 									</div>
