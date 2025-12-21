@@ -18,6 +18,9 @@ import Link from 'next/link'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
 import { BsTiktok } from 'react-icons/bs'
+import { PropertyType } from '@/types/property'
+import { getProperties } from '@/services/propertyService'
+import { useEffect, useState } from 'react'
 
 const Footer = () => {
 	const t = useTranslations()
@@ -26,6 +29,39 @@ const Footer = () => {
 	const scrollToTop = () => {
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
+
+	async function getPropertyCounts(language: string) {
+		const types: PropertyType[] = ['house', 'apartment', 'commercial', 'land']
+		const counts: Record<PropertyType, number> = {
+			house: 0,
+			apartment: 0,
+			commercial: 0,
+			land: 0,
+		}
+
+		await Promise.all(
+			types.map(async type => {
+				const properties = await getProperties({
+					property_type: type,
+					show_hidden: false,
+				})
+				counts[type] = properties.length
+			})
+		)
+
+		return counts
+	}
+
+	const [counts, setCounts] = useState<Record<PropertyType, number>>({
+		house: 0,
+		apartment: 0,
+		commercial: 0,
+		land: 0,
+	})
+
+	useEffect(() => {
+		getPropertyCounts(language).then(setCounts)
+	}, [language])
 
 	/** CONTACT DATA SPLIT */
 	const phoneContacts = [
@@ -264,22 +300,22 @@ Chance Realty has been operating in the market for over 10 years, providing high
 								{
 									label: t.houses,
 									href: `/${language}/properties?property_type=house`,
-									count: '250+',
+									type: 'house',
 								},
 								{
 									label: t.apartments,
 									href: `/${language}/properties?property_type=apartment`,
-									count: '180+',
+									type: 'apartment',
 								},
 								{
 									label: t.commercial,
 									href: `/${language}/properties?property_type=commercial`,
-									count: '95+',
+									type: 'commercial',
 								},
 								{
 									label: t.land,
 									href: `/${language}/properties?property_type=land`,
-									count: '120+',
+									type: 'land',
 								},
 							].map((link, index) => (
 								<li key={index}>
@@ -292,7 +328,7 @@ Chance Realty has been operating in the market for over 10 years, providing high
 											{link.label}
 										</span>
 										<span className='text-xs bg-gray-700 px-2 py-1 rounded-full group-hover:bg-blue-600 transition-colors duration-200'>
-											{link.count}
+											{counts[link.type as PropertyType] ?? 0}+
 										</span>
 									</Link>
 								</li>

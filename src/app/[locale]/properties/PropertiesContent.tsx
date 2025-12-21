@@ -69,12 +69,16 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			limit: 12,
 		}
 
+		const getArrayFromParams = (key: string): number[] | undefined => {
+			const all = searchParams.getAll(key)
+			if (all.length === 0) return undefined
+			if (all.length === 1) return undefined // Single value, will be handled below
+			return all.map(v => parseInt(v)).filter(v => !isNaN(v))
+		}
+
 		// Parse ALL URL parameters
 		const property_type = searchParams.get('property_type')
 		const listing_type = searchParams.get('listing_type')
-		const state_id = searchParams.get('state_id')
-		const city_id = searchParams.get('city_id')
-		const district_id = searchParams.get('district_id')
 		const min_price = searchParams.get('min_price')
 		const max_price = searchParams.get('max_price')
 		const exclusive = searchParams.get('exclusive')
@@ -92,13 +96,35 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		const max_area_acres = searchParams.get('max_area_acres')
 		const min_area_sqft = searchParams.get('min_area_sqft')
 		const max_area_sqft = searchParams.get('max_area_sqft')
+		const stateIds = getArrayFromParams('state_id')
+		const cityIds = getArrayFromParams('city_id')
+		const districtIds = getArrayFromParams('district_id')
 
 		if (property_type)
 			initialFilter.property_type = property_type as PropertyType
 		if (listing_type) initialFilter.listing_type = listing_type as ListingType
-		if (state_id) initialFilter.state_id = parseInt(state_id)
-		if (city_id) initialFilter.city_id = parseInt(city_id)
-		if (district_id) initialFilter.district_id = parseInt(district_id)
+		if (stateIds && stateIds.length > 0) {
+			initialFilter.state_id = stateIds
+		} else {
+			const singleStateId = searchParams.get('state_id')
+			if (singleStateId) initialFilter.state_id = parseInt(singleStateId)
+		}
+
+		if (cityIds && cityIds.length > 0) {
+			initialFilter.city_id = cityIds
+		} else {
+			const singleCityId = searchParams.get('city_id')
+			if (singleCityId) initialFilter.city_id = parseInt(singleCityId)
+		}
+
+		if (districtIds && districtIds.length > 0) {
+			initialFilter.district_id = districtIds
+		} else {
+			const singleDistrictId = searchParams.get('district_id')
+			if (singleDistrictId)
+				initialFilter.district_id = parseInt(singleDistrictId)
+		}
+		
 		if (min_price) initialFilter.min_price = parseFloat(min_price)
 		if (max_price) initialFilter.max_price = parseFloat(max_price)
 		if (exclusive === 'true') setShowExclusiveOnly(true)
@@ -165,7 +191,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 				...filter,
 				sort_by: sortBy,
 				sort_order: sortOrder,
-				limit: 100,
+				limit: 1000,
 				is_exclusive: showExclusiveOnly ? true : undefined,
 				show_hidden: false,
 			})

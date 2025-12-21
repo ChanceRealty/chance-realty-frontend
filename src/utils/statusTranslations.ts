@@ -1,17 +1,20 @@
-// Add this to src/utils/statusTranslations.ts
-import { PropertyStatus } from '@/types/property';
+import { PropertyStatus } from '@/types/property'
 import { CheckCircle, Clock, XCircle, Pause, AlertCircle } from 'lucide-react'
+import React from 'react'
+
+type StatusValue = 'active' | 'pending' | 'sold' | 'rented' | 'inactive'
+
 export function getTranslatedStatus(
-	status: PropertyStatus,
+	status: PropertyStatus | StatusValue | string,
 	language: 'hy' | 'en' | 'ru'
 ): { label: string; icon: React.ComponentType<{ className?: string }> } {
 	const statusStr =
-		typeof status === 'object' ? status?.name || 'active' : String(status)
+		typeof status === 'string' ? status : status?.name ?? 'active'
 
 	const statusTranslations: Record<
-		string,
+		StatusValue,
 		Record<
-			string,
+			'hy' | 'en' | 'ru',
 			{ label: string; icon: React.ComponentType<{ className?: string }> }
 		>
 	> = {
@@ -43,7 +46,7 @@ export function getTranslatedStatus(
 	}
 
 	return (
-		statusTranslations[statusStr.toLowerCase()]?.[language] ||
+		statusTranslations[statusStr.toLowerCase() as StatusValue]?.[language] ??
 		statusTranslations.active[language]
 	)
 }

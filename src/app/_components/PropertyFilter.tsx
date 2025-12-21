@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
 	PropertyFilter as FilterType,
 	PropertyType,
@@ -36,6 +36,7 @@ import {
 	KeyRound,
 	Layers3,
 	Maximize,
+	Check,
 } from 'lucide-react'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
@@ -59,7 +60,7 @@ interface PropertyFilterProps {
 		children: React.ReactNode
 		badge?: number | string
 	}) => (
-		<div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'>
+		<div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-visible'>
 			<button className='w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors'>
 				<div className='flex items-center'>
 					<div className='p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mr-3'>
@@ -94,7 +95,12 @@ export default function PropertyFilter({
 	const [selectedState, setSelectedState] = useState<State | null>(null)
 	const [cities, setCities] = useState<City[]>([])
 	const [features, setFeatures] = useState<PropertyFeature[]>([])
-
+	const [showStateDropdown, setShowStateDropdown] = useState(false)
+	const [showCityDropdown, setShowCityDropdown] = useState(false)
+	const [showDistrictDropdown, setShowDistrictDropdown] = useState(false)
+	const stateDropdownRef = useRef<HTMLDivElement>(null)
+	const cityDropdownRef = useRef<HTMLDivElement>(null)
+	const districtDropdownRef = useRef<HTMLDivElement>(null)
 	// Local filter state - doesn't trigger parent updates
 	const [localFilter, setLocalFilter] = useState<FilterType>({
 		...initialFilter,
@@ -157,23 +163,75 @@ export default function PropertyFilter({
 	}, [])
 
 	useEffect(() => {
-		if (localFilter.state_id) {
-			const state = states.find(s => s.id === localFilter.state_id)
-			setSelectedState(state || null)
+		const selectedStateIds = getSelectedStateIds()
 
-			if (state?.uses_districts) {
-				fetchDistricts(localFilter.state_id)
-				setCities([])
-			} else {
-				fetchCities(localFilter.state_id)
-				setDistricts([])
+		if (selectedStateIds.length > 0) {
+			// Fetch cities/districts for all selected states
+			const fetchLocationData = async () => {
+				const allCities: City[] = []
+				const allDistricts: District[] = []
+				let usesDistricts = false
+
+				for (const stateId of selectedStateIds) {
+					const state = states.find(s => s.id === stateId)
+					if (state) {
+						if (state.uses_districts) {
+							usesDistricts = true
+							const stateDistricts = await getDistrictsByState(stateId)
+							allDistricts.push(...(stateDistricts || []))
+						} else {
+							const stateCities = await getCitiesByState(stateId)
+							allCities.push(...(stateCities || []))
+						}
+					}
+				}
+
+				// Remove duplicates by id
+				const uniqueCities = allCities.filter(
+					(city, index, self) => index === self.findIndex(c => c.id === city.id)
+				)
+				const uniqueDistricts = allDistricts.filter(
+					(district, index, self) =>
+						index === self.findIndex(d => d.id === district.id)
+				)
+
+				setCities(uniqueCities)
+				setDistricts(uniqueDistricts)
 			}
+
+			fetchLocationData()
 		} else {
-			setSelectedState(null)
 			setCities([])
 			setDistricts([])
 		}
 	}, [localFilter.state_id, states])
+
+	// Handle click outside to close dropdowns
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				stateDropdownRef.current &&
+				!stateDropdownRef.current.contains(event.target as Node)
+			) {
+				setShowStateDropdown(false)
+			}
+			if (
+				cityDropdownRef.current &&
+				!cityDropdownRef.current.contains(event.target as Node)
+			) {
+				setShowCityDropdown(false)
+			}
+			if (
+				districtDropdownRef.current &&
+				!districtDropdownRef.current.contains(event.target as Node)
+			) {
+				setShowDistrictDropdown(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => document.removeEventListener('mousedown', handleClickOutside)
+	}, [])
 
 	const fetchStates = async () => {
 		try {
@@ -213,6 +271,54 @@ export default function PropertyFilter({
 			console.error('Error fetching features:', error)
 			setFeatures([])
 		}
+	}
+	// Helper functions for multi-select
+	const getSelectedStateIds = (): number[] => {
+		if (!localFilter.state_id) return []
+		return Array.isArray(localFilter.state_id)
+			? localFilter.state_id
+			: [localFilter.state_id]
+	}
+
+	const getSelectedCityIds = (): number[] => {
+		if (!localFilter.city_id) return []
+		return Array.isArray(localFilter.city_id)
+			? localFilter.city_id
+			: [localFilter.city_id]
+	}
+
+	const getSelectedDistrictIds = (): number[] => {
+		if (!localFilter.district_id) return []
+		return Array.isArray(localFilter.district_id)
+			? localFilter.district_id
+			: [localFilter.district_id]
+	}
+
+	const toggleState = (stateId: number) => {
+		const currentIds = getSelectedStateIds()
+		const newIds = currentIds.includes(stateId)
+			? currentIds.filter(id => id !== stateId)
+			: [...currentIds, stateId]
+
+		handleFilterChange('state_id', newIds.length > 0 ? newIds : undefined)
+	}
+
+	const toggleCity = (cityId: number) => {
+		const currentIds = getSelectedCityIds()
+		const newIds = currentIds.includes(cityId)
+			? currentIds.filter(id => id !== cityId)
+			: [...currentIds, cityId]
+
+		handleFilterChange('city_id', newIds.length > 0 ? newIds : undefined)
+	}
+
+	const toggleDistrict = (districtId: number) => {
+		const currentIds = getSelectedDistrictIds()
+		const newIds = currentIds.includes(districtId)
+			? currentIds.filter(id => id !== districtId)
+			: [...currentIds, districtId]
+
+		handleFilterChange('district_id', newIds.length > 0 ? newIds : undefined)
 	}
 
 	// Update local filter WITHOUT triggering parent
@@ -1048,102 +1154,223 @@ export default function PropertyFilter({
 					title={t.location}
 					icon={MapPin}
 					badge={
-						localFilter.state_id ||
-						localFilter.city_id ||
-						localFilter.district_id
-							? '1'
+						getSelectedStateIds().length ||
+						getSelectedCityIds().length ||
+						getSelectedDistrictIds().length
+							? (
+									getSelectedStateIds().length +
+									getSelectedCityIds().length +
+									getSelectedDistrictIds().length
+							  ).toString()
 							: undefined
 					}
 				>
 					<div className='space-y-4'>
-						{/* State */}
-						<div className='relative'>
+						{/* States Multi-Select */}
+						<div className='relative' ref={stateDropdownRef}>
 							<label className='block text-sm font-semibold text-gray-700 mb-2'>
 								{t.stateProvince}
 							</label>
-							<div className='relative'>
-								<MapPin className='absolute left-3 text-gray-600 top-1/2 transform -translate-y-1/2 w-4 h-4' />
-								<select
-									value={localFilter.state_id || ''}
-									onChange={e => {
-										const stateId = e.target.value
-											? parseInt(e.target.value)
-											: undefined
-										handleFilterChange('state_id', stateId)
-									}}
-									className='w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm appearance-none text-gray-600 cursor-pointer'
-								>
-									<option value=''>{t.allStates}</option>
+
+							{/* Dropdown Button */}
+							<button
+								type='button'
+								onClick={() => setShowStateDropdown(!showStateDropdown)}
+								className='w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl text-sm hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+							>
+								<div className='flex items-center gap-2'>
+									<MapPin className='w-4 h-4 text-gray-600' />
+									<span className='text-gray-600'>
+										{getSelectedStateIds().length > 0
+											? `${getSelectedStateIds().length} ${
+													language === 'hy'
+														? 'նահանգ'
+														: language === 'ru'
+														? 'регионов'
+														: 'states'
+											  } ${
+													language === 'hy'
+														? 'ընտրված է'
+														: language === 'ru'
+														? 'выбрано'
+														: 'selected'
+											  }`
+											: t.allStates}
+									</span>
+								</div>
+								<ChevronDown
+									className={`w-4 h-4 text-gray-400 transition-transform ${
+										showStateDropdown ? 'rotate-180' : ''
+									}`}
+								/>
+							</button>
+
+							{/* Dropdown Menu */}
+							{showStateDropdown && (
+								<div className='absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto'>
 									{states.map(state => (
-										<option key={state.id} value={state.id}>
-											{getTranslatedStateName(state.name, language)}
-											{state.uses_districts && ` (${t.districts})`}
-										</option>
+										<label
+											key={state.id}
+											className='flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors'
+										>
+											<div className='relative flex items-center'>
+												<input
+													type='checkbox'
+													checked={getSelectedStateIds().includes(state.id)}
+													onChange={() => toggleState(state.id)}
+													className='w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+												/>
+												{getSelectedStateIds().includes(state.id) && (
+													<Check className='w-3 h-3 absolute left-0.5 pointer-events-none' />
+												)}
+											</div>
+											<span className='ml-3 text-sm text-gray-700'>
+												{getTranslatedStateName(state.name, language)}
+												{state.uses_districts && ` (${t.districts})`}
+											</span>
+										</label>
 									))}
-								</select>
-								<ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-							</div>
+								</div>
+							)}
 						</div>
 
-						{/* District Selection */}
-						{selectedState?.uses_districts && (
-							<div className='relative'>
+						{/* Districts Multi-Select */}
+						{districts.length > 0 && (
+							<div className='relative' ref={districtDropdownRef}>
 								<label className='block text-sm font-semibold text-gray-700 mb-2'>
 									{t.district}
 								</label>
-								<div className='relative'>
-									<Building2 className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-									<select
-										value={localFilter.district_id || ''}
-										onChange={e =>
-											handleFilterChange(
-												'district_id',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none disabled:bg-gray-50'
-										disabled={!localFilter.state_id}
-									>
-										<option value=''>{t.allDistricts}</option>
+
+								{/* Dropdown Button */}
+								<button
+									type='button'
+									onClick={() => setShowDistrictDropdown(!showDistrictDropdown)}
+									className='w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl text-sm hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								>
+									<div className='flex items-center gap-2'>
+										<Building2 className='w-4 h-4 text-gray-600' />
+										<span className='text-gray-600'>
+											{getSelectedDistrictIds().length > 0
+												? `${getSelectedDistrictIds().length} ${
+														language === 'hy'
+															? 'շրջան'
+															: language === 'ru'
+															? 'районов'
+															: 'districts'
+												  } ${
+														language === 'hy'
+															? 'ընտրված է'
+															: language === 'ru'
+															? 'выбрано'
+															: 'selected'
+												  }`
+												: t.allDistricts}
+										</span>
+									</div>
+									<ChevronDown
+										className={`w-4 h-4 text-gray-400 transition-transform ${
+											showDistrictDropdown ? 'rotate-180' : ''
+										}`}
+									/>
+								</button>
+
+								{/* Dropdown Menu */}
+								{showDistrictDropdown && (
+									<div className='absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto'>
 										{districts.map(district => (
-											<option key={district.id} value={district.id}>
-												{getTranslatedDistrictName(district, language)}
-											</option>
+											<label
+												key={district.id}
+												className='flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors'
+											>
+												<div className='relative flex items-center'>
+													<input
+														type='checkbox'
+														checked={getSelectedDistrictIds().includes(
+															district.id
+														)}
+														onChange={() => toggleDistrict(district.id)}
+														className='w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+													/>
+													{getSelectedDistrictIds().includes(district.id) && (
+														<Check className='w-3 h-3 absolute left-0.5 pointer-events-none' />
+													)}
+												</div>
+												<span className='ml-3 text-sm text-gray-700'>
+													{getTranslatedDistrictName(district, language)}
+												</span>
+											</label>
 										))}
-									</select>
-									<ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-								</div>
+									</div>
+								)}
 							</div>
 						)}
 
-						{/* City Selection */}
-						{selectedState && !selectedState.uses_districts && (
-							<div className='relative'>
+						{/* Cities Multi-Select */}
+						{cities.length > 0 && (
+							<div className='relative' ref={cityDropdownRef}>
 								<label className='block text-sm font-semibold text-gray-700 mb-2'>
 									{t.city}
 								</label>
-								<div className='relative'>
-									<Building2 className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-									<select
-										value={localFilter.city_id || ''}
-										onChange={e =>
-											handleFilterChange(
-												'city_id',
-												e.target.value ? parseInt(e.target.value) : undefined
-											)
-										}
-										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none disabled:bg-gray-50'
-										disabled={!localFilter.state_id}
-									>
-										<option value=''>{t.allCities}</option>
+
+								{/* Dropdown Button */}
+								<button
+									type='button'
+									onClick={() => setShowCityDropdown(!showCityDropdown)}
+									className='w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl text-sm hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+								>
+									<div className='flex items-center gap-2'>
+										<Building2 className='w-4 h-4 text-gray-600' />
+										<span className='text-gray-600'>
+											{getSelectedCityIds().length > 0
+												? `${getSelectedCityIds().length} ${
+														language === 'hy'
+															? 'քաղաք'
+															: language === 'ru'
+															? 'городов'
+															: 'cities'
+												  } ${
+														language === 'hy'
+															? 'ընտրված է'
+															: language === 'ru'
+															? 'выбрано'
+															: 'selected'
+												  }`
+												: t.allCities}
+										</span>
+									</div>
+									<ChevronDown
+										className={`w-4 h-4 text-gray-400 transition-transform ${
+											showCityDropdown ? 'rotate-180' : ''
+										}`}
+									/>
+								</button>
+
+								{/* Dropdown Menu */}
+								{showCityDropdown && (
+									<div className='absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto'>
 										{cities.map(city => (
-											<option key={city.id} value={city.id}>
-												{getTranslatedCityName(city.name, language)}
-											</option>
+											<label
+												key={city.id}
+												className='flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors'
+											>
+												<div className='relative flex items-center'>
+													<input
+														type='checkbox'
+														checked={getSelectedCityIds().includes(city.id)}
+														onChange={() => toggleCity(city.id)}
+														className='w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+													/>
+													{getSelectedCityIds().includes(city.id) && (
+														<Check className='w-3 h-3 absolute left-0.5 pointer-events-none' />
+													)}
+												</div>
+												<span className='ml-3 text-sm text-gray-700'>
+													{getTranslatedCityName(city.name, language)}
+												</span>
+											</label>
 										))}
-									</select>
-									<ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-								</div>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
@@ -1221,7 +1448,7 @@ export default function PropertyFilter({
 			)}
 
 			{/* Features */}
-			<div className='w-full'>
+			{/*<div className='w-full'>
 				<FilterSection
 					title={t.featuresAndAmenities}
 					icon={Star}
@@ -1266,7 +1493,7 @@ export default function PropertyFilter({
 						)}
 					</div>
 				</FilterSection>
-			</div>
+			</div>*/}
 
 			{/* Action Buttons - UPDATED: Only apply on button click */}
 			<div className='w-full space-y-3'>
@@ -1326,24 +1553,65 @@ export default function PropertyFilter({
 								</button>
 							</span>
 						)}
-						{localFilter.state_id && (
-							<span className='inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full'>
-								{getTranslatedStateName(
-									states.find(s => s.id === localFilter.state_id)?.name || '',
-									language
-								)}
-								<button
-									onClick={() => {
-										handleFilterChange('state_id', undefined)
-										handleFilterChange('city_id', undefined)
-										handleFilterChange('district_id', undefined)
-									}}
-									className='ml-2 hover:text-purple-600'
-								>
-									<X className='w-3 h-3' />
-								</button>
-							</span>
-						)}
+						{/* State badges - now handles multiple */}
+						{getSelectedStateIds().length > 0 &&
+							getSelectedStateIds().map(stateId => {
+								const state = states.find(s => s.id === stateId)
+								return state ? (
+									<span
+										key={stateId}
+										className='inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full'
+									>
+										{getTranslatedStateName(state.name, language)}
+										<button
+											onClick={() => toggleState(stateId)}
+											className='ml-2 hover:text-purple-600'
+										>
+											<X className='w-3 h-3' />
+										</button>
+									</span>
+								) : null
+							})}
+
+						{/* City badges - now handles multiple */}
+						{getSelectedCityIds().length > 0 &&
+							getSelectedCityIds().map(cityId => {
+								const city = cities.find(c => c.id === cityId)
+								return city ? (
+									<span
+										key={cityId}
+										className='inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'
+									>
+										{getTranslatedCityName(city.name, language)}
+										<button
+											onClick={() => toggleCity(cityId)}
+											className='ml-2 hover:text-green-600'
+										>
+											<X className='w-3 h-3' />
+										</button>
+									</span>
+								) : null
+							})}
+
+						{/* District badges - now handles multiple */}
+						{getSelectedDistrictIds().length > 0 &&
+							getSelectedDistrictIds().map(districtId => {
+								const district = districts.find(d => d.id === districtId)
+								return district ? (
+									<span
+										key={districtId}
+										className='inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full'
+									>
+										{getTranslatedDistrictName(district, language)}
+										<button
+											onClick={() => toggleDistrict(districtId)}
+											className='ml-2 hover:text-blue-600'
+										>
+											<X className='w-3 h-3' />
+										</button>
+									</span>
+								) : null
+							})}
 						{(localFilter.min_price || localFilter.max_price) && (
 							<span className='inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full'>
 								${localFilter.min_price || 0} - ${localFilter.max_price || '∞'}

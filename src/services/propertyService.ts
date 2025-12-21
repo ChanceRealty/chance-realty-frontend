@@ -32,10 +32,31 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		if (filter.property_type)
 			params.append('property_type', filter.property_type)
 		if (filter.listing_type) params.append('listing_type', filter.listing_type)
-		if (filter.state_id) params.append('state_id', filter.state_id.toString())
-		if (filter.city_id) params.append('city_id', filter.city_id.toString())
-		if (filter.district_id)
-			params.append('district_id', filter.district_id.toString())
+		if (filter.state_id) {
+			if (Array.isArray(filter.state_id)) {
+				filter.state_id.forEach(id => params.append('state_id', id.toString()))
+			} else {
+				params.append('state_id', filter.state_id.toString())
+			}
+		}
+
+		if (filter.city_id) {
+			if (Array.isArray(filter.city_id)) {
+				filter.city_id.forEach(id => params.append('city_id', id.toString()))
+			} else {
+				params.append('city_id', filter.city_id.toString())
+			}
+		}
+
+		if (filter.district_id) {
+			if (Array.isArray(filter.district_id)) {
+				filter.district_id.forEach(id =>
+					params.append('district_id', id.toString())
+				)
+			} else {
+				params.append('district_id', filter.district_id.toString())
+			}
+		}
 		if (filter.min_price)
 			params.append('min_price', filter.min_price.toString())
 		if (filter.max_price)

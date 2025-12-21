@@ -42,6 +42,7 @@ import {
 	getTranslatedStateName,
 } from '@/services/propertyService'
 import { FaVrCardboard } from 'react-icons/fa'
+import { getTranslatedStatus } from '@/utils/statusTranslations'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
@@ -612,6 +613,11 @@ const formatPrice = (price: number, listingType: string) => {
 		}
 	}
 
+const statusValue =
+	typeof property.status === 'string' ? property.status : property.status.name
+
+const isSold = statusValue === 'sold'
+
 
 
 	return (
@@ -749,36 +755,38 @@ const formatPrice = (price: number, listingType: string) => {
 						)}
 
 						{/* Enhanced Badges */}
-						<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
-							{/* Exclusive Badge */}
-							{property.is_exclusive && (
-								<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
-									<Crown className='w-3 h-3' />
-									{getExclusiveLabel()}
+						{!isSold && (
+							<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
+								{/* Exclusive Badge */}
+								{property.is_exclusive && (
+									<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
+										<Crown className='w-3 h-3' />
+										{getExclusiveLabel()}
+									</span>
+								)}
+
+								{/* Listing Type Badge */}
+								<span
+									className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
+										property.listing_type === 'sale'
+											? 'bg-gradient-to-r from-green-500 to-emerald-600'
+											: property.listing_type === 'rent'
+											? 'bg-gradient-to-r from-blue-500 to-blue-600'
+											: 'bg-gradient-to-r from-purple-500 to-purple-600'
+									}`}
+								>
+									{getListingTypeLabel(property.listing_type)}
 								</span>
-							)}
 
-							{/* Listing Type Badge */}
-							<span
-								className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg ${
-									property.listing_type === 'sale'
-										? 'bg-gradient-to-r from-green-500 to-emerald-600'
-										: property.listing_type === 'rent'
-										? 'bg-gradient-to-r from-blue-500 to-blue-600'
-										: 'bg-gradient-to-r from-purple-500 to-purple-600'
-								}`}
-							>
-								{getListingTypeLabel(property.listing_type)}
-							</span>
-
-							{/* Status Badge */}
-							{/*<span
+								{/* Status Badge */}
+								{/*<span
 							className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1 ${statusInfo.color}`}
 						>
 							<StatusIcon className='w-3 h-3' />
 							{statusInfo.label}
 						</span>*/}
-						</div>
+							</div>
+						)}
 
 						{/* Action Buttons */}
 						<div className='absolute top-3 right-3 z-10'>
@@ -800,6 +808,54 @@ const formatPrice = (price: number, listingType: string) => {
 								</button>
 							)}
 						</div>
+						{isSold && (
+							<>
+								{/* Beautiful SOLD label */}
+								<div className='absolute inset-0 z-30 flex items-center justify-center pointer-events-none'>
+									<div className='relative'>
+										{/* Glow effect behind */}
+										<div className='absolute inset-0 bg-red-500/30 blur-xl scale-110 rounded-lg' />
+
+										{/* Main SOLD badge */}
+										<div
+											className='
+            relative
+            bg-gradient-to-br from-red-600 via-red-700 to-red-800
+            text-white font-black
+            px-20 py-5 text-3xl tracking-[0.3em]
+            transform -rotate-12
+            shadow-[0_20px_60px_rgba(220,38,38,0.5)]
+            border-4 border-white/90
+            rounded-sm
+            uppercase
+            animate-pulse
+            before:content-[""]
+            before:absolute
+            before:inset-0
+            before:bg-gradient-to-t
+            before:from-black/20
+            before:to-transparent
+            before:rounded-sm
+          '
+										>
+											{/* Inner shine effect */}
+											<div className='absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-t-sm' />
+
+											<span className='relative drop-shadow-lg'>
+												{' '}
+												{getTranslatedStatus('sold', language).label}
+											</span>
+
+											{/* Corner decorations */}
+											<div className='absolute -top-2 -left-2 w-4 h-4 border-t-4 border-l-4 border-white/70' />
+											<div className='absolute -top-2 -right-2 w-4 h-4 border-t-4 border-r-4 border-white/70' />
+											<div className='absolute -bottom-2 -left-2 w-4 h-4 border-b-4 border-l-4 border-white/70' />
+											<div className='absolute -bottom-2 -right-2 w-4 h-4 border-b-4 border-r-4 border-white/70' />
+										</div>
+									</div>
+								</div>
+							</>
+						)}
 					</div>
 
 					{/* Content Section */}

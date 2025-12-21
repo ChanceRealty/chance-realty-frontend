@@ -66,8 +66,7 @@ export default function HomePage() {
 
 		fetchProperties()
 	}, [])
-
-
+	
 
 
 		return (

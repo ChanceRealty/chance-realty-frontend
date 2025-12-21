@@ -1,6 +1,7 @@
 export type ListingType = 'sale' | 'rent' | 'daily_rent'
 export type PropertyType = 'house' | 'apartment' | 'commercial' | 'land'
 export type MediaType = 'image' | 'video'
+type PropertyStatusValue = 'available' | 'sold' | 'rented' | 'pending'
 
 export interface State {
 	id: number
@@ -59,7 +60,7 @@ export interface BaseProperty {
 	postal_code?: string
 	latitude?: number
 	longitude?: number
-	status: PropertyStatus
+	status: PropertyStatusValue | PropertyStatus
 	views: number
 	url_3d?: string | null
 	created_at: Date
@@ -131,16 +132,16 @@ export interface PropertyMedia {
 export interface PropertyFilter {
 	property_type?: PropertyType
 	listing_type?: ListingType
-	state_id?: number
-	city_id?: number
-	district_id?: number
+	state_id?: number | number[]
+	city_id?: number | number[]
+	district_id?: number | number[]
 	min_price?: number
 	max_price?: number
 	bedrooms?: number
 	bathrooms?: number
 	rooms?: number
 	features?: number[]
-	status?: string 
+	status?: string
 	sort_by?: 'price' | 'created_at' | 'views'
 	sort_order?: 'asc' | 'desc'
 	page?: number
