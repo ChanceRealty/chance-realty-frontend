@@ -9,6 +9,8 @@ import {
 	City,
 	District,
 	PropertyFeature,
+	getBusinessTypeName,
+	getBuildingTypeName,
 } from '@/types/property'
 import {
 	getStates,
@@ -18,6 +20,8 @@ import {
 	getTranslatedField,
 	getTranslatedCityName,
 	getTranslatedStateName,
+	getApartmentBuildingTypes,
+	getCommercialBusinessTypes,
 } from '@/services/propertyService'
 import {
 	Home,
@@ -28,11 +32,9 @@ import {
 	MapPin,
 	Bed,
 	Bath,
-	Star,
 	Search,
 	X,
 	ChevronDown,
-	Filter,
 	KeyRound,
 	Layers3,
 	Maximize,
@@ -40,14 +42,12 @@ import {
 } from 'lucide-react'
 import { useTranslations } from '@/translations/translations'
 import { useLanguage } from '@/context/LanguageContext'
-import { getTranslatedFeature } from '@/utils/featureTranslations'
 import { RxHeight } from 'react-icons/rx'
 
 interface PropertyFilterProps {
 	onFilterChange: (filter: FilterType) => void
 	initialFilter?: FilterType
 }
-
 
 	const FilterSection = ({
 		title,
@@ -106,12 +106,21 @@ export default function PropertyFilter({
 		...initialFilter,
 		property_type: initialFilter.property_type as PropertyType | undefined,
 	})
-
+	const [buildingTypes, setBuildingTypes] = useState<any[]>([])
+	const [businessTypes, setBusinessTypes] = useState<any[]>([])
 	// Separate state for price inputs (strings for better UX)
 	const [localPrices, setLocalPrices] = useState({
 		min: localFilter.min_price?.toString() || '',
 		max: localFilter.max_price?.toString() || '',
 	})
+	const [showBuildingTypeDropdown, setShowBuildingTypeDropdown] =
+		useState(false)
+	const [showBusinessTypeDropdown, setShowBusinessTypeDropdown] =
+		useState(false)
+
+	const buildingTypeDropdownRef = useRef<HTMLDivElement>(null)
+	const businessTypeDropdownRef = useRef<HTMLDivElement>(null)
+
 
 	// Debounce function
 	const debounce = useCallback(
@@ -160,6 +169,8 @@ export default function PropertyFilter({
 	useEffect(() => {
 		fetchStates()
 		fetchFeatures()
+		fetchBuildingTypes()
+		fetchBusinessTypes()
 	}, [])
 
 	useEffect(() => {
@@ -228,6 +239,20 @@ export default function PropertyFilter({
 				setShowDistrictDropdown(false)
 			}
 		}
+		if (
+			buildingTypeDropdownRef.current &&
+			!buildingTypeDropdownRef.current.contains(event.target as Node)
+		) {
+			setShowBuildingTypeDropdown(false)
+		}
+
+		if (
+			businessTypeDropdownRef.current &&
+			!businessTypeDropdownRef.current.contains(event.target as Node)
+		) {
+			setShowBusinessTypeDropdown(false)
+		}
+
 
 		document.addEventListener('mousedown', handleClickOutside)
 		return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -240,6 +265,28 @@ export default function PropertyFilter({
 		} catch (error) {
 			console.error('Error fetching states:', error)
 			setStates([])
+		}
+	}
+
+	const fetchBuildingTypes = async () => {
+		try {
+			// Replace with your actual API endpoint
+			const data = await getApartmentBuildingTypes()
+			setBuildingTypes(data || [])
+		} catch (error) {
+			console.error('Error fetching building types:', error)
+			setBuildingTypes([])
+		}
+	}
+
+	const fetchBusinessTypes = async () => {
+		try {
+			// Replace with your actual API endpoint
+			const data = await getCommercialBusinessTypes()
+			setBusinessTypes(data || [])
+		} catch (error) {
+			console.error('Error fetching business types:', error)
+			setBusinessTypes([])
 		}
 	}
 
@@ -343,7 +390,8 @@ export default function PropertyFilter({
 			newFilter.ceiling_height = undefined
 			newFilter.min_lot_size_sqft = undefined
 			newFilter.max_lot_size_sqft = undefined
-			newFilter.business_type = undefined
+			newFilter.business_type_id = undefined
+			newFilter.building_type_id = undefined
 			newFilter.min_area_acres = undefined
 			newFilter.max_area_acres = undefined
 			newFilter.min_area_sqft = undefined
@@ -765,7 +813,7 @@ export default function PropertyFilter({
 							<div className='relative'>
 								<label className='block text-xs font-semibold text-gray-700 mb-1'>
 									{language === 'hy'
-										? 'Ընդհանուր հարկեր'
+										? 'Ընդ. հարկեր'
 										: language === 'ru'
 										? 'Всего этажей'
 										: 'Total Floors'}
@@ -817,6 +865,54 @@ export default function PropertyFilter({
 								/>
 							</div>
 						</div>
+						<div className='relative mt-2' ref={buildingTypeDropdownRef}>
+							<label className='block text-xs font-semibold text-gray-700 mb-1'>
+								{language === 'hy'
+									? 'Շինության տիպ'
+									: language === 'ru'
+									? 'Тип здания'
+									: 'Building Type'}
+							</label>
+
+							<button
+								type='button'
+								onClick={() => setShowBuildingTypeDropdown(prev => !prev)}
+								className='w-full flex items-center justify-between px-4 py-2 border-2 border-gray-200 rounded-xl text-sm bg-white hover:bg-gray-50'
+							>
+								<span className='text-gray-700'>
+									{localFilter.building_type_id
+										? getBuildingTypeName(
+												buildingTypes.find(
+													b => b.id === localFilter.building_type_id
+												),
+												language
+										  )
+										: language === 'hy'
+										? 'Ընտրել'
+										: language === 'ru'
+										? 'Выбрать'
+										: 'Select'}
+								</span>
+								<ChevronDown className='w-4 h-4 text-gray-400' />
+							</button>
+
+							{showBuildingTypeDropdown && (
+								<div className='absolute z-50 mt-2 w-full text-gray-600 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto'>
+									{buildingTypes.map(type => (
+										<button
+											key={type.id}
+											onClick={() => {
+												handleFilterChange('building_type_id', type.id)
+												setShowBuildingTypeDropdown(false)
+											}}
+											className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100'
+										>
+											{getBuildingTypeName(type, language)}
+										</button>
+									))}
+								</div>
+							)}
+						</div>
 					</>
 				)
 
@@ -867,9 +963,7 @@ export default function PropertyFilter({
 								</div>
 							</div>
 						</div>
-
-						{/* Business Type */}
-						<div className='relative mt-2'>
+						<div className='relative mt-2' ref={businessTypeDropdownRef}>
 							<label className='block text-xs font-semibold text-gray-700 mb-1'>
 								{language === 'hy'
 									? 'Բիզնեսի տեսակ'
@@ -877,50 +971,45 @@ export default function PropertyFilter({
 									? 'Тип бизнеса'
 									: 'Business Type'}
 							</label>
-							<div className='relative'>
-								<Landmark className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
-								<select
-									value={localFilter.business_type || ''}
-									onChange={e =>
-										handleFilterChange(
-											'business_type',
-											e.target.value || undefined
-										)
-									}
-									className='w-full text-gray-600 pl-10 pr-8 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white appearance-none cursor-pointer'
-								>
-									<option value=''>{t.any}</option>
-									<option value='office'>
-										{language === 'hy'
-											? 'Գրասենյակ'
-											: language === 'ru'
-											? 'Офис'
-											: 'Office'}
-									</option>
-									<option value='retail'>
-										{language === 'hy'
-											? 'Խանութ'
-											: language === 'ru'
-											? 'Магазин'
-											: 'Retail'}
-									</option>
-									<option value='restaurant'>
-										{language === 'hy'
-											? 'Ռեստորան'
-											: language === 'ru'
-											? 'Ресторан'
-											: 'Restaurant'}
-									</option>
-									<option value='warehouse'>
-										{language === 'hy'
-											? 'Պահեստ'
-											: language === 'ru'
-											? 'Склад'
-											: 'Warehouse'}
-									</option>
-								</select>
-								<ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none' />
-							</div>
+
+							<button
+								type='button'
+								onClick={() => setShowBusinessTypeDropdown(prev => !prev)}
+								className='w-full flex items-center justify-between px-4 py-2 border-2 border-gray-200 rounded-xl text-sm bg-white hover:bg-gray-50'
+							>
+								<span className='text-gray-700'>
+									{localFilter.business_type_id
+										? getBusinessTypeName(
+												businessTypes.find(
+													b => b.id === localFilter.business_type_id
+												),
+												language
+										  )
+										: language === 'hy'
+										? 'Ընտրել'
+										: language === 'ru'
+										? 'Выбрать'
+										: 'Select'}
+								</span>
+								<ChevronDown className='w-4 h-4 text-gray-400' />
+							</button>
+
+							{showBusinessTypeDropdown && (
+								<div className='absolute z-50 mt-2 w-full text-gray-600 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto'>
+									{businessTypes.map(type => (
+										<button
+											key={type.id}
+											onClick={() => {
+												handleFilterChange('business_type_id', type.id)
+												setShowBusinessTypeDropdown(false)
+											}}
+											className='w-full text-left px-4 py-2 text-sm hover:bg-gray-100'
+										>
+											{getBusinessTypeName(type, language)}
+										</button>
+									))}
+								</div>
+							)}
 						</div>
 
 						{/* Floors */}
@@ -1037,6 +1126,10 @@ export default function PropertyFilter({
 				return null
 		}
 	}
+
+	useEffect(() => {
+		console.log('BUSINESS TYPES:', buildingTypes)
+	}, [buildingTypes])
 
 	return (
 		<div className='flex flex-col gap-6'>
@@ -1516,120 +1609,6 @@ export default function PropertyFilter({
 				)}
 			</div>
 
-			{/* Filter Summary */}
-			{hasActiveFilters() && (
-				<div className='bg-blue-50 border border-blue-200 rounded-2xl p-4'>
-					<h3 className='text-sm font-semibold text-blue-800 mb-2 flex items-center'>
-						<Filter className='w-4 h-4 mr-2' />
-						{t.activeFilters}
-					</h3>
-					<div className='flex flex-wrap gap-2'>
-						{localFilter.property_type && (
-							<span className='inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full'>
-								{
-									propertyTypes.find(
-										pt => pt.type === localFilter.property_type
-									)?.label
-								}
-								<button
-									onClick={() => handleFilterChange('property_type', undefined)}
-									className='ml-2 hover:text-blue-600'
-								>
-									<X className='w-3 h-3' />
-								</button>
-							</span>
-						)}
-						{localFilter.listing_type && (
-							<span className='inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'>
-								{
-									listingTypes.find(lt => lt.type === localFilter.listing_type)
-										?.label
-								}
-								<button
-									onClick={() => handleFilterChange('listing_type', undefined)}
-									className='ml-2 hover:text-green-600'
-								>
-									<X className='w-3 h-3' />
-								</button>
-							</span>
-						)}
-						{/* State badges - now handles multiple */}
-						{getSelectedStateIds().length > 0 &&
-							getSelectedStateIds().map(stateId => {
-								const state = states.find(s => s.id === stateId)
-								return state ? (
-									<span
-										key={stateId}
-										className='inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full'
-									>
-										{getTranslatedStateName(state.name, language)}
-										<button
-											onClick={() => toggleState(stateId)}
-											className='ml-2 hover:text-purple-600'
-										>
-											<X className='w-3 h-3' />
-										</button>
-									</span>
-								) : null
-							})}
-
-						{/* City badges - now handles multiple */}
-						{getSelectedCityIds().length > 0 &&
-							getSelectedCityIds().map(cityId => {
-								const city = cities.find(c => c.id === cityId)
-								return city ? (
-									<span
-										key={cityId}
-										className='inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full'
-									>
-										{getTranslatedCityName(city.name, language)}
-										<button
-											onClick={() => toggleCity(cityId)}
-											className='ml-2 hover:text-green-600'
-										>
-											<X className='w-3 h-3' />
-										</button>
-									</span>
-								) : null
-							})}
-
-						{/* District badges - now handles multiple */}
-						{getSelectedDistrictIds().length > 0 &&
-							getSelectedDistrictIds().map(districtId => {
-								const district = districts.find(d => d.id === districtId)
-								return district ? (
-									<span
-										key={districtId}
-										className='inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full'
-									>
-										{getTranslatedDistrictName(district, language)}
-										<button
-											onClick={() => toggleDistrict(districtId)}
-											className='ml-2 hover:text-blue-600'
-										>
-											<X className='w-3 h-3' />
-										</button>
-									</span>
-								) : null
-							})}
-						{(localFilter.min_price || localFilter.max_price) && (
-							<span className='inline-flex items-center px-3 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full'>
-								${localFilter.min_price || 0} - ${localFilter.max_price || '∞'}
-								<button
-									onClick={() => {
-										handleFilterChange('min_price', undefined)
-										handleFilterChange('max_price', undefined)
-										setLocalPrices({ min: '', max: '' })
-									}}
-									className='ml-2 hover:text-orange-600'
-								>
-									<X className='w-3 h-3' />
-								</button>
-							</span>
-						)}
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }

@@ -3,6 +3,24 @@ export type PropertyType = 'house' | 'apartment' | 'commercial' | 'land'
 export type MediaType = 'image' | 'video'
 type PropertyStatusValue = 'available' | 'sold' | 'rented' | 'pending'
 
+export interface ApartmentBuildingType {
+	id: number
+	name_hy: string
+	name_en: string
+	name_ru: string
+	is_active: boolean
+	sort_order: number
+}
+
+export interface CommercialBusinessType {
+	id: number
+	name_hy: string
+	name_en: string
+	name_ru: string
+	is_active: boolean
+	sort_order: number
+}
+
 export interface State {
 	id: number
 	name: string
@@ -76,6 +94,8 @@ export interface BaseProperty {
 
 	is_hidden: boolean
 	is_exclusive: boolean
+	is_top: boolean
+	is_urgently: boolean
 }
 
 export interface HouseAttributes {
@@ -96,11 +116,15 @@ export interface ApartmentAttributes {
 	floor: number
 	total_floors: number
 	ceiling_height?: number
+	building_type_id?: number
+	building_type?: ApartmentBuildingType
 }
 
 export interface CommercialAttributes {
 	property_id: number
 	business_type?: string
+	business_type_id?: number
+	business_type_info?: CommercialBusinessType
 	area_sqft: number
 	floors?: number
 	ceiling_height?: number
@@ -159,7 +183,12 @@ export interface PropertyFilter {
 	max_area_acres?: number
 	is_hidden?: boolean
 	is_exclusive?: boolean
+	is_top?: boolean
+	is_urgently?: boolean
 	show_hidden?: boolean
+	building_type_id?: number
+	business_type_id?: number
+	
 }
 
 export interface HouseProperty extends BaseProperty {
@@ -187,3 +216,36 @@ export type Property =
 	| ApartmentProperty
 	| CommercialProperty
 	| LandProperty
+
+
+export function getBuildingTypeName(
+	buildingType: ApartmentBuildingType | undefined,
+	language: 'hy' | 'en' | 'ru' = 'hy'
+): string {
+	if (!buildingType) return ''
+
+	switch (language) {
+		case 'ru':
+			return buildingType.name_ru
+		case 'en':
+			return buildingType.name_en
+		default:
+			return buildingType.name_hy
+	}
+}
+
+export function getBusinessTypeName(
+	businessType: CommercialBusinessType | undefined,
+	language: 'hy' | 'en' | 'ru' = 'hy'
+): string {
+	if (!businessType) return ''
+
+	switch (language) {
+		case 'ru':
+			return businessType.name_ru
+		case 'en':
+			return businessType.name_en
+		default:
+			return businessType.name_hy
+	}
+}

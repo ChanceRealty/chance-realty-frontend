@@ -15,7 +15,6 @@ import {
 	// CheckCircle,
 	// Clock,
 	// XCircle,
-	Landmark,
 	Trees,
 	ChevronLeft,
 	ChevronRight,
@@ -24,6 +23,8 @@ import {
 	Crown,
 	Layers3,
 	DoorClosed,
+	Flame,
+	AlertCircle,
 } from 'lucide-react'
 import {
 	ApartmentAttributes,
@@ -43,6 +44,7 @@ import {
 } from '@/services/propertyService'
 import { FaVrCardboard } from 'react-icons/fa'
 import { getTranslatedStatus } from '@/utils/statusTranslations'
+import { get } from 'http'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
@@ -412,6 +414,28 @@ const formatPrice = (price: number, listingType: string) => {
 		}
 	}
 
+	const getTopLabel = () => {
+		switch (language) {
+			case 'hy':
+				return 'Տոփ'
+			case 'ru':
+				return 'Топ'
+			default:
+				return 'Top'
+		}
+	}
+
+	const getUrgentlyLabel = () => {
+		switch (language) {
+			case 'hy':
+				return 'Շտապ'
+			case 'ru':
+				return 'Срочно'
+			default:
+				return 'Urgently'
+		}
+	}
+
 	// Get property attributes display
 	const renderPropertyAttributes = () => {
 		const attributeClass = variant === 'compact' ? 'text-xs' : 'text-sm'
@@ -759,9 +783,21 @@ const isSold = statusValue === 'sold'
 							<div className='absolute top-3 left-3 flex flex-col gap-2 z-10'>
 								{/* Exclusive Badge */}
 								{property.is_exclusive && (
-									<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
+									<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-purple-600 shadow-lg flex items-center gap-1 animate-pulse'>
 										<Crown className='w-3 h-3' />
 										{getExclusiveLabel()}
+									</span>
+								)}
+								{property.is_top && (
+									<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-yellow-600 shadow-lg flex items-center gap-1 animate-pulse'>
+										<Flame className='w-3 h-3' />
+										{getTopLabel()}
+									</span>
+								)}
+								{property.is_urgently && (
+									<span className='px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600 shadow-lg flex items-center gap-1 animate-pulse'>
+										<AlertCircle className='w-3 h-3' />
+										{getUrgentlyLabel()}
 									</span>
 								)}
 

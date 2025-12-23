@@ -5,8 +5,10 @@ import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { getTranslatedFeature } from '@/utils/featureTranslations'
 import { getTranslatedStatus } from '@/utils/statusTranslations'
-import { Property, PropertyStatus } from '@/types/property'
+import { ApartmentAttributes, CommercialAttributes, getBuildingTypeName, getBusinessTypeName, Property, PropertyStatus } from '@/types/property'
 import {
+	getApartmentBuildingTypes,
+	getCommercialBusinessTypes,
 	getPropertyByCustomId,
 	getTranslatedCityName,
 	getTranslatedField,
@@ -57,6 +59,7 @@ import React from 'react'
 import ymaps from 'yandex-maps'
 import ContactPopup from '@/app/_components/ContactPopup'
 import { FaVrCardboard } from 'react-icons/fa'
+import build from 'next/dist/build'
 
 interface PropertyDetailClientProps {
 	property: Property
@@ -448,6 +451,8 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 		if (path?.startsWith('http')) return path
 		return `${API_BASE_URL}${path}`
 	}, [])
+	const [buildingTypes, setBuildingTypes] = useState<any[]>([])
+	const [businessTypes, setBusinessTypes] = useState<any[]>([])
 
 	useEffect(() => {
 		const fetchProperty = async () => {
@@ -629,6 +634,35 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 		}
 	}
 
+
+
+		const fetchBuildingTypes = async () => {
+			try {
+				// Replace with your actual API endpoint
+				const data = await getApartmentBuildingTypes()
+				setBuildingTypes(data || [])
+			} catch (error) {
+				console.error('Error fetching building types:', error)
+				setBuildingTypes([])
+			}
+		}
+	
+		const fetchBusinessTypes = async () => {
+			try {
+				// Replace with your actual API endpoint
+				const data = await getCommercialBusinessTypes()
+				setBusinessTypes(data || [])
+			} catch (error) {
+				console.error('Error fetching business types:', error)
+				setBusinessTypes([])
+			}
+		}
+
+				useEffect(() => {
+					fetchBuildingTypes()
+					fetchBusinessTypes()
+				}, [])
+
 	
 
 	const getAttributeLabel = (key: string) => {
@@ -657,6 +691,11 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 				hy: 'Բիզնեսի տեսակ',
 				ru: 'Тип бизнеса',
 				en: 'Business Type',
+			},
+			building_type: {
+				hy: 'Շինության տիպ',
+				ru: 'Тип здания',
+				en: 'Building Type',
 			},
 			rooms: {
 				hy: 'Սենյակներ',
@@ -713,6 +752,31 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 	const handleImageClick = useCallback(() => {
 		setShowFullGallery(true)
 	}, [])
+	
+	const businessType = useMemo(() => {
+	if (!property) return null
+
+	if (property.property_type !== 'commercial') return null
+
+	const attrs = property.attributes as CommercialAttributes
+
+	if (!attrs.business_type_id) return null
+
+	return businessTypes.find(bt => bt.id === attrs.business_type_id) || null
+}, [property, businessTypes])
+
+const buildingType = useMemo(() => {
+	if (!property) return null
+
+	if (property.property_type !== 'commercial') return null
+
+	const attrs = property.attributes as ApartmentAttributes
+
+	if (!attrs.building_type_id) return null
+
+	return businessTypes.find(bt => bt.id === attrs.building_type_id) || null
+}, [property, businessTypes])
+
 
 	const getPropertyAttributes = useCallback(() => {
 		if (!property) return null
@@ -910,6 +974,24 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 										</div>
 									</div>
 								)}
+								{property.attributes.building_type_id && (
+									<div className='flex items-center'>
+										<div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-2'>
+											<Building2 className='w-6 h-6 text-blue-600' />
+										</div>
+										<div>
+											<p className='text-xs text-gray-500'>
+												{getAttributeLabel('building_type')}
+											</p>
+											<p className='font-medium text-gray-700'>
+												{getBuildingTypeName(
+													property.attributes.building_type,
+													language
+												)}
+											</p>
+										</div>
+									</div>
+								)}
 							</>
 						)}
 					</div>
@@ -937,7 +1019,7 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 									</div>
 								)}
 
-								{property.attributes.business_type && (
+								{property.attributes.business_type_id && (
 									<div className='flex items-center'>
 										<div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-2'>
 											<Landmark className='w-6 h-6 text-blue-600' />
@@ -947,7 +1029,10 @@ export default function PropertyDetailClient({}: PropertyDetailClientProps) {
 												{getAttributeLabel('business_type')}
 											</p>
 											<p className='font-medium text-gray-700'>
-												{property.attributes.business_type}
+												{getBusinessTypeName(
+													property.attributes.business_type_info,
+													language
+												)}
 											</p>
 										</div>
 									</div>

@@ -330,6 +330,50 @@ export async function getPropertyByCustomId(customId: string) {
 	}
 }
 
+export async function getApartmentBuildingTypes() {
+	try {
+		const language = getCurrentLanguage()
+
+		const response = await fetch(
+			`${API_BASE_URL}/api/public/properties/apartment-building-types?lang=${language}`
+		)
+
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch apartment building types: ${response.status} ${response.statusText}`
+			)
+		}
+
+		const buildingTypes = await response.json()
+		return buildingTypes
+	} catch (error) {
+		console.error('Error fetching apartment building types:', error)
+		throw error
+	}
+}
+
+export async function getCommercialBusinessTypes() {
+		try {
+			const language = getCurrentLanguage()
+
+			const response = await fetch(
+				`${API_BASE_URL}/api/public/properties/commercial-business-types?lang=${language}`
+			)
+
+			if (!response.ok) {
+				throw new Error(
+					`Failed to fetch commercial business types: ${response.status} ${response.statusText}`
+				)
+			}
+
+			const buildingTypes = await response.json()
+			return buildingTypes
+		} catch (error) {
+			console.error('Error fetching apartment building types:', error)
+			throw error
+		}
+}
+
 export async function getStates() {
 	try {
 		const language = getCurrentLanguage()
