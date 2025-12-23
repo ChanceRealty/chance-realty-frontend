@@ -88,8 +88,11 @@ export const translations = {
 		hiddenFees: 'Թաքնված վճարներ',
 		experienceThe: 'Փորձեք',
 		ChanceRealtyDifference: 'Շանս Ռիելթի տարբերությունը',
-		watchAllAds: "Տեսնել բոլոր տեսահոլովակները",
-
+		watchAllAds: 'Տեսնել բոլոր տեսահոլովակները',
+		adVideoTitle: 'Ձեր Երազանքի Տունը Սպասում է',
+		adVideoSubtitle: 'Հայաստանի Լավագույն Անշարժ Գույքի Հարթակ',
+		adVideoDescription:
+			'Բացահայտեք հազարավոր պրեմիում բնակարաններ և տներ ամբողջ երկրում: Մեր պլատֆորմը միավորում է վստահելի վաճառողներին և լուրջ գնորդներին՝ ապահովելով անվտանգ և արագ գործարքներ',
 		// Ads page
 		adsTitle: 'Գովազդային Տեսահոլովակներ',
 		adsSubtitle: 'Տեսեք մեր լավագույն գովազդները:',
@@ -465,8 +468,11 @@ export const translations = {
 		hiddenFees: 'Hidden Fees',
 		experienceThe: 'Experience the',
 		ChanceRealtyDifference: 'Chance Realty Difference',
-		watchAllAds: "Watch All Ads",
-
+		watchAllAds: 'Watch All Ads',
+		adVideoTitle: 'Your Dream Home Awaits',
+		adVideoSubtitle: "Armenia's Premier Real Estate Platform",
+		adVideoDescription:
+			'Discover thousands of premium apartments and houses across the country. Our platform connects trusted sellers with serious buyers, ensuring safe and fast transactions',
 		// Ads page
 		adsTitle: 'Video Ads',
 		adsSubtitle: 'Watch our best ads',
@@ -827,6 +833,11 @@ Chance Realty is a team of experienced professionals specializing in the sale an
 		experienceThe: 'Ощутите',
 		ChanceRealtyDifference: 'разницу с Chance Realty',
 		watchAllAds: 'Смотреть все видеоролики',
+		adVideoTitle: 'Дом Вашей Мечты Ждет',
+		adVideoSubtitle: 'Премиум Платформа Недвижимости Армении',
+		adVideoDescription:
+			'Откройте для себя тысячи премиальных квартир и домов по всей стране. Наша платформа связывает надежных продавцов с серьезными покупателями, обеспечивая безопасные и быстрые сделки',
+
 		// Ads page
 		adsTitle: 'Рекламные видео',
 		adsSubtitle: 'Смотрите наши лучшие рекламные ролики',

@@ -217,27 +217,25 @@ export default function PropertyFilter({
 		}
 	}, [localFilter.state_id, states])
 
-	// Handle click outside to close dropdowns
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				stateDropdownRef.current &&
-				!stateDropdownRef.current.contains(event.target as Node)
-			) {
-				setShowStateDropdown(false)
-			}
-			if (
-				cityDropdownRef.current &&
-				!cityDropdownRef.current.contains(event.target as Node)
-			) {
-				setShowCityDropdown(false)
-			}
-			if (
-				districtDropdownRef.current &&
-				!districtDropdownRef.current.contains(event.target as Node)
-			) {
-				setShowDistrictDropdown(false)
-			}
+useEffect(() => {
+	const handleClickOutside = (event: MouseEvent) => {
+		if (
+			stateDropdownRef.current &&
+			!stateDropdownRef.current.contains(event.target as Node)
+		) {
+			setShowStateDropdown(false)
+		}
+		if (
+			cityDropdownRef.current &&
+			!cityDropdownRef.current.contains(event.target as Node)
+		) {
+			setShowCityDropdown(false)
+		}
+		if (
+			districtDropdownRef.current &&
+			!districtDropdownRef.current.contains(event.target as Node)
+		) {
+			setShowDistrictDropdown(false)
 		}
 		if (
 			buildingTypeDropdownRef.current &&
@@ -245,18 +243,17 @@ export default function PropertyFilter({
 		) {
 			setShowBuildingTypeDropdown(false)
 		}
-
 		if (
 			businessTypeDropdownRef.current &&
 			!businessTypeDropdownRef.current.contains(event.target as Node)
 		) {
 			setShowBusinessTypeDropdown(false)
 		}
+	}
 
-
-		document.addEventListener('mousedown', handleClickOutside)
-		return () => document.removeEventListener('mousedown', handleClickOutside)
-	}, [])
+	document.addEventListener('mousedown', handleClickOutside)
+	return () => document.removeEventListener('mousedown', handleClickOutside)
+}, [])
 
 	const fetchStates = async () => {
 		try {
