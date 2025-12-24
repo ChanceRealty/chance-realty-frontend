@@ -44,6 +44,7 @@ const Footer = () => {
 				const properties = await getProperties({
 					property_type: type,
 					show_hidden: false,
+					limit: 10000,
 				})
 				counts[type] = properties.length
 			})

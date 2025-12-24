@@ -21,6 +21,7 @@ export function getCurrentLanguage(): 'hy' | 'en' | 'ru' {
 	return 'hy' // Default to Armenian
 }
 
+
 // Enhanced getProperties with better logging and parameter handling
 export async function getProperties(filter: PropertyFilter = {}) {
 	try {
@@ -88,14 +89,22 @@ export async function getProperties(filter: PropertyFilter = {}) {
 		if (filter.floor) params.append('floor', filter.floor.toString())
 		if (filter.total_floors)
 			params.append('total_floors', filter.total_floors.toString())
+		if (filter.building_type_id) {
+			params.append('building_type_id', filter.building_type_id.toString())
+		}
 
 		// Common attribute
 		if (filter.ceiling_height)
 			params.append('ceiling_height', filter.ceiling_height.toString())
 
 		// Commercial-specific
+		if (filter.business_type_id) {
+			params.append('business_type_id', filter.business_type_id.toString())
+		}
+
 		if (filter.business_type)
 			params.append('business_type', filter.business_type)
+
 		if(filter.rooms)
 			params.append('rooms', filter.rooms.toString())
 
@@ -263,6 +272,40 @@ export async function getProperties(filter: PropertyFilter = {}) {
 				property.attributes?.ceiling_height !== filter.ceiling_height
 			)
 				return false
+
+				if (filter.building_type_id && property.property_type === 'apartment') {
+					const propertyBuildingTypeId = property.attributes?.building_type_id
+
+					console.log('🏢 Checking building_type_id:', {
+						filter: filter.building_type_id,
+						property: propertyBuildingTypeId,
+						propertyId: property.custom_id,
+						match: propertyBuildingTypeId === filter.building_type_id,
+					}) // ✅ Debug logging
+
+					if (propertyBuildingTypeId !== filter.building_type_id) {
+						return false
+					}
+				}
+
+				// ✅ FIX: Business Type ID (commercial)
+				if (
+					filter.business_type_id &&
+					property.property_type === 'commercial'
+				) {
+					const propertyBusinessTypeId = property.attributes?.business_type_id
+
+					console.log('🏪 Checking business_type_id:', {
+						filter: filter.business_type_id,
+						property: propertyBusinessTypeId,
+						propertyId: property.custom_id,
+						match: propertyBusinessTypeId === filter.business_type_id,
+					}) // ✅ Debug logging
+
+					if (propertyBusinessTypeId !== filter.business_type_id) {
+						return false
+					}
+				}
 
 			// Business type, rooms (commercial)
 			if (

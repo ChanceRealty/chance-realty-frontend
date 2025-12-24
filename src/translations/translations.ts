@@ -191,7 +191,7 @@ export const translations = {
 		contactSubtitle: 'Պատրա՞ստ եք սկսել զրույց',
 		getInTouch: 'Կապվել մեզ հետ',
 		contactForm: 'Հետադարձ կապի ձև',
-		sendMessage: 'Ուղարկել հաղորդագրություն',
+		sendMessage: 'Ուղարկել',
 		name: 'Անուն',
 		email: 'Էլ. փոստ',
 		phone: 'Հեռախոս',

@@ -11,6 +11,7 @@ import { FaVrCardboard } from 'react-icons/fa'
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const pathname = usePathname()
+	const [openDropdown, setOpenDropdown] = useState<string | null>(null)
 
 	const pathParts = pathname.split('/')
 	const currentLang = (
@@ -146,12 +147,31 @@ const Header = () => {
 							<div key={item.label} className='relative group'>
 								<Link
 									href={item.href}
-									className={`relative px-3 xl:px-4 py-2 rounded-lg text-sm xl:text-base font-medium transition-all duration-200 
-	${getNavItemClass(item.href)} 
-	after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 hover:after:w-full`}
+									className={`relative px-3 xl:px-4 py-2 rounded-lg text-sm xl:text-base font-medium transition-all duration-200
+		${getNavItemClass(item.href)}
+		after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 group-hover:after:w-full`}
 								>
 									{item.label}
 								</Link>
+
+								{item.dropdown && (
+									<div
+										className='absolute left-0 top-full mt-2 w-56 rounded-xl bg-white shadow-lg border border-gray-100
+			opacity-0 invisible translate-y-2
+			group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
+			transition-all duration-200 z-50'
+									>
+										{item.dropdown.map(sub => (
+											<Link
+												key={sub.label}
+												href={sub.href}
+												className='block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition'
+											>
+												{sub.label}
+											</Link>
+										))}
+									</div>
+								)}
 							</div>
 						))}
 					</nav>
@@ -195,7 +215,7 @@ const Header = () => {
 
 			{/* Mobile Menu */}
 			<div
-				className={`lg:hidden mobile-menu transition-all duration-300 ease-in-out ${
+				className={`lg:hidden mobile-menu transition-all duration-300 ease-in-out pointer-events-auto ${
 					isMenuOpen
 						? 'max-h-screen opacity-100'
 						: 'max-h-0 opacity-0 overflow-hidden'
@@ -204,52 +224,71 @@ const Header = () => {
 				<div className='bg-white border-t border-gray-200'>
 					<div className='container mx-auto px-4 py-4 space-y-2'>
 						<div className='pb-4 mb-4 border-b border-gray-100 flex items-center'>
-							<div className='flex-1 flex items-center gap-1'>
-								<SearchSection />
-								<Link
-									href={`/${currentLang}/properties?3d=true`}
-									className='flex items-center gap-1 text-gray-700 font-medium'
-									onClick={() => setIsMenuOpen(false)}
-								>
-									<FaVrCardboard className='w-4 h-4' />
-									<span>{t.dTour}</span>
-								</Link>
-							</div>
+							<SearchSection />
 						</div>
 
-						<div className='pb-4 mb-4 border-b border-gray-100'>
+						<div className='flex flex-row pb-4 mb-4 border-b border-gray-100 gap-6'>
 							<LanguageSwitcher />
+							<Link
+								href={`/${currentLang}/properties?3d=true`}
+								className='flex items-center gap-1 text-gray-700 font-medium'
+								onClick={() => setIsMenuOpen(false)}
+							>
+								<FaVrCardboard className='w-4 h-4' />
+								<span>{t.dTour}</span>
+							</Link>
 						</div>
+
 						{navItems.map(item => (
 							<div key={item.label} className='space-y-2'>
-								<Link
-									href={item.href}
-									className={`block px-4 py-3 rounded-lg transition-all duration-200 font-medium ${getNavItemClass(
-										item.href
-									)}`}
-									onClick={() => setIsMenuOpen(false)}
-								>
-									{item.label}
-								</Link>
-								{item.dropdown && (
-									<div className='ml-4 space-y-1'>
-										{item.dropdown.map(dropdownItem => {
-											const isSubActive = pathname.startsWith(dropdownItem.href)
-											return (
-												<Link
-													key={dropdownItem.label}
-													href={dropdownItem.href}
-													className={`block px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
-														isSubActive
-															? 'text-blue-600 bg-blue-50'
-															: 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-													}`}
-													onClick={() => setIsMenuOpen(false)}
-												>
-													{dropdownItem.label}
-												</Link>
+								{item.dropdown ? (
+									<button
+										className={`w-full text-left px-4 py-3 rounded-lg font-medium flex justify-between items-center
+              ${getNavItemClass(item.href)}`}
+										onClick={() =>
+											setOpenDropdown(
+												openDropdown === item.label ? null : item.label
 											)
-										})}
+										}
+									>
+										<span>{item.label}</span>
+										<span
+											className={`transition-transform ${
+												openDropdown === item.label ? 'rotate-180' : ''
+											}`}
+										>
+											▾
+										</span>
+									</button>
+								) : (
+									// ✅ Use Link instead of button for top-level non-dropdown links
+									<Link
+										href={item.href}
+										className={`block px-4 py-3 rounded-lg font-medium ${getNavItemClass(
+											item.href
+										)}`}
+										onClick={() => setIsMenuOpen(false)}
+									>
+										{item.label}
+									</Link>
+								)}
+
+								{/* Mobile Dropdown */}
+								{item.dropdown && openDropdown === item.label && (
+									<div className='ml-4 space-y-1'>
+										{item.dropdown.map(sub => (
+											<Link
+												key={sub.label}
+												href={sub.href}
+												className='block px-4 py-2 text-sm rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+												onClick={() => {
+													setIsMenuOpen(false)
+													setOpenDropdown(null)
+												}}
+											>
+												{sub.label}
+											</Link>
+										))}
 									</div>
 								)}
 							</div>

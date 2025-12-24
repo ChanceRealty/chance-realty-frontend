@@ -193,14 +193,27 @@ export default function PropertiesContent({}: PropertyCardProps) {
 
 	// Custom sorting function for properties
 	const customSortProperties = (properties: Property[]): Property[] => {
-		// Separate properties by type
-		const topProperties = properties.filter(p => p.is_top).slice(0, 6)
+		// ✅ Filter out sold properties from special categories
+		const statusCheck = (p: Property) => {
+			const statusValue =
+				typeof p.status === 'string' ? p.status : p.status.name
+			return statusValue !== 'sold'
+		}
+
+		// Top, urgently, exclusive - only non-sold (max 6 each)
+		const topProperties = properties
+			.filter(p => p.is_top && statusCheck(p))
+			.slice(0, 6)
 		const urgentlyProperties = properties
-			.filter(p => !p.is_top && p.is_urgently)
+			.filter(p => !p.is_top && p.is_urgently && statusCheck(p))
 			.slice(0, 6)
 		const exclusiveProperties = properties
-			.filter(p => !p.is_top && !p.is_urgently && p.is_exclusive)
+			.filter(
+				p => !p.is_top && !p.is_urgently && p.is_exclusive && statusCheck(p)
+			)
 			.slice(0, 6)
+
+		// ✅ Regular properties (including sold ones)
 		const remainingProperties = properties.filter(
 			p => !p.is_top && !p.is_urgently && !p.is_exclusive
 		)
@@ -219,7 +232,7 @@ export default function PropertiesContent({}: PropertyCardProps) {
 			}
 		})
 
-		// Combine in order: top -> urgently -> exclusive -> remaining
+		// ✅ Combine: top → urgently → exclusive → regular (with sold mixed in)
 		return [
 			...topProperties,
 			...urgentlyProperties,
@@ -397,7 +410,6 @@ export default function PropertiesContent({}: PropertyCardProps) {
 		setShowUrgentlyOnly(!showUrgentlyOnly)
 		setCurrentPage(1)
 	}
-
 
 	const getFilterSummary = () => {
 		const summary = []

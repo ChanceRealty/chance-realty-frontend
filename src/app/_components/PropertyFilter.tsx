@@ -453,15 +453,15 @@ useEffect(() => {
 			type: 'apartment' as const,
 			icon: Building2,
 			label: t.apartment,
-			color: 'green',
+			color: 'blue',
 		},
 		{
 			type: 'commercial' as const,
 			icon: Landmark,
 			label: t.commercial,
-			color: 'purple',
+			color: 'blue',
 		},
-		{ type: 'land' as const, icon: Trees, label: t.land, color: 'orange' },
+		{ type: 'land' as const, icon: Trees, label: t.land, color: 'blue' },
 	]
 
 	const listingTypes: {
@@ -470,9 +470,9 @@ useEffect(() => {
 		color: string
 		icon: string
 	}[] = [
-		{ type: 'sale', label: t.forSale, color: 'green', icon: '🏠' },
+		{ type: 'sale', label: t.forSale, color: 'blue', icon: '🏠' },
 		{ type: 'rent', label: t.forRent, color: 'blue', icon: '🔑' },
-		{ type: 'daily_rent', label: t.forDailyRent, color: 'purple', icon: '📅' },
+		{ type: 'daily_rent', label: t.forDailyRent, color: 'blue', icon: '📅' },
 	]
 
 	const isPropertyType = (type: PropertyType): boolean => {
@@ -505,7 +505,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='0'
 									/>
 								</div>
@@ -527,7 +527,7 @@ useEffect(() => {
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='0'
 										step='0.5'
 									/>
@@ -557,7 +557,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -573,7 +573,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -601,7 +601,7 @@ useEffect(() => {
 											e.target.value ? parseInt(e.target.value) : undefined
 										)
 									}
-									className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+									className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 									min='1'
 								/>
 							</div>
@@ -629,7 +629,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -645,7 +645,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -673,7 +673,7 @@ useEffect(() => {
 											e.target.value ? parseFloat(e.target.value) : undefined
 										)
 									}
-									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 									min='2'
 									max='6'
 									step='0.1'
@@ -704,7 +704,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='0'
 									/>
 								</div>
@@ -726,7 +726,7 @@ useEffect(() => {
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='0'
 										step='0.5'
 									/>
@@ -756,7 +756,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -772,7 +772,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -801,7 +801,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='1'
 									/>
 								</div>
@@ -827,7 +827,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+										className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 										min='1'
 									/>
 								</div>
@@ -855,7 +855,7 @@ useEffect(() => {
 											e.target.value ? parseFloat(e.target.value) : undefined
 										)
 									}
-									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 									min='2'
 									max='6'
 									step='0.1'
@@ -938,7 +938,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -954,7 +954,7 @@ useEffect(() => {
 												e.target.value ? parseInt(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 									/>
 								</div>
@@ -1030,7 +1030,7 @@ useEffect(() => {
 											e.target.value ? parseInt(e.target.value) : undefined
 										)
 									}
-									className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+									className='w-full text-gray-600 pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm'
 									min='1'
 								/>
 							</div>
@@ -1057,7 +1057,7 @@ useEffect(() => {
 											e.target.value ? parseFloat(e.target.value) : undefined
 										)
 									}
-									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+									className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 									min='2'
 									max='6'
 									step='0.1'
@@ -1092,7 +1092,7 @@ useEffect(() => {
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-green-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 										step='0.01'
 									/>
@@ -1109,7 +1109,7 @@ useEffect(() => {
 												e.target.value ? parseFloat(e.target.value) : undefined
 											)
 										}
-										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+										className='w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl text-sm text-gray-600'
 										min={0}
 										step='0.01'
 									/>
@@ -1175,11 +1175,6 @@ useEffect(() => {
 								>
 									{label}
 								</span>
-								{isPropertyType(type) && (
-									<div className='absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center'>
-										<span className='text-white text-[10px]'>✓</span>
-									</div>
-								)}
 							</button>
 						))}
 					</div>
@@ -1227,11 +1222,6 @@ useEffect(() => {
 								>
 									{label}
 								</span>
-								{localFilter.listing_type === type && (
-									<div className='ml-auto w-4 h-4 bg-green-500 rounded-full flex items-center justify-center'>
-										<span className='text-white text-[10px]'>✓</span>
-									</div>
-								)}
 							</button>
 						))}
 					</div>
@@ -1489,7 +1479,7 @@ useEffect(() => {
 										placeholder={t.startFiltering}
 										value={localPrices.min}
 										onChange={e => handlePriceChange('min', e.target.value)}
-										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									/>
 								</div>
 								<div className='relative flex-1'>
@@ -1499,7 +1489,7 @@ useEffect(() => {
 										placeholder={t.endFiltering}
 										value={localPrices.max}
 										onChange={e => handlePriceChange('max', e.target.value)}
-										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
+										className='w-full text-gray-600 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm hover:border-gray-300 transition-all duration-200 bg-white shadow-sm'
 									/>
 								</div>
 							</div>

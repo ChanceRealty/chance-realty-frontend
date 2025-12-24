@@ -361,12 +361,13 @@ const ContactClient = () => {
 					<div className='w-full max-w-3xl'>
 						<div className='bg-white rounded-3xl shadow-xl p-8 border border-gray-100'>
 							<div className='text-center mb-8'>
-								<div className='w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+								<div className='w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
 									<Send className='w-8 h-8 text-white' />
 								</div>
-								<h2 className='text-3xl font-bold text-gray-900 mb-2'>
+								<h2 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-2'>
 									{t.sendMessage}
 								</h2>
+
 								<p className='text-gray-600'>
 									{language === 'hy'
 										? 'Լրացրեք ստորև բերված ձևը և մենք կպատասխանենք ձեզ հնարավորինս արագ:'
@@ -652,20 +653,20 @@ const ContactClient = () => {
 										)}
 									</div>
 
-									<div className='flex flex-col sm:flex-row gap-4'>
+									<div className='flex flex-col sm:flex-row gap-3'>
 										<button
 											type='submit'
 											disabled={isSubmitting}
-											className='flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-8 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none'
+											className='flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2.5 px-6 sm:py-4 sm:px-8 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none'
 										>
 											{isSubmitting ? (
 												<>
-													<div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+													<div className='w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
 													<span>{t.sending}</span>
 												</>
 											) : (
 												<>
-													<Send className='h-5 w-5' />
+													<Send className='h-4 w-4 sm:h-5 sm:w-5' />
 													<span>{t.sendMessage}</span>
 												</>
 											)}
@@ -674,7 +675,7 @@ const ContactClient = () => {
 										<button
 											type='button'
 											onClick={() => reset()}
-											className='px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors'
+											className='px-6 py-2.5 sm:px-8 sm:py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold text-sm sm:text-base hover:bg-gray-50 transition-colors'
 										>
 											{t.clear}{' '}
 											{language === 'hy'
@@ -683,14 +684,6 @@ const ContactClient = () => {
 												? 'форму'
 												: 'Form'}
 										</button>
-									</div>
-
-									{/* Form Footer */}
-									<div className='bg-blue-50 rounded-xl p-4 border border-blue-200'>
-										<div className='flex items-center space-x-2 text-sm text-blue-800'>
-											<Shield className='w-4 h-4' />
-											<span className='font-medium'>{t.secureInfo}</span>
-										</div>
 									</div>
 								</form>
 							)}
@@ -742,20 +735,20 @@ const ContactClient = () => {
 						</div>
 
 						{/* CTA after FAQ */}
-						<div className='text-center mt-12'>
-							<p className='text-gray-600 mb-6'>
+						<div className='text-center mt-12 px-4 sm:px-0'>
+							<p className='text-gray-600 mb-4 text-sm sm:text-base'>
 								{language === 'hy'
 									? 'Դեռ հարցեր ունե՞ք: Մենք այստեղ ենք օգնելու:'
 									: language === 'ru'
 									? 'Остались вопросы? Мы здесь, чтобы помочь!'
 									: "Still have questions? We're here to help!"}
 							</p>
-							<div className='flex flex-col sm:flex-row gap-4 justify-center'>
+							<div className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center'>
 								<a
 									href='tel:+37400000000'
-									className='inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold'
+									className='inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base'
 								>
-									<Phone className='w-4 h-4 mr-2' />
+									<Phone className='w-4 h-4 sm:w-5 sm:h-5 mr-2' />
 									{language === 'hy'
 										? 'Զանգահարել հիմա'
 										: language === 'ru'
@@ -764,9 +757,9 @@ const ContactClient = () => {
 								</a>
 								<a
 									href='mailto:info@chancerealty.am'
-									className='inline-flex items-center px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-semibold'
+									className='inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-colors font-semibold text-sm sm:text-base'
 								>
-									<Mail className='w-4 h-4 mr-2' />
+									<Mail className='w-4 h-4 sm:w-5 sm:h-5 mr-2' />
 									{language === 'hy'
 										? 'Ուղարկել էլ. նամակ'
 										: language === 'ru'

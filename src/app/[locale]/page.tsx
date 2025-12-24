@@ -33,28 +33,44 @@ export default function HomePage() {
 					return
 				}
 
-				const exclusive = recent.filter(p => p.is_exclusive)
-				const nonExclusive = recent.filter(p => !p.is_exclusive)
-
-				exclusive.sort(
-					(a, b) =>
-						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+				// ✅ NEW SORTING LOGIC: Top → Urgently → Exclusive → Regular
+				const topProperties = recent.filter(p => p.is_top)
+				const urgentlyProperties = recent.filter(
+					p => !p.is_top && p.is_urgently
 				)
-				nonExclusive.sort(
-					(a, b) =>
-						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+				const exclusiveProperties = recent.filter(
+					p => !p.is_top && !p.is_urgently && p.is_exclusive
+				)
+				const regularProperties = recent.filter(
+					p => !p.is_top && !p.is_urgently && !p.is_exclusive
 				)
 
+				// Sort each category by date (newest first)
+				const sortByDate = (a: Property, b: Property) =>
+					new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+
+				topProperties.sort(sortByDate)
+				urgentlyProperties.sort(sortByDate)
+				exclusiveProperties.sort(sortByDate)
+				regularProperties.sort(sortByDate)
+
+				// ✅ If top properties >= 9, show only top
+				// Otherwise, fill with urgently → exclusive → regular
 				const MAX_PROPERTIES = 9
-				const finalProperties = [
-					...exclusive,
-					...nonExclusive.slice(
-						0,
-						Math.max(0, MAX_PROPERTIES - exclusive.length)
-					),
-				]
+				let finalProperties: Property[] = []
 
-				setRecentProperties(finalProperties.slice(0, MAX_PROPERTIES))
+				if (topProperties.length >= MAX_PROPERTIES) {
+					finalProperties = topProperties.slice(0, MAX_PROPERTIES)
+				} else {
+					finalProperties = [
+						...topProperties,
+						...urgentlyProperties,
+						...exclusiveProperties,
+						...regularProperties,
+					].slice(0, MAX_PROPERTIES)
+				}
+
+				setRecentProperties(finalProperties)
 			} catch (error) {
 				console.error('Error fetching properties:', error)
 				setRecentProperties([])
@@ -198,16 +214,15 @@ export default function HomePage() {
 							</div>
 						</>
 					)}
-
 					<div className='text-center'>
 						<Link
 							href={`/${language}/properties`}
-							className='group inline-flex items-center px-10 py-5 bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-lg relative overflow-hidden'
+							className='group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-base relative overflow-hidden'
 						>
 							<span className='relative z-10 flex items-center'>
-								<span className='mr-3'>🏡</span>
+								<span className='mr-2 text-lg'>🏡</span>
 								{t.viewAll} {t.properties}
-								<ArrowRight className='ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300' />
+								<ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300' />
 							</span>
 						</Link>
 					</div>
@@ -348,22 +363,22 @@ export default function HomePage() {
 					<div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
 						<Link
 							href={`/${language}/properties`}
-							className='group inline-flex items-center px-10 py-5 bg-gradient-to-r from-white to-gray-100 text-blue-900 font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 text-lg relative overflow-hidden min-w-[200px]'
+							className='group inline-flex items-center px-5 py-3 bg-gradient-to-r from-white to-gray-100 text-blue-900 font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-base relative overflow-hidden min-w-[150px]'
 						>
 							<span className='relative z-10 flex items-center group-hover:text-white transition-colors duration-300'>
-								<span className='mr-3'>🏠</span>
+								<span className='mr-2 text-lg'>🏠</span>
 								{t.startBrowsing}
-								<ArrowRight className='ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300' />
+								<ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300' />
 							</span>
 						</Link>
 
 						<Link
 							href={`/${language}/contact`}
-							className='group inline-flex items-center px-10 py-5 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-lg backdrop-blur-sm min-w-[200px]'
+							className='group inline-flex items-center px-5 py-3 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-base backdrop-blur-sm min-w-[150px]'
 						>
-							<span className='mr-3'>📞</span>
+							<span className='mr-2 text-lg'>📞</span>
 							{t.contactExpert}
-							<ArrowRight className='ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300' />
+							<ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300' />
 						</Link>
 					</div>
 				</div>
