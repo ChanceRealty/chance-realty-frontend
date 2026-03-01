@@ -888,6 +888,26 @@ export function getTranslatedField(
 	return obj[fieldName] || ''
 }
 
+export async function getAdVideos() {
+	try {
+		const response = await fetch(`${API_BASE_URL}/api/public/ad-videos`, {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+		})
+
+		if (!response.ok) return []
+
+		const data = await response.json()
+		return Array.isArray(data) ? data : []
+	} catch (error) {
+		console.error('Error fetching ad videos:', error)
+		return []
+	}
+}
+
 // Export helper to check if translation exists
 export function hasTranslation(
 	obj: Record<string, string | undefined>,

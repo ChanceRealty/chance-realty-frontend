@@ -1124,10 +1124,6 @@ useEffect(() => {
 		}
 	}
 
-	useEffect(() => {
-		console.log('BUSINESS TYPES:', buildingTypes)
-	}, [buildingTypes])
-
 	return (
 		<div className='flex flex-col gap-6'>
 			{/* Property Type */}
@@ -1513,7 +1509,7 @@ useEffect(() => {
 							localFilter.ceiling_height ||
 							localFilter.min_lot_size_sqft ||
 							localFilter.max_lot_size_sqft ||
-							localFilter.business_type ||
+							localFilter.business_type_id ||
 							localFilter.min_area_acres ||
 							localFilter.max_area_acres ||
 							localFilter.min_area_sqft ||
